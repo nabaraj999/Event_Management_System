@@ -7,9 +7,9 @@
     <title>EventHUB</title>
 
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;800;900&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CDN -->
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Icons -->
@@ -21,9 +21,8 @@
                 extend: {
                     fontFamily: { raleway: ["Raleway", "sans-serif"] },
                     colors: {
-                        primary: "#FF7A28",
-                        darkBlue: "#063970",
-                        softGray: "#F7F7F7",
+                        primary: "#FF7A28",  /* Orange */
+                        darkBlue: "#063970" /* Blue */
                     },
                 }
             }
@@ -31,20 +30,17 @@
     </script>
 
     <style>
-        /* Hide Scrollbar for Categories */
         .scrollbar-hide::-webkit-scrollbar {
             display: none;
         }
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
     </style>
+
 </head>
 
-<body class="font-raleway bg-softGray">
 
-    <!-- NAVIGATION -->
+<body class="font-raleway bg-gray-50">
+
+    <!-- NAVBAR -->
     <nav class="sticky top-0 z-50 bg-white shadow-md">
         <div class="max-w-7xl mx-auto flex items-center justify-between py-4 px-6">
 
@@ -56,7 +52,6 @@
                 <span class="ml-3 text-3xl font-extrabold text-darkBlue tracking-tight">EventHUB</span>
             </a>
 
-            <!-- Desktop Menu -->
             <div class="hidden md:flex items-center space-x-8 text-gray-700 font-medium">
                 <a href="#" class="hover:text-primary">Home</a>
                 <a href="#" class="hover:text-primary">Events</a>
@@ -66,16 +61,16 @@
             </div>
 
             <div class="flex items-center space-x-4">
-                <a href="#"
-                    class="bg-darkBlue px-6 py-2 rounded-lg text-white font-medium hover:bg-primary transition">Login</a>
-
+                <a href="#" class="bg-darkBlue px-6 py-2 rounded-lg text-white font-semibold hover:bg-primary transition">
+                    Login
+                </a>
                 <button id="mobile-toggle" class="md:hidden text-gray-700 text-2xl">
                     <i class="fas fa-bars"></i>
                 </button>
             </div>
         </div>
 
-        <!-- Mobile Menu -->
+        <!-- Mobile -->
         <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200 px-6 py-4">
             <a href="#" class="block py-2 hover:text-primary">Home</a>
             <a href="#" class="block py-2 hover:text-primary">Events</a>
