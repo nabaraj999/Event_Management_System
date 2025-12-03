@@ -1,97 +1,61 @@
 
+    <!-- TRENDING EVENTS -->
+    <section class="py-20 bg-softGray">
+        <div class="max-w-7xl mx-auto px-6">
 
-    <!-- Popular Events Section -->
-    <section class="py-16 bg-white">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-4xl font-bold text-deep-blue mb-4">Popular Events</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">Discover the hottest events happening near you. Book your tickets now!</p>
-            </div>
+            <h2 class="text-3xl font-extrabold text-darkBlue mb-10">Trending Events</h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Event Card 1 -->
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
-                    <div class="h-48 bg-gradient-to-r from-blue-500 to-purple-600 relative">
-                        <div class="absolute top-4 right-4 bg-white text-deep-blue px-3 py-1 rounded-full font-semibold text-sm">
-                            Music
-                        </div>
-                    </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
+
+                <!-- Card -->
+                <div
+                    class="bg-white shadow-lg rounded-xl overflow-hidden transform transition hover:-translate-y-2 hover:shadow-2xl duration-300">
+                    <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1200"
+                        class="w-full h-52 object-cover" />
                     <div class="p-6">
-                        <h3 class="text-xl font-bold text-deep-blue mb-2">Summer Music Festival 2023</h3>
-                        <div class="flex items-center text-gray-600 mb-2">
-                            <i class="far fa-calendar-alt mr-2"></i>
-                            <span>June 15, 2023 | 6:00 PM</span>
-                        </div>
-                        <div class="flex items-center text-gray-600 mb-4">
-                            <i class="fas fa-map-marker-alt mr-2"></i>
-                            <span>Central Park, New York</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-orange font-bold text-lg">$45.00</span>
-                            <button class="bg-deep-blue text-white px-4 py-2 rounded-lg hover:bg-orange transition-all duration-300">
-                                Book Now
-                            </button>
+                        <h3 class="font-bold text-xl">Rock Concert 2025</h3>
+                        <p class="text-gray-600 text-sm mt-1">Kathmandu • Jan 12</p>
+                        <p class="font-bold text-primary text-lg mt-2">Rs. 1,500</p>
+
+                        <div class="mt-4 flex gap-3">
+                            <a href="#" class="px-4 py-2 border border-primary rounded-lg text-primary font-semibold hover:bg-primary hover:text-white transition">View Details</a>
+                            <a href="#" class="px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-darkBlue transition">Book Now</a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Event Card 2 -->
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
-                    <div class="h-48 bg-gradient-to-r from-green-500 to-teal-600 relative">
-                        <div class="absolute top-4 right-4 bg-white text-deep-blue px-3 py-1 rounded-full font-semibold text-sm">
-                            Tech
-                        </div>
-                    </div>
+                <div
+                    class="bg-white shadow-lg rounded-xl overflow-hidden transform transition hover:-translate-y-2 hover:shadow-2xl duration-300">
+                    <img src="https://images.unsplash.com/photo-1551836022-4c4c79ecde6c?q=80&w=1200"
+                        class="w-full h-52 object-cover" />
                     <div class="p-6">
-                        <h3 class="text-xl font-bold text-deep-blue mb-2">Tech Innovation Summit</h3>
-                        <div class="flex items-center text-gray-600 mb-2">
-                            <i class="far fa-calendar-alt mr-2"></i>
-                            <span>July 22, 2023 | 9:00 AM</span>
-                        </div>
-                        <div class="flex items-center text-gray-600 mb-4">
-                            <i class="fas fa-map-marker-alt mr-2"></i>
-                            <span>Convention Center, San Francisco</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-orange font-bold text-lg">$75.00</span>
-                            <button class="bg-deep-blue text-white px-4 py-2 rounded-lg hover:bg-orange transition-all duration-300">
-                                Book Now
-                            </button>
+                        <h3 class="font-bold text-xl">Tech Conference 2025</h3>
+                        <p class="text-gray-600 text-sm mt-1">Lalitpur • Feb 3</p>
+                        <p class="font-bold text-primary text-lg mt-2">Rs. 800</p>
+
+                        <div class="mt-4 flex gap-3">
+                            <a href="#" class="px-4 py-2 border border-primary rounded-lg text-primary font-semibold hover:bg-primary hover:text-white transition">View Details</a>
+                            <a href="#" class="px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-darkBlue transition">Book Now</a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Event Card 3 -->
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
-                    <div class="h-48 bg-gradient-to-r from-red-500 to-pink-600 relative">
-                        <div class="absolute top-4 right-4 bg-white text-deep-blue px-3 py-1 rounded-full font-semibold text-sm">
-                            Food
-                        </div>
-                    </div>
+                <div
+                    class="bg-white shadow-lg rounded-xl overflow-hidden transform transition hover:-translate-y-2 hover:shadow-2xl duration-300">
+                    <img src="https://images.unsplash.com/photo-1515169067865-5387ec356754?q=80&w=1200"
+                        class="w-full h-52 object-cover" />
                     <div class="p-6">
-                        <h3 class="text-xl font-bold text-deep-blue mb-2">International Food Festival</h3>
-                        <div class="flex items-center text-gray-600 mb-2">
-                            <i class="far fa-calendar-alt mr-2"></i>
-                            <span>August 5, 2023 | 11:00 AM</span>
-                        </div>
-                        <div class="flex items-center text-gray-600 mb-4">
-                            <i class="fas fa-map-marker-alt mr-2"></i>
-                            <span>Downtown Square, Chicago</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-orange font-bold text-lg">$25.00</span>
-                            <button class="bg-deep-blue text-white px-4 py-2 rounded-lg hover:bg-orange transition-all duration-300">
-                                Book Now
-                            </button>
+                        <h3 class="font-bold text-xl">Photography Workshop</h3>
+                        <p class="text-gray-600 text-sm mt-1">Pokhara • March 10</p>
+                        <p class="font-bold text-primary text-lg mt-2">Rs. 2,000</p>
+
+                        <div class="mt-4 flex gap-3">
+                            <a href="#" class="px-4 py-2 border border-primary rounded-lg text-primary font-semibold hover:bg-primary hover:text-white transition">View Details</a>
+                            <a href="#" class="px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-darkBlue transition">Book Now</a>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="text-center mt-12">
-                <button class="border-2 border-deep-blue text-deep-blue px-6 py-3 rounded-lg font-semibold hover:bg-deep-blue hover:text-white transition-all duration-300">
-                    View All Events
-                </button>
             </div>
         </div>
     </section>

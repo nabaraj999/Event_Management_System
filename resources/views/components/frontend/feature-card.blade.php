@@ -1,47 +1,35 @@
 
- <section class="py-16 bg-white">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-4xl font-bold text-deep-blue mb-4">Why Choose EventFlow?</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">We provide a seamless event booking experience with modern features</p>
-            </div>
+    <!-- WHY CHOOSE -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-4xl font-extrabold text-darkBlue mb-12 text-center">Why Choose EventHUB?</h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Feature 1 -->
-                <div class="text-center p-6">
-                    <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-deep-blue flex items-center justify-center">
-                        <i class="fas fa-qrcode text-white text-2xl"></i>
+            <div class="grid md:grid-cols-3 gap-12">
+
+                <div class="text-center px-6">
+                    <div class="text-primary text-5xl mb-4">
+                        <i class="fas fa-qrcode"></i>
                     </div>
-                    <h3 class="text-xl font-semibold text-deep-blue mb-2">Digital QR Tickets</h3>
-                    <p class="text-gray-600">Get instant digital tickets with QR codes for easy entry</p>
+                    <h3 class="font-bold text-xl mb-2">Digital QR Tickets</h3>
+                    <p class="text-gray-600">Instant download, secure scanning, paperless entry.</p>
                 </div>
 
-                <!-- Feature 2 -->
-                <div class="text-center p-6">
-                    <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-orange flex items-center justify-center">
-                        <i class="fas fa-mobile-alt text-white text-2xl"></i>
+                <div class="text-center px-6">
+                    <div class="text-primary text-5xl mb-4">
+                        <i class="fas fa-credit-card"></i>
                     </div>
-                    <h3 class="text-xl font-semibold text-deep-blue mb-2">Mobile Reminders</h3>
-                    <p class="text-gray-600">Never miss an event with smart digital reminders</p>
+                    <h3 class="font-bold text-xl mb-2">Easy Payments</h3>
+                    <p class="text-gray-600">Supports eSewa, Khalti, Bank & Card payments.</p>
                 </div>
 
-                <!-- Feature 3 -->
-                <div class="text-center p-6">
-                    <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-deep-blue flex items-center justify-center">
-                        <i class="fas fa-wallet text-white text-2xl"></i>
+                <div class="text-center px-6">
+                    <div class="text-primary text-5xl mb-4">
+                        <i class="fas fa-bell"></i>
                     </div>
-                    <h3 class="text-xl font-semibold text-deep-blue mb-2">Easy Payments</h3>
-                    <p class="text-gray-600">Secure payments with eSewa, Khalti, and credit cards</p>
+                    <h3 class="font-bold text-xl mb-2">Smart Reminders</h3>
+                    <p class="text-gray-600">Never miss your event with automated alerts.</p>
                 </div>
 
-                <!-- Feature 4 -->
-                <div class="text-center p-6">
-                    <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-orange flex items-center justify-center">
-                        <i class="fas fa-chart-bar text-white text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold text-deep-blue mb-2">Organizer Dashboard</h3>
-                    <p class="text-gray-600">Powerful tools to manage and promote your events</p>
-                </div>
             </div>
         </div>
     </section>
