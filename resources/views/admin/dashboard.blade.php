@@ -1,5 +1,5 @@
 <x-admin.admin-layout >
-<div class="space-y-8">
+<div class="space-y-8 mt-2">
 
     <!-- Welcome Hero -->
     <div class="bg-gradient-to-r from-darkBlue via-primary to-orange-600 rounded-2xl p-8 text-white shadow-2xl relative overflow-hidden">
