@@ -75,7 +75,7 @@
                 <span>Events</span>
             </a>
 
-            <a href="#" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition">
+            <a href="{{ route('admin.categories.index') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition">
                 <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M3 3h6v6H3V3zm8 0h6v6h-6V3zm-8 8h6v6H3v-6zm8 0h6v6h-6v-6z"/>
                 </svg>

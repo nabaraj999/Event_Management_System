@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\CompanyInfoController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\EventCategoryController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -53,7 +54,8 @@ Route::prefix('admin')
         Route::post('/company-info', [CompanyInfoController::class, 'update'])
             ->name('company.update');
 
-        // Optional: If you ever want PUT/PATCH (recommended for REST)
         Route::put('/company-info', [CompanyInfoController::class, 'update'])
-            ->name('company.update'); // same name, Laravel will use POST if PUT not allowed
+            ->name('company.update');
+        Route::resource('categories', EventCategoryController::class)
+             ->except(['show']);
     });
