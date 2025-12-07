@@ -6,7 +6,7 @@
         <div class="bg-white shadow-2xl rounded-xl overflow-hidden">
 
             <!-- Header - Solid Brand Color -->
-            <div class="bg-[#FF7A28] text-white px-8 py-6">
+            <div class="bg-[#063970] text-white px-8 py-6">
                 <h1 class="text-3xl font-bold">Company Information Settings</h1>
                 <p class="opacity-90 mt-1">Manage your company profile, branding, contact, and legal details</p>
             </div>
@@ -161,7 +161,7 @@
                         <label for="is_active" class="text-lg font-medium text-gray-700">Company is Active</label>
                     </div>
                 </div>
-                
+
                 <!-- Submit Button -->
                 <div class="flex justify-end pt-10 border-t border-gray-200">
                     <button type="submit"

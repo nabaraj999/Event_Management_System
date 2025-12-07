@@ -2,7 +2,7 @@
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="bg-white shadow-2xl rounded-xl overflow-hidden">
 
-            <div class="bg-[#FF7A28] text-white px-8 py-6">
+            <div class="bg-[#063970] text-white px-8 py-6">
                 <h1 class="text-3xl font-bold">{{ isset($category) ? 'Edit Category' : 'Create New Category' }}</h1>
             </div>
 
