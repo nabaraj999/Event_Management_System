@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -60,7 +61,7 @@
                 <span>Dashboard</span>
             </a>
 
-            <a href="#" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition">
+            <a href="{{ route('admin.company.edit') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition">
                 <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M4 4a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-4l-2-2H4z"/>
                 </svg>
@@ -204,5 +205,4 @@
     });
 </script>
 </body>
-</html> 
-
+</html>
