@@ -77,4 +77,8 @@ class Event extends Model
     {
         return $this->totalRemainingSeats() <= 0;
     }
+    public function tickets()
+{
+    return $this->hasMany(EventTicket::class, 'event_id');
+}
 }

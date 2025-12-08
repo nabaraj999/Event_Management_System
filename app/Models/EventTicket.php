@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 class EventTicket extends Model
 {
     use HasFactory;
@@ -12,9 +14,9 @@ class EventTicket extends Model
 
     protected $appends = ['remaining_seats'];
 
-    public function event()
+    public function event(): BelongsTo
     {
-        return $this->belongsTo(Event::class);
+        return $this->belongsTo(Event::class, 'event_id');
     }
 
     public function getRemainingSeatsAttribute()
