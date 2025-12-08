@@ -4,7 +4,7 @@ use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\CompanyInfoController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventCategoryController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 // ==================== PUBLIC ROUTES ====================
@@ -58,4 +58,7 @@ Route::prefix('admin')
             ->name('company.update');
         Route::resource('categories', EventCategoryController::class)
              ->except(['show']);
+
+       Route::get('/profile', [ProfileController::class, 'index'])->name('profile');           // → route name: admin.profile
+       Route::put('/profile', [ProfileController::class, 'update']) ->name('profile.update');
     });
