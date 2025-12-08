@@ -1,5 +1,5 @@
 <?php
-// app/Http/Controllers/Admin/ProfileController.php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -18,6 +18,7 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
+        /** @var \App\Models\Admin $admin */
         $admin = Auth::guard('admin')->user();
 
         $request->validate([
@@ -28,25 +29,19 @@ class ProfileController extends Controller
             'new_password'     => ['nullable', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
         ]);
 
-        $data = [
-            'name'  => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-        ];
+        $data = $request->only(['name', 'email', 'phone']);
 
-        // Update password if provided
         if ($request->filled('current_password')) {
             if (!Hash::check($request->current_password, $admin->password)) {
                 return back()->withErrors(['current_password' => 'The current password is incorrect.']);
             }
-
             $data['password'] = Hash::make($request->new_password);
         }
 
         $admin->update($data);
 
-       return redirect()
-        ->route('admin.profile')
-        ->with('swal_success', 'Profile updated successfully!');
+        return redirect()
+            ->route('admin.profile')
+            ->with('swal_success', 'Profile updated successfully!');
     }
 }
