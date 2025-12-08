@@ -65,7 +65,7 @@
                                 </td>
                                 <td class="px-6 py-5">
                                     <div class="font-semibold text-[#063970]">
-                                       {{ $ticket->event?->name ?? '—' }}
+                                       {{ $ticket->event?->title ?? '—' }}
                                     </div>
                                     <div class="text-xs text-gray-500">ID: {{ $ticket->event_id }}</div>
                                 </td>

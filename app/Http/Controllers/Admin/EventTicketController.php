@@ -19,9 +19,9 @@ class EventTicketController extends Controller
       $tickets = EventTicket::with('event')
             ->when($search, function ($query, $search) {
                 return $query->where('id', 'like', "%{$search}%")
-                    ->orWhere('name', 'like', "%{$search}%")
+                    ->orWhere('title', 'like', "%{$search}%")
                     ->orWhereHas('event', function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%");
+                        $q->where('title', 'like', "%{$search}%");
                     });
             })
             ->latest()
