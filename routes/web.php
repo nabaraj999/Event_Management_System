@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 
 // ==================== PUBLIC ROUTES ====================
 Route::get('/', function () {
-    return view('welcome');
+    return view('dashboard');
 })->name('home');
 
 // ==================== USER AUTH ROUTES (Breeze/Jetstream) ====================

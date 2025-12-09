@@ -61,9 +61,19 @@
             </div>
 
             <div class="flex items-center space-x-4">
-                <a href="{{ route('login') }}" class="bg-darkBlue px-6 py-2 rounded-lg text-white font-semibold hover:bg-primary transition">
-                    Login
-                </a>
+                @guest
+                    <a href="{{ route('login') }}" class="bg-darkBlue px-6 py-2 rounded-lg text-white font-semibold hover:bg-primary transition">
+                        Login
+                    </a>
+                @endguest
+                @auth
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                        @csrf
+                    </form>
+                    <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="bg-darkBlue px-6 py-2 rounded-lg text-white font-semibold hover:bg-primary transition">
+                        Logout
+                    </a>
+                @endauth
                 <button id="mobile-toggle" class="md:hidden text-gray-700 text-2xl">
                     <i class="fas fa-bars"></i>
                 </button>
