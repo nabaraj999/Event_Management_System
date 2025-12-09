@@ -54,4 +54,9 @@ class EventCategory extends Model
     {
         return "<x-heroicon-o-{$name} class=\"{$class}\" />";
     }
+
+    public function category()
+{
+    return $this->belongsTo(EventCategory::class, 'category_id');
+}
 }

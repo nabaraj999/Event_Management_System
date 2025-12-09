@@ -61,7 +61,7 @@
             </div>
 
             <div class="flex items-center space-x-4">
-                <a href="#" class="bg-darkBlue px-6 py-2 rounded-lg text-white font-semibold hover:bg-primary transition">
+                <a href="{{ route('login') }}" class="bg-darkBlue px-6 py-2 rounded-lg text-white font-semibold hover:bg-primary transition">
                     Login
                 </a>
                 <button id="mobile-toggle" class="md:hidden text-gray-700 text-2xl">
