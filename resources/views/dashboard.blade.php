@@ -69,23 +69,28 @@
         <h2 class="text-3xl font-extrabold text-darkBlue mb-6">Event Categories</h2>
 
         <div class="flex space-x-6 overflow-x-auto scrollbar-hide py-2 scroll-smooth">
-            @foreach ($categories as $category)
-                <div
-                    class="min-w-[150px] px-6 py-4 rounded-xl bg-softGray shadow hover:shadow-lg transition cursor-pointer text-center">
-                    @if ($category->icon_type === 'fontawesome')
+            @forelse ($categories as $category)
+                <div class="min-w-[150px] flex-shrink-0 px-6 py-4 rounded-xl bg-softGray shadow hover:shadow-lg transition cursor-pointer text-center">
+
+                    <!-- Icon Handling -->
+                    @if ($category->icon_type === 'fontawesome' && $category->icon_name)
                         <i class="fas {{ $category->icon_name }} text-primary text-3xl mb-2"></i>
-                    @elseif($category->icon_type === 'heroicon')
-                        <!-- Assuming Heroicons usage; adjust based on your setup (e.g., via Blade component or inline SVG) -->
-                        <x-heroicon-o-{{ $category->icon_name }} class="h-8 w-8 text-primary mb-2" />
-                    @elseif($category->icon_type === 'custom' && $category->custom_svg)
-                        {!! $category->custom_svg !!}
+
+                    @elseif ($category->icon_type === 'custom' && $category->custom_svg)
+                        <div class="h-8 w-8 mx-auto mb-2 text-primary">
+                            {!! $category->custom_svg !!}
+                        </div>
+
                     @else
-                        <!-- Fallback icon if needed -->
-                        <i class="fas fa-question-circle text-primary text-3xl mb-2"></i>
+                        <!-- Fallback icon -->
+                        <i class="fas fa-calendar-alt text-primary text-3xl mb-2"></i>
                     @endif
-                    <p class="font-semibold">{{ $category->name }}</p>
+
+                    <p class="font-semibold text-gray-800">{{ $category->name }}</p>
                 </div>
-            @endforeach
+            @empty
+                <p class="text-gray-500 col-span-full text-center py-8">No categories available at the moment.</p>
+            @endforelse
         </div>
     </div>
 </section>
@@ -128,6 +133,81 @@
 
 <x-frontend.feature-card />
 <x-frontend.footer-card />
+<!-- Add this modal to your dashboard.blade.php, probably at the end of the body -->
+
+@if($showInterestModal)
+    <div id="interestModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full">
+            <h2 class="text-2xl font-bold mb-4 text-darkBlue">Tell us about your interests</h2>
+            <p class="mb-6 text-gray-600">Help us recommend the best events for you!</p>
+
+            <form action="{{ route('user.interests.store') }}" method="POST">
+                @csrf
+                <input type="hidden" name="user_id" value="{{ auth()->id() }}">
+
+                <!-- Interests Input - Using a simple repeatable field; you can use JS to add more -->
+                <div id="interests-container" class="space-y-4">
+                    <div class="flex space-x-4">
+                        <div class="flex-1">
+                            <label for="interest_1" class="block text-sm font-medium text-gray-700">Interest</label>
+                            <input type="text" name="interests[]" id="interest_1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary" required>
+                        </div>
+                        <div class="flex-1">
+                            <label for="category_1" class="block text-sm font-medium text-gray-700">Category (optional)</label>
+                            <select name="category_ids[]" id="category_1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary">
+                                <option value="">Select Category</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" onclick="addInterestField()" class="mt-4 text-primary font-semibold hover:underline">Add Another Interest</button>
+
+                <div class="mt-6 flex justify-between">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 transition">Skip for Now</button>
+                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-darkBlue transition">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function closeModal() {
+            document.getElementById('interestModal').style.display = 'none';
+        }
+
+        function addInterestField() {
+            const container = document.getElementById('interests-container');
+            const count = container.children.length + 1;
+            const html = `
+                <div class="flex space-x-4">
+                    <div class="flex-1">
+                        <label for="interest_${count}" class="block text-sm font-medium text-gray-700">Interest</label>
+                        <input type="text" name="interests[]" id="interest_${count}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary" required>
+                    </div>
+                    <div class="flex-1">
+                        <label for="category_${count}" class="block text-sm font-medium text-gray-700">Category (optional)</label>
+                        <select name="category_ids[]" id="category_${count}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary">
+                            <option value="">Select Category</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        // Auto-show modal if needed
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('interestModal').style.display = 'flex';
+        });
+    </script>
+@endif
 
 <script>
     document.getElementById("mobile-toggle").onclick = () => {
@@ -136,5 +216,6 @@
 </script>
 
 </body>
+
 
 </html>

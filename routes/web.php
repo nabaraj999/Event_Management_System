@@ -8,31 +8,32 @@ use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\EventTicketController;
 use App\Http\Controllers\User\HomeController;
+use App\Http\Controllers\User\InterestController;
 use App\Http\Controllers\User\UserEventCategoryController;
 use Illuminate\Support\Facades\Route;
 
-// ==================== PUBLIC ROUTES ====================
-Route::get('/', function () {
-    return view('dashboard');
-})->name('home');
+// ==================== PUBLIC HOME PAGE ====================
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// ==================== USER AUTH ROUTES (Breeze/Jetstream) ====================
-require __DIR__ . '/auth.php';
+// ==================== AUTH ROUTES ====================
+require __DIR__.'/auth.php';
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+// ==================== AUTHENTICATED USER ROUTES ====================
+Route::middleware(['auth', 'verified'])->name('user.')->group(function () {
 
+    // This is the real user dashboard AFTER login
+    Route::get('/dashboard', [HomeController::class, 'index'])
+        ->name('dashboard');
+
+    // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-
+    // Interests
+    Route::post('/user/interests', [InterestController::class, 'store'])
+        ->name('interests.store');
 });
-Route::get('/', [UserEventCategoryController::class, 'index'])->name('dashboard');
-Route::get('/', [HomeController::class, 'index']);
-
 
 
 

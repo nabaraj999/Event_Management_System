@@ -45,8 +45,13 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    public function userInterests()
+public function interests()
 {
-    return $this->hasMany(UserInterest::class);
+    return $this->hasMany(UserInterest::class); // not belongsToMany!
+}
+
+public function interestCategoryIds()
+{
+    return $this->interests()->pluck('category_id')->filter()->unique()->values();
 }
 }
