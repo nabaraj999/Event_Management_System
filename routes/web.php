@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\EventCategoryController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\EventTicketController;
+use App\Http\Controllers\User\HomeController;
+use App\Http\Controllers\User\UserEventCategoryController;
 use Illuminate\Support\Facades\Route;
 
 // ==================== PUBLIC ROUTES ====================
@@ -25,7 +27,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+
 });
+Route::get('/', [UserEventCategoryController::class, 'index'])->name('dashboard');
+Route::get('/', [HomeController::class, 'index']);
+
+
+
+
 
 // ==================== ADMIN AUTH ROUTES ====================
 Route::get('/admin-login', [LoginController::class, 'showLoginForm'])
@@ -35,21 +45,17 @@ Route::get('/admin-login', [LoginController::class, 'showLoginForm'])
 Route::post('/admin-login', [LoginController::class, 'login']);
 
 // ==================== ADMIN PANEL (Protected) ====================
-Route::prefix('admin')
-    ->as('admin.')
-    ->middleware('auth:admin')
-    ->group(function () {
-
+Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function () {
         // Admin Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-         Route::post('/logout', [LoginController::class, 'logout']) ->name('logout');
+        Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
         // ==================== COMPANY INFO - CLEAN & SIMPLE ====================
         // This gives you exactly: admin.company.edit & admin.company.update
-        Route::get('/company-info', [CompanyInfoController::class, 'index']) ->name('company.edit');
+        Route::get('/company-info', [CompanyInfoController::class, 'index'])->name('company.edit');
         Route::post('/company-info', [CompanyInfoController::class, 'update'])->name('company.update');
 
-        Route::put('/company-info', [CompanyInfoController::class, 'update']) ->name('company.update');
+        Route::put('/company-info', [CompanyInfoController::class, 'update'])->name('company.update');
         Route::resource('categories', EventCategoryController::class)->except(['show']);
 
         Route::get('/profile', [ProfileController::class, 'index'])->name('profile');           // → route name: admin.profile
