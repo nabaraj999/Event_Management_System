@@ -53,8 +53,8 @@
             </a>
 
             <div class="hidden md:flex items-center space-x-8 text-gray-700 font-medium">
-                <a href="#" class="hover:text-primary">Home</a>
-                <a href="#" class="hover:text-primary">Events</a>
+                <a href="{{ route('home') }}" class="hover:text-primary">Home</a>
+                <a href="{{ route('events.index') }}" class="hover:text-primary">Events</a>
                 <a href="#" class="hover:text-primary">Categories</a>
                 <a href="#" class="hover:text-primary">About Us</a>
                 <a href="#" class="hover:text-primary">Contact</a>

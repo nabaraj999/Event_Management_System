@@ -10,10 +10,12 @@ use App\Http\Controllers\Admin\EventTicketController;
 use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\InterestController;
 use App\Http\Controllers\User\UserEventCategoryController;
+use App\Http\Controllers\User\UserEventController;
 use Illuminate\Support\Facades\Route;
 
 // ==================== PUBLIC HOME PAGE ====================
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/events', [UserEventController::class, 'index'])->name('events.index');
 
 // ==================== AUTH ROUTES ====================
 require __DIR__.'/auth.php';
