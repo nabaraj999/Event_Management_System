@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('interest');  // e.g., "music", "sports"
             $table->foreignId('category_id')->nullable()->constrained('event_categories')->onDelete('set null');
+            $table->boolean('has_completed_or_skipped_interests')->default(false);
             $table->timestamps();
         });
     }

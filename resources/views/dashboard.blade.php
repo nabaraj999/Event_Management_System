@@ -134,62 +134,62 @@
 <x-frontend.feature-card />
 <x-frontend.footer-card />
 <!-- Add this modal to your dashboard.blade.php, probably at the end of the body -->
-
 @if($showInterestModal)
     <div id="interestModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 relative transform transition-all duration-300 scale-100">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 relative">
             <button type="button" onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition">
-                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
+
             <h2 class="text-3xl font-bold text-center text-darkBlue mb-4">Share Your Interests</h2>
-            <p class="text-center text-gray-600 mb-8">Select categories that excite you to get personalized event recommendations!</p>
+            <p class="text-center text-gray-600 mb-8">Help us show you better events! (You can skip this)</p>
 
-            <form action="{{ route('user.interests.store') }}" method="POST">
+            <form id="interestForm" action="{{ route('user.interests.store') }}" method="POST">
                 @csrf
-                <input type="hidden" name="user_id" value="{{ auth()->id() }}">
 
-                <!-- Categories as Checkboxes -->
+                <!-- Categories -->
                 <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-800 mb-3">Select Categories</label>
+                    <label class="block text-sm font-semibold text-gray-800 mb-3">Select Categories (optional)</label>
                     <div class="grid grid-cols-2 gap-4 max-h-48 overflow-y-auto p-2 border border-gray-200 rounded-lg bg-gray-50">
                         @foreach($categories as $category)
                             <div class="flex items-center">
-                                <input type="checkbox" name="category_ids[]" value="{{ $category->id }}" id="category_{{ $category->id }}" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                <input type="checkbox" name="category_ids[]" value="{{ $category->id }}" id="category_{{ $category->id }}" class="h-4 w-4 text-primary focus:ring-primary rounded">
                                 <label for="category_{{ $category->id }}" class="ml-2 text-sm text-gray-700 cursor-pointer">{{ $category->name }}</label>
                             </div>
                         @endforeach
                     </div>
                 </div>
 
-                <!-- Custom Interests Input -->
+                <!-- Custom Interests -->
                 <div class="mb-6">
-                    <label for="custom_interests" class="block text-sm font-semibold text-gray-800 mb-2">Custom Interests (comma-separated, optional)</label>
-                    <input type="text" name="custom_interests" id="custom_interests" class="block w-full border-gray-300 rounded-lg shadow-sm focus:border-primary focus:ring-primary px-4 py-2" placeholder="e.g., hiking, photography, cooking">
+                    <label for="custom_interests" class="block text-sm font-semibold text-gray-800 mb-2">Add Your Own (comma-separated)</label>
+                    <input type="text" name="custom_interests" id="custom_interests" placeholder="e.g., yoga, painting, tech talks" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary focus:ring-primary">
                 </div>
 
-                <div class="flex justify-between gap-4">
-                    <button type="button" onclick="closeModalAndSkip()" class="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 transition">Skip</button>
-                    <button type="submit" class="flex-1 px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-darkBlue transition">Save Interests</button>
+                <div class="flex gap-4">
+                    <!-- Skip Button: Submits empty form → marks as skipped -->
+                    <button type="00submit" onclick="this.form.submit()" class="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 transition">
+                        Skip for Now
+                    </button>
+                    <button type="submit" class="flex-1 px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-darkBlue transition">
+                        Save & Continue
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
+        // Auto-show modal
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('interestModal').style.display = 'flex';
+        });
+
         function closeModal() {
             document.getElementById('interestModal').style.display = 'none';
         }
-
-        function closeModalAndSkip() {
-            closeModal();
-            // Optionally, send an AJAX request to mark as skipped if needed
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('interestModal').style.display = 'flex';
-        });
     </script>
 @endif
 
