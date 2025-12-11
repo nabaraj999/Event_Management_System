@@ -16,7 +16,7 @@ class HomeController extends Controller
                    ->where('status', 'published')
                    ->where('start_date', '>=', now())
                    ->orderBy('start_date')
-                   ->limit(6)
+                   ->limit(3)
                    ->get();
 
     $categories = EventCategory::where('is_active', true)

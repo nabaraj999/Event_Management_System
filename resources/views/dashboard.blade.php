@@ -136,39 +136,42 @@
 <!-- Add this modal to your dashboard.blade.php, probably at the end of the body -->
 
 @if($showInterestModal)
-    <div id="interestModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full">
-            <h2 class="text-2xl font-bold mb-4 text-darkBlue">Tell us about your interests</h2>
-            <p class="mb-6 text-gray-600">Help us recommend the best events for you!</p>
+    <div id="interestModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 relative transform transition-all duration-300 scale-100">
+            <button type="button" onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+            <h2 class="text-3xl font-bold text-center text-darkBlue mb-4">Share Your Interests</h2>
+            <p class="text-center text-gray-600 mb-8">Select categories that excite you to get personalized event recommendations!</p>
 
             <form action="{{ route('user.interests.store') }}" method="POST">
                 @csrf
                 <input type="hidden" name="user_id" value="{{ auth()->id() }}">
 
-                <!-- Interests Input - Using a simple repeatable field; you can use JS to add more -->
-                <div id="interests-container" class="space-y-4">
-                    <div class="flex space-x-4">
-                        <div class="flex-1">
-                            <label for="interest_1" class="block text-sm font-medium text-gray-700">Interest</label>
-                            <input type="text" name="interests[]" id="interest_1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary" required>
-                        </div>
-                        <div class="flex-1">
-                            <label for="category_1" class="block text-sm font-medium text-gray-700">Category (optional)</label>
-                            <select name="category_ids[]" id="category_1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary">
-                                <option value="">Select Category</option>
-                                @foreach($categories as $category)
-                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                <!-- Categories as Checkboxes -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-800 mb-3">Select Categories</label>
+                    <div class="grid grid-cols-2 gap-4 max-h-48 overflow-y-auto p-2 border border-gray-200 rounded-lg bg-gray-50">
+                        @foreach($categories as $category)
+                            <div class="flex items-center">
+                                <input type="checkbox" name="category_ids[]" value="{{ $category->id }}" id="category_{{ $category->id }}" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                <label for="category_{{ $category->id }}" class="ml-2 text-sm text-gray-700 cursor-pointer">{{ $category->name }}</label>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
 
-                <button type="button" onclick="addInterestField()" class="mt-4 text-primary font-semibold hover:underline">Add Another Interest</button>
+                <!-- Custom Interests Input -->
+                <div class="mb-6">
+                    <label for="custom_interests" class="block text-sm font-semibold text-gray-800 mb-2">Custom Interests (comma-separated, optional)</label>
+                    <input type="text" name="custom_interests" id="custom_interests" class="block w-full border-gray-300 rounded-lg shadow-sm focus:border-primary focus:ring-primary px-4 py-2" placeholder="e.g., hiking, photography, cooking">
+                </div>
 
-                <div class="mt-6 flex justify-between">
-                    <button type="button" onclick="closeModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 transition">Skip for Now</button>
-                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-darkBlue transition">Submit</button>
+                <div class="flex justify-between gap-4">
+                    <button type="button" onclick="closeModalAndSkip()" class="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 transition">Skip</button>
+                    <button type="submit" class="flex-1 px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-darkBlue transition">Save Interests</button>
                 </div>
             </form>
         </div>
@@ -179,30 +182,11 @@
             document.getElementById('interestModal').style.display = 'none';
         }
 
-        function addInterestField() {
-            const container = document.getElementById('interests-container');
-            const count = container.children.length + 1;
-            const html = `
-                <div class="flex space-x-4">
-                    <div class="flex-1">
-                        <label for="interest_${count}" class="block text-sm font-medium text-gray-700">Interest</label>
-                        <input type="text" name="interests[]" id="interest_${count}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary" required>
-                    </div>
-                    <div class="flex-1">
-                        <label for="category_${count}" class="block text-sm font-medium text-gray-700">Category (optional)</label>
-                        <select name="category_ids[]" id="category_${count}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary">
-                            <option value="">Select Category</option>
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-            `;
-            container.insertAdjacentHTML('beforeend', html);
+        function closeModalAndSkip() {
+            closeModal();
+            // Optionally, send an AJAX request to mark as skipped if needed
         }
 
-        // Auto-show modal if needed
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('interestModal').style.display = 'flex';
         });
