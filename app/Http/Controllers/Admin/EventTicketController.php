@@ -33,7 +33,7 @@ class EventTicketController extends Controller
 
     public function create()
     {
-        $events = Event::pluck('name', 'id');
+        $events = Event::pluck('title', 'id');
         return view('admin.event_tickets.create', compact('events'));
     }
 
@@ -59,7 +59,7 @@ class EventTicketController extends Controller
 
     public function edit(EventTicket $eventTicket)
     {
-        $events = Event::pluck('name', 'id');
+        $events = Event::pluck('title', 'id');
         return view('admin.event_tickets.edit', compact('eventTicket', 'events'));
     }
 

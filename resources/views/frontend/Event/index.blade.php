@@ -179,3 +179,4 @@
         </div>
     </div>
 </div>
+<x-frontend.footer-card />

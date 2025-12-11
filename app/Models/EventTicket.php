@@ -9,6 +9,24 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class EventTicket extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'event_id',
+        'name',
+        'description',
+        'price',
+        'total_seats',
+        'sale_start',
+        'sale_end',
+        'is_active',
+        'sort_order',
+    ];
+
+    // THIS IS THE KEY FIX
+    protected $casts = [
+        'sale_start' => 'datetime',
+        'sale_end'   => 'datetime',
+        'is_active'  => 'boolean',
+    ];
 
     protected $guarded = [];
 
