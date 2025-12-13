@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\EventCategoryController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\EventTicketController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\InterestController;
 use App\Http\Controllers\User\UserEventCategoryController;
@@ -78,4 +79,7 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::put('/event-tickets/{eventTicket}', [EventTicketController::class, 'update'])->name('event-tickets.update');
         Route::delete('/event-tickets/{eventTicket}', [EventTicketController::class, 'destroy'])->name('event-tickets.destroy');
         Route::get('/event-tickets/{eventTicket}', [EventTicketController::class, 'show'])->name('event-tickets.show');
+
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
     });

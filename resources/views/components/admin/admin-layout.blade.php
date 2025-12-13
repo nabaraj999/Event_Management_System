@@ -116,7 +116,7 @@
                     <span>Bookings</span>
                 </a>
 
-                <a href="#"
+                <a href="{{ route('admin.users.index') }}"
                     class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
        {{ request()->routeIs('admin.users.*') ? 'sidebar-active' : '' }}">
                     <i class="fa-solid fa-users w-6 h-6 mr-3 text-lg"></i>
