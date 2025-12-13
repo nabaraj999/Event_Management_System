@@ -150,18 +150,18 @@
 
             <!-- Logout -->
             <div class="p-4 border-t border-white/10">
-                <form action="{{ route('admin.logout') }}" method="POST">
-                    @csrf
-                    <button type="submit"
-                        class="w-full flex items-center justify-center space-x-3 px-4 py-3 rounded-lg bg-red-600 hover:bg-red-700 transition font-semibold">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-6 0v-1" />
-                        </svg>
-                        <span>Logout</span>
-                    </button>
-                </form>
-            </div>
+    <form action="{{ route('admin.logout') }}" method="POST">
+        @csrf
+        <button type="submit"
+            class="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg bg-red-600 hover:bg-red-700 transition font-semibold">
+
+            <i class="fa-solid fa-right-from-bracket text-lg"></i>
+            <span>Logout</span>
+
+        </button>
+    </form>
+</div>
+
         </aside>
 
         <!-- MAIN CONTENT -->
