@@ -57,6 +57,6 @@ class UserEventController extends Controller
                                    ->orderBy('sort_order')
                                    ->get();
 
-        return view('event.index', compact('events', 'categories', 'sort'));
+        return view('frontend.event.index', compact('events', 'categories', 'sort'));
     }
 }
