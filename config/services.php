@@ -34,5 +34,12 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'khalti' => [
+    'secret_key' => env('KHALTI_SECRET_KEY'),
+    'live'       => env('KHALTI_LIVE', false),
+    'return_url' => env('KHALTI_RETURN_URL'),
+    'cancel_url' => env('KHALTI_CANCEL_URL'),
+    'website_url' => env('KHALTI_WEBSITE_URL'),
+],
 
 ];

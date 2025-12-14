@@ -1,4 +1,4 @@
-<x-frontend.frontend-layout title="Booking Success">
+<x-frontend.frontend-layout />
 
 <div class="py-24 bg-white min-h-screen font-raleway text-center">
     <div class="max-w-2xl mx-auto px-6">

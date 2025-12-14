@@ -3,9 +3,14 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
+use App\Models\BookingTicket;
 use App\Models\Event;
 use App\Models\EventCategory;
+use App\Models\EventTicket;
+use App\Services\KhaltiService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UserEventController extends Controller
 {
@@ -77,4 +82,5 @@ class UserEventController extends Controller
 
     return view('frontend.event.show', compact('event'));
 }
+
 }
