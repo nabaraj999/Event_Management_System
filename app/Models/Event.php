@@ -81,4 +81,5 @@ class Event extends Model
 {
     return $this->hasMany(EventTicket::class, 'event_id');
 }
+
 }

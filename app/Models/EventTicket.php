@@ -46,4 +46,6 @@ class EventTicket extends Model
     {
         return $this->is_active && $this->remaining_seats > 0;
     }
+
+    
 }

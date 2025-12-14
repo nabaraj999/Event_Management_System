@@ -150,7 +150,7 @@
                                 <p class="text-gray-700 text-sm mb-4 line-clamp-3">{{ $event->short_description }}</p>
 
                                 <div class="mt-4 flex gap-3 flex-wrap">
-                                    <a href="#" class="px-4 py-2 border border-primary rounded-lg text-primary font-semibold hover:bg-primary hover:text-white transition">
+                                    <a href="{{ route('events.show', $event) }}" class="px-4 py-2 border border-primary rounded-lg text-primary font-semibold hover:bg-primary hover:text-white transition">
                                         Details
                                     </a>
                                     @if($event->has_registration)

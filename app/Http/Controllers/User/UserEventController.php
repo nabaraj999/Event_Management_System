@@ -59,4 +59,21 @@ class UserEventController extends Controller
 
         return view('frontend.event.index', compact('events', 'categories', 'sort'));
     }
+
+    public function show(Event $event)
+{
+    if ($event->status !== 'published') {
+        abort(404);
+    }
+
+    $event->load(['tickets' => function ($query) {
+        $query->where('is_active', true)
+              ->orderBy('sort_order')
+              ->orderBy('price');
+    }]);
+
+    $event->load('category');
+
+    return view('frontend.event.show', compact('event'));
+}
 }

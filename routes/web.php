@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Route;
 // ==================== PUBLIC HOME PAGE ====================
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/events', [UserEventController::class, 'index'])->name('events.index');
+// routes/web.php
+Route::get('/events/{event}', [UserEventController::class, 'show'])->name('events.show');
 
 // ==================== AUTH ROUTES ====================
 require __DIR__.'/auth.php';
