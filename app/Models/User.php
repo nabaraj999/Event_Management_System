@@ -54,4 +54,8 @@ public function interestCategoryIds()
 {
     return $this->interests()->pluck('category_id')->filter()->unique()->values();
 }
+public function bookings()
+{
+    return $this->hasMany(Booking::class);
+}
 }

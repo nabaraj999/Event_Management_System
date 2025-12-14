@@ -66,6 +66,7 @@ class UserEventController extends Controller
         abort(404);
     }
 
+    // Load ALL active tickets (no date filter here)
     $event->load(['tickets' => function ($query) {
         $query->where('is_active', true)
               ->orderBy('sort_order')

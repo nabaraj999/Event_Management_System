@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\EventTicketController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\User\BookingController;
 use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\InterestController;
 use App\Http\Controllers\User\UserEventCategoryController;
@@ -19,6 +20,9 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/events', [UserEventController::class, 'index'])->name('events.index');
 // routes/web.php
 Route::get('/events/{event}', [UserEventController::class, 'show'])->name('events.show');
+ Route::get('/booking/success', [BookingController::class, 'success']) ->name('booking.success');
+    Route::get('/booking/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
+
 
 // ==================== AUTH ROUTES ====================
 require __DIR__.'/auth.php';
@@ -29,6 +33,9 @@ Route::middleware(['auth', 'verified'])->name('user.')->group(function () {
     // This is the real user dashboard AFTER login
     Route::get('/dashboard', [HomeController::class, 'index'])
         ->name('dashboard');
+
+    Route::get('/booking/{eventTicket}', [BookingController::class, 'create'])->name('booking.create');
+    Route::post('/booking/store', [BookingController::class, 'store'])->name('booking.store');
 
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
