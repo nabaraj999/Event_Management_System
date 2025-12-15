@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminBookingController;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\CompanyInfoController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -92,4 +93,6 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
 
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
+
+    Route::resource('bookings', AdminBookingController::class)->only(['index', 'show']);
     });
