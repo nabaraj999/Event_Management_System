@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Mail\TicketConfirmation;
 use App\Models\EventTicket;
 use App\Models\Booking;
 use App\Models\BookingTicket;
@@ -11,6 +12,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\View; // Add this for rendering the view
 use Carbon\Carbon;
 
 class BookingController extends Controller
@@ -132,63 +137,81 @@ class BookingController extends Controller
     /**
      * Khalti callback - Verify and confirm payment
      */
-    public function success(Request $request, KhaltiService $khalti)
-    {
-        $pidx = $request->query('pidx');
+  /**
+ * Khalti callback - Verify and confirm payment
+ */
+public function success(Request $request, KhaltiService $khalti)
+{
+    $pidx = $request->query('pidx');
 
-        if (!$pidx) {
-            return view('frontend.event.cancel')->with('error', 'Invalid payment callback.');
-        }
-
-        $booking = Booking::where('transaction_id', $pidx)
-            ->where('payment_status', 'pending')
-            ->first();
-
-        if (!$booking) {
-            return view('frontend.event.cancel')->with('error', 'Booking not found or already processed.');
-        }
-
-        // Verify with Khalti lookup API
-        $lookup = $khalti->lookupPayment($pidx);
-
-        // Always save the raw response for debugging
-        $booking->payment_response = $lookup;
-        $booking->save();
-
-        Log::info('Khalti Payment Lookup', ['pidx' => $pidx, 'response' => $lookup]);
-
-        if (isset($lookup['status']) && $lookup['status'] === 'Completed') {
-            DB::transaction(function () use ($booking, $lookup) {
-                $booking->payment_status = 'paid';
-                $booking->status = 'confirmed';
-
-                if (isset($lookup['transaction_id'])) {
-                    $booking->transaction_id = $lookup['transaction_id'];
-                }
-
-                $booking->save();
-
-                // Confirm seats - increase sold_seats
-                $bookingTicket = BookingTicket::where('booking_id', $booking->id)->first();
-                if ($bookingTicket) {
-                    EventTicket::where('id', $bookingTicket->event_ticket_id)
-                        ->increment('sold_seats', $bookingTicket->quantity);
-                }
-            });
-
-            return view('frontend.event.success', compact('booking'))
-                ->with('message', 'Payment successful! Your tickets are confirmed.');
-        }
-
-        // Payment failed or not completed
-        $booking->payment_status = 'failed';
-        $booking->status = 'cancelled';
-        $booking->save();
-
-        $errorMsg = $lookup['message'] ?? 'Payment could not be verified.';
-        return view('frontend.event.cancel')->with('error', $errorMsg);
+    if (!$pidx) {
+        return view('frontend.event.cancel')->with('error', 'Invalid payment callback.');
     }
 
+    $booking = Booking::where('transaction_id', $pidx)
+        ->where('payment_status', 'pending')
+        ->first();
+
+    if (!$booking) {
+        return view('frontend.event.cancel')->with('error', 'Booking not found or already processed.');
+    }
+
+    // Verify with Khalti lookup API
+    $lookup = $khalti->lookupPayment($pidx);
+
+    // Always save the raw response for debugging
+    $booking->payment_response = $lookup;
+    $booking->save();
+
+    Log::info('Khalti Payment Lookup', ['pidx' => $pidx, 'response' => $lookup]);
+
+    if (isset($lookup['status']) && $lookup['status'] === 'Completed') {
+        DB::transaction(function () use ($booking, $lookup, $khalti) {
+            $booking->payment_status = 'paid';
+            $booking->status = 'confirmed';
+
+            if (isset($lookup['transaction_id'])) {
+                $booking->transaction_id = $lookup['transaction_id'];
+            }
+
+            // Generate unique secure token for QR code verification
+            $booking->ticket_token = Str::random(40);
+            $booking->save();
+
+            // Load relationships needed for email and views
+            $booking->load(['bookingTickets.eventTicket.event', 'event']);
+
+            // Confirm seats (increment sold_seats)
+            $bookingTicket = BookingTicket::where('booking_id', $booking->id)->first();
+            if ($bookingTicket) {
+                EventTicket::where('id', $bookingTicket->event_ticket_id)
+                    ->increment('sold_seats', $bookingTicket->quantity);
+            }
+
+            // Generate QR Code
+           $verificationUrl = route('verify.ticket', $booking->ticket_token);
+
+           $qrCodePng = (string) QrCode::format('png')
+    ->size(400)
+    ->errorCorrection('H')
+    ->generate($verificationUrl);
+
+            // Send confirmation email using the proper Mailable
+            Mail::to($booking->email)->send(new TicketConfirmation($booking, $qrCodePng));
+        });
+
+        return view('frontend.event.success', compact('booking'))
+            ->with('message', 'Payment successful! Your ticket with QR code has been sent to your email.');
+    }
+
+    // Payment failed or not completed
+    $booking->payment_status = 'failed';
+    $booking->status = 'cancelled';
+    $booking->save();
+
+    $errorMsg = $lookup['message'] ?? 'Payment could not be verified.';
+    return view('frontend.event.cancel')->with('error', $errorMsg);
+}
     /**
      * User cancelled payment on Khalti
      */
@@ -207,5 +230,28 @@ class BookingController extends Controller
         }
 
         return view('frontend.event.cancel')->with('error', 'Payment was cancelled.');
+    }
+
+    /**
+     * Verify ticket via QR code scan
+     */
+    public function verifyTicket($token)
+    {
+        $booking = Booking::where('ticket_token', $token)->first();
+
+        if (!$booking) {
+            return view('frontend.event.ticket-invalid')->with('error', 'Invalid ticket QR code.');
+        }
+
+        if ($booking->payment_status !== 'paid' || $booking->status !== 'confirmed') {
+            return view('frontend.event.ticket-invalid')->with('error', 'This ticket is not paid or confirmed.');
+        }
+
+        if ($booking->is_checked_in) {
+            return view('frontend.event.ticket-already-used')->with('message', 'This ticket has already been checked in.');
+        }
+
+        // Public view - show ticket details
+        return view('frontend.event.ticket-valid', compact('booking'));
     }
 }

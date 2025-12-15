@@ -54,4 +54,10 @@ class Booking extends Model
             default => 'bg-gray-100 text-gray-800',
         };
     }
+
+
+public function bookingTickets()
+{
+    return $this->hasMany(BookingTicket::class);
+}
 }

@@ -23,7 +23,7 @@ Route::get('/events/{event}', [UserEventController::class, 'show'])->name('event
  Route::get('/booking/success', [BookingController::class, 'success']) ->name('booking.success');
     Route::get('/booking/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
     Route::post('webhook/khalti', [BookingController::class, 'webhook']);
-
+Route::get('/verify-ticket/{token}', [BookingController::class, 'verifyTicket'])->name('verify.ticket');
 
 // ==================== AUTH ROUTES ====================
 require __DIR__.'/auth.php';

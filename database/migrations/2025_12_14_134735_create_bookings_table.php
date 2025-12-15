@@ -29,6 +29,7 @@ return new class extends Migration
             $table->string('transaction_id')->nullable(); // from payment gateway
             $table->json('payment_response')->nullable(); // store raw response for debugging
 
+
             $table->timestamps();
         });
     }
