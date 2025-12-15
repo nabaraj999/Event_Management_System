@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\EventCategoryController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\EventTicketController;
+use App\Http\Controllers\Admin\TicketScannerController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\User\BookingController;
 use App\Http\Controllers\User\HomeController;
@@ -21,13 +22,13 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/events', [UserEventController::class, 'index'])->name('events.index');
 // routes/web.php
 Route::get('/events/{event}', [UserEventController::class, 'show'])->name('events.show');
- Route::get('/booking/success', [BookingController::class, 'success']) ->name('booking.success');
-    Route::get('/booking/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
-    Route::post('webhook/khalti', [BookingController::class, 'webhook']);
+Route::get('/booking/success', [BookingController::class, 'success'])->name('booking.success');
+Route::get('/booking/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
+Route::post('webhook/khalti', [BookingController::class, 'webhook']);
 Route::get('/verify-ticket/{token}', [BookingController::class, 'verifyTicket'])->name('verify.ticket');
 
 // ==================== AUTH ROUTES ====================
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 // ==================== AUTHENTICATED USER ROUTES ====================
 Route::middleware(['auth', 'verified'])->name('user.')->group(function () {
@@ -61,38 +62,47 @@ Route::post('/admin-login', [LoginController::class, 'login']);
 
 // ==================== ADMIN PANEL (Protected) ====================
 Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function () {
-        // Admin Dashboard
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-        Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+    // Admin Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-        // ==================== COMPANY INFO - CLEAN & SIMPLE ====================
-        // This gives you exactly: admin.company.edit & admin.company.update
-        Route::get('/company-info', [CompanyInfoController::class, 'index'])->name('company.edit');
-        Route::post('/company-info', [CompanyInfoController::class, 'update'])->name('company.update');
+    // ==================== COMPANY INFO - CLEAN & SIMPLE ====================
+    // This gives you exactly: admin.company.edit & admin.company.update
+    Route::get('/company-info', [CompanyInfoController::class, 'index'])->name('company.edit');
+    Route::post('/company-info', [CompanyInfoController::class, 'update'])->name('company.update');
 
-        Route::put('/company-info', [CompanyInfoController::class, 'update'])->name('company.update');
-        Route::resource('categories', EventCategoryController::class)->except(['show']);
+    Route::put('/company-info', [CompanyInfoController::class, 'update'])->name('company.update');
+    Route::resource('categories', EventCategoryController::class)->except(['show']);
 
-        Route::get('/profile', [ProfileController::class, 'index'])->name('profile');           // → route name: admin.profile
-        Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');           // → route name: admin.profile
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
-        Route::get('/events', [EventController::class, 'index'])->name('events.index');
-        Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
-        Route::post('/events', [EventController::class, 'store'])->name('events.store');
-        Route::get('/events/{event}/edit', [EventController::class, 'edit'])->name('events.edit');
-        Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');
-        Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
+    Route::get('/events', [EventController::class, 'index'])->name('events.index');
+    Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
+    Route::post('/events', [EventController::class, 'store'])->name('events.store');
+    Route::get('/events/{event}/edit', [EventController::class, 'edit'])->name('events.edit');
+    Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');
+    Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
 
-        Route::get('/event-tickets', [EventTicketController::class, 'index'])->name('event-tickets.index');
-        Route::get('/event-tickets/create', [EventTicketController::class, 'create'])->name('event-tickets.create');
-        Route::post('/event-tickets', [EventTicketController::class, 'store'])->name('event-tickets.store');
-        Route::get('/event-tickets/{eventTicket}/edit', [EventTicketController::class, 'edit'])->name('event-tickets.edit');
-        Route::put('/event-tickets/{eventTicket}', [EventTicketController::class, 'update'])->name('event-tickets.update');
-        Route::delete('/event-tickets/{eventTicket}', [EventTicketController::class, 'destroy'])->name('event-tickets.destroy');
-        Route::get('/event-tickets/{eventTicket}', [EventTicketController::class, 'show'])->name('event-tickets.show');
+    Route::get('/event-tickets', [EventTicketController::class, 'index'])->name('event-tickets.index');
+    Route::get('/event-tickets/create', [EventTicketController::class, 'create'])->name('event-tickets.create');
+    Route::post('/event-tickets', [EventTicketController::class, 'store'])->name('event-tickets.store');
+    Route::get('/event-tickets/{eventTicket}/edit', [EventTicketController::class, 'edit'])->name('event-tickets.edit');
+    Route::put('/event-tickets/{eventTicket}', [EventTicketController::class, 'update'])->name('event-tickets.update');
+    Route::delete('/event-tickets/{eventTicket}', [EventTicketController::class, 'destroy'])->name('event-tickets.destroy');
+    Route::get('/event-tickets/{eventTicket}', [EventTicketController::class, 'show'])->name('event-tickets.show');
 
-        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
 
     Route::resource('bookings', AdminBookingController::class)->only(['index', 'show']);
-    });
+   Route::get('/ticket-scanner', [TicketScannerController::class, 'index'])
+        ->name('ticket-scanner');
+
+    // AJAX Routes for Scanner
+    Route::post('/ticket-scanner/verify', [TicketScannerController::class, 'verify'])
+        ->name('ticket-scanner.verify');
+
+    Route::post('/ticket-scanner/checkin', [TicketScannerController::class, 'checkIn'])
+        ->name('ticket-scanner.checkin');
+});

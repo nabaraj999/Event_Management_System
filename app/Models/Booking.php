@@ -16,6 +16,7 @@ class Booking extends Model
         'total_amount' => 'decimal:2',
         'payment_response' => 'array', // since we store JSON
     ];
+    
 
     // Relationships
     public function user()
