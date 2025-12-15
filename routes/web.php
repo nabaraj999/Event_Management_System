@@ -10,12 +10,17 @@ use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\EventTicketController;
 use App\Http\Controllers\Admin\TicketScannerController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\ProfileController as ControllersProfileController;
 use App\Http\Controllers\User\BookingController;
 use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\InterestController;
 use App\Http\Controllers\User\UserEventCategoryController;
 use App\Http\Controllers\User\UserEventController;
 use Illuminate\Support\Facades\Route;
+
+
+
+
 
 // ==================== PUBLIC HOME PAGE ====================
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -26,6 +31,13 @@ Route::get('/booking/success', [BookingController::class, 'success'])->name('boo
 Route::get('/booking/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
 Route::post('webhook/khalti', [BookingController::class, 'webhook']);
 Route::get('/verify-ticket/{token}', [BookingController::class, 'verifyTicket'])->name('verify.ticket');
+
+
+
+
+
+
+
 
 // ==================== AUTH ROUTES ====================
 require __DIR__ . '/auth.php';
@@ -41,14 +53,20 @@ Route::middleware(['auth', 'verified'])->name('user.')->group(function () {
     Route::post('/booking/store', [BookingController::class, 'store'])->name('booking.store');
 
     // Profile routes
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile', [ControllersProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ControllersProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ControllersProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Interests
     Route::post('/user/interests', [InterestController::class, 'store'])
         ->name('interests.store');
 });
+
+
+
+
+
+
 
 
 
@@ -96,7 +114,7 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
 
     Route::resource('bookings', AdminBookingController::class)->only(['index', 'show']);
-   Route::get('/ticket-scanner', [TicketScannerController::class, 'index'])
+    Route::get('/ticket-scanner', [TicketScannerController::class, 'index'])
         ->name('ticket-scanner');
 
     // AJAX Routes for Scanner
