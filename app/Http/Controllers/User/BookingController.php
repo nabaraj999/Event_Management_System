@@ -10,21 +10,20 @@ use App\Services\KhaltiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class BookingController extends Controller
 {
     /**
-     * Show the booking form for a specific ticket
+     * Show booking form
      */
     public function create(EventTicket $eventTicket)
     {
-        // Redirect if not logged in (middleware already handles, but extra safety)
         if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'Please login to book tickets.');
         }
 
-        // Calculate remaining seats (considering pending bookings too to prevent overbooking)
         $bookedQuantity = BookingTicket::where('event_ticket_id', $eventTicket->id)
             ->join('bookings', 'booking_ticket.booking_id', '=', 'bookings.id')
             ->whereIn('bookings.payment_status', ['pending', 'paid'])
@@ -32,7 +31,6 @@ class BookingController extends Controller
 
         $remaining = $eventTicket->total_seats - ($eventTicket->sold_seats + $bookedQuantity);
 
-        // Check if ticket is currently on sale
         $now = Carbon::now();
         $isOnSale = true;
 
@@ -43,7 +41,6 @@ class BookingController extends Controller
             $isOnSale = false;
         }
 
-        // Block booking if not available
         if ($remaining <= 0 || !$isOnSale) {
             $message = $remaining <= 0
                 ? 'This ticket is sold out.'
@@ -52,16 +49,15 @@ class BookingController extends Controller
             return redirect()->back()->with('error', $message);
         }
 
-        // Load event for display
         $eventTicket->load('event');
 
-       return view('frontend.event.create', compact('eventTicket', 'remaining'));
+        return view('frontend.event.create', compact('eventTicket', 'remaining'));
     }
 
     /**
-     * Store the booking and prepare for payment
+     * Create booking and redirect to Khalti
      */
-   public function store(Request $request, KhaltiService $khalti)
+    public function store(Request $request, KhaltiService $khalti)
     {
         $request->validate([
             'event_ticket_id' => 'required|exists:event_tickets,id',
@@ -75,7 +71,6 @@ class BookingController extends Controller
         $eventTicket = EventTicket::findOrFail($request->event_ticket_id);
         $quantity = (int)$request->quantity;
 
-        // Recheck remaining seats
         $bookedQuantity = BookingTicket::where('event_ticket_id', $eventTicket->id)
             ->join('bookings', 'booking_ticket.booking_id', '=', 'bookings.id')
             ->whereIn('bookings.payment_status', ['pending', 'paid'])
@@ -90,7 +85,6 @@ class BookingController extends Controller
         $totalAmount = $quantity * $eventTicket->price;
 
         return DB::transaction(function () use ($request, $eventTicket, $quantity, $totalAmount, $khalti) {
-            // Create booking
             $booking = Booking::create([
                 'user_id' => Auth::id(),
                 'event_id' => $eventTicket->event_id,
@@ -103,7 +97,6 @@ class BookingController extends Controller
                 'status' => 'pending',
             ]);
 
-            // Create booking ticket entry
             BookingTicket::create([
                 'booking_id' => $booking->id,
                 'event_ticket_id' => $eventTicket->id,
@@ -112,7 +105,6 @@ class BookingController extends Controller
                 'sub_total' => $totalAmount,
             ]);
 
-            // Initiate Khalti payment
             $payload = [
                 'return_url' => route('booking.success'),
                 'website_url' => config('services.khalti.website_url'),
@@ -130,7 +122,6 @@ class BookingController extends Controller
 
             if (isset($response['payment_url']) && isset($response['pidx'])) {
                 $booking->update(['transaction_id' => $response['pidx']]);
-
                 return redirect()->away($response['payment_url']);
             }
 
@@ -139,19 +130,82 @@ class BookingController extends Controller
     }
 
     /**
-     * Payment success page
+     * Khalti callback - Verify and confirm payment
      */
-    public function success(Request $request)
+    public function success(Request $request, KhaltiService $khalti)
     {
-        // You can add logic later to verify payment here
-        return view('frontend.event.success');
+        $pidx = $request->query('pidx');
+
+        if (!$pidx) {
+            return view('frontend.event.cancel')->with('error', 'Invalid payment callback.');
+        }
+
+        $booking = Booking::where('transaction_id', $pidx)
+            ->where('payment_status', 'pending')
+            ->first();
+
+        if (!$booking) {
+            return view('frontend.event.cancel')->with('error', 'Booking not found or already processed.');
+        }
+
+        // Verify with Khalti lookup API
+        $lookup = $khalti->lookupPayment($pidx);
+
+        // Always save the raw response for debugging
+        $booking->payment_response = $lookup;
+        $booking->save();
+
+        Log::info('Khalti Payment Lookup', ['pidx' => $pidx, 'response' => $lookup]);
+
+        if (isset($lookup['status']) && $lookup['status'] === 'Completed') {
+            DB::transaction(function () use ($booking, $lookup) {
+                $booking->payment_status = 'paid';
+                $booking->status = 'confirmed';
+
+                if (isset($lookup['transaction_id'])) {
+                    $booking->transaction_id = $lookup['transaction_id'];
+                }
+
+                $booking->save();
+
+                // Confirm seats - increase sold_seats
+                $bookingTicket = BookingTicket::where('booking_id', $booking->id)->first();
+                if ($bookingTicket) {
+                    EventTicket::where('id', $bookingTicket->event_ticket_id)
+                        ->increment('sold_seats', $bookingTicket->quantity);
+                }
+            });
+
+            return view('frontend.event.success', compact('booking'))
+                ->with('message', 'Payment successful! Your tickets are confirmed.');
+        }
+
+        // Payment failed or not completed
+        $booking->payment_status = 'failed';
+        $booking->status = 'cancelled';
+        $booking->save();
+
+        $errorMsg = $lookup['message'] ?? 'Payment could not be verified.';
+        return view('frontend.event.cancel')->with('error', $errorMsg);
     }
 
     /**
-     * Payment cancelled page
+     * User cancelled payment on Khalti
      */
     public function cancel(Request $request)
     {
-        return view('frontend.event.cancel');
+        $pidx = $request->query('pidx');
+
+        if ($pidx) {
+            $booking = Booking::where('transaction_id', $pidx)->first();
+            if ($booking && $booking->payment_status === 'pending') {
+                $booking->update([
+                    'payment_status' => 'failed',
+                    'status' => 'cancelled',
+                ]);
+            }
+        }
+
+        return view('frontend.event.cancel')->with('error', 'Payment was cancelled.');
     }
 }

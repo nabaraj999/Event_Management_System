@@ -22,6 +22,7 @@ Route::get('/events', [UserEventController::class, 'index'])->name('events.index
 Route::get('/events/{event}', [UserEventController::class, 'show'])->name('events.show');
  Route::get('/booking/success', [BookingController::class, 'success']) ->name('booking.success');
     Route::get('/booking/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
+    Route::post('webhook/khalti', [BookingController::class, 'webhook']);
 
 
 // ==================== AUTH ROUTES ====================

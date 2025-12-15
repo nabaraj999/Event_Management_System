@@ -20,20 +20,17 @@ class KhaltiService
 
     public function initiatePayment(array $payload)
     {
-        $response = Http::withHeaders([
-            'Authorization' => 'Key ' . $this->secretKey,
+        return Http::withHeaders([
+            'Authorization' => 'key ' . $this->secretKey,   // lowercase 'key'
             'Content-Type' => 'application/json',
-        ])->post($this->baseUrl . 'epayment/initiate/', $payload);
-
-        return $response->json();
+        ])->post($this->baseUrl . 'epayment/initiate/', $payload)->json();
     }
 
     public function lookupPayment(string $pidx)
     {
-        $response = Http::withHeaders([
-            'Authorization' => 'Key ' . $this->secretKey,
-        ])->get($this->baseUrl . 'epayment/lookup/?pidx=' . $pidx);
-
-        return $response->json();
+        return Http::withHeaders([
+            'Authorization' => 'key ' . $this->secretKey,   // lowercase 'key'
+            'Content-Type' => 'application/json',
+        ])->post($this->baseUrl . 'epayment/lookup/', ['pidx' => $pidx])->json(); // POST with body
     }
 }
