@@ -254,4 +254,26 @@ public function success(Request $request, KhaltiService $khalti)
         // Public view - show ticket details
         return view('frontend.event.ticket-valid', compact('booking'));
     }
+
+    // app/Http/Controllers/UserBookingController.php
+
+public function history()
+{
+    $bookings = Auth::user()->bookings()
+        ->with(['event', 'bookingTickets.eventTicket'])
+        ->latest()
+        ->paginate(10);
+
+    return view('profile.history', compact('bookings'));
+}
+
+public function invoice($ticket_token)
+{
+    $booking = Auth::user()->bookings()
+        ->with(['event', 'bookingTickets.eventTicket'])
+        ->where('ticket_token', $ticket_token)
+        ->firstOrFail();
+
+    return view('profile.invoice', compact('booking'));
+}
 }

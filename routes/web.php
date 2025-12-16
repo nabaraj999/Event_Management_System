@@ -60,6 +60,9 @@ Route::middleware(['auth', 'verified'])->name('user.')->group(function () {
     // Interests
     Route::post('/user/interests', [InterestController::class, 'store'])
         ->name('interests.store');
+
+    Route::get('/my-bookings', [BookingController::class, 'history'])->name('profile.history');
+    Route::get('/invoice/{ticket_token}', [BookingController::class, 'invoice'])->name('profile.invoice');
 });
 
 
