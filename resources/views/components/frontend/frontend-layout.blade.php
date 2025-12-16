@@ -80,6 +80,7 @@
                         <!-- Dropdown Menu -->
                         <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                             <a href="{{ route('user.profile.edit') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary transition">My Profile</a>
+                            <a href="{{ route('user.profile.edit') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary transition">My Event</a>
                             <hr class="my-1 border-gray-200">
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="inline">
                                 @csrf
