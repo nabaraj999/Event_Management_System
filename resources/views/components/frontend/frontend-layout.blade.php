@@ -55,7 +55,7 @@
                 <a href="{{ route('home') }}" class="hover:text-primary transition">Home</a>
                 <a href="{{ route('events.index') }}" class="hover:text-primary transition">Events</a>
                 <a href="{{ route('event-categories.index') }}" class="hover:text-primary transition">Categories</a>
-                <a href="#" class="hover:text-primary transition">About Us</a>
+                <a href="{{ route('about') }}" class="hover:text-primary transition">About Us</a>
                 <a href="#" class="hover:text-primary transition">Contact</a>
             </div>
 

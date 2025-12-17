@@ -37,6 +37,8 @@ Route::get('/verify-ticket/{token}', [BookingController::class, 'verifyTicket'])
 Route::get('/event-categories', [MainEventCategoryController::class, 'index']) ->name('event-categories.index');
 Route::get('/events/category/{slug}', [MainEventCategoryController::class, 'show'])->name('events.category');
 
+Route::get('/about', function () {return view('frontend.about-us.index');})->name('about');
+
 
 
 
