@@ -56,7 +56,7 @@
                 <a href="{{ route('events.index') }}" class="hover:text-primary transition">Events</a>
                 <a href="{{ route('event-categories.index') }}" class="hover:text-primary transition">Categories</a>
                 <a href="{{ route('about') }}" class="hover:text-primary transition">About Us</a>
-                <a href="#" class="hover:text-primary transition">Contact</a>
+                <a href="{{ route('contact') }}" class="hover:text-primary transition">Contact</a>
             </div>
 
             <!-- Right Section: Auth Buttons / Profile -->

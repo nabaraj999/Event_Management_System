@@ -10,7 +10,9 @@ use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\EventTicketController;
 use App\Http\Controllers\Admin\TicketScannerController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\User\ContactController;
 use App\Http\Controllers\ProfileController as ControllersProfileController;
+use App\Http\Controllers\User\AboutController;
 use App\Http\Controllers\User\BookingController;
 use App\Http\Controllers\User\EventCategoryController as ControllersUserEventCategoryController;
 use App\Http\Controllers\User\HomeController;
@@ -38,8 +40,8 @@ Route::get('/event-categories', [MainEventCategoryController::class, 'index']) -
 Route::get('/events/category/{slug}', [MainEventCategoryController::class, 'show'])->name('events.category');
 
 Route::get('/about', function () {return view('frontend.about-us.index');})->name('about');
-
-
+Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 
 
