@@ -11,9 +11,14 @@ class EventCategory extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'slug', 'description',
-        'icon_type', 'icon_name', 'custom_svg',
-        'is_active', 'sort_order'
+        'name',
+        'slug',
+        'description',
+        'icon_type',
+        'icon_name',
+        'custom_svg',
+        'is_active',
+        'sort_order'
     ];
 
     protected $casts = [
@@ -56,7 +61,12 @@ class EventCategory extends Model
     }
 
     public function category()
-{
-    return $this->belongsTo(EventCategory::class, 'category_id');
-}
+    {
+        return $this->belongsTo(EventCategory::class, 'category_id');
+    }
+
+    public function events()
+    {
+        return $this->hasMany(Event::class, 'category_id'); // Adjust Event model name and foreign key
+    }
 }
