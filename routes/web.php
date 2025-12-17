@@ -12,8 +12,10 @@ use App\Http\Controllers\Admin\TicketScannerController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ProfileController as ControllersProfileController;
 use App\Http\Controllers\User\BookingController;
+use App\Http\Controllers\User\EventCategoryController as ControllersUserEventCategoryController;
 use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\InterestController;
+use App\Http\Controllers\User\MainEventCategoryController;
 use App\Http\Controllers\User\UserEventCategoryController;
 use App\Http\Controllers\User\UserEventController;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +33,9 @@ Route::get('/booking/success', [BookingController::class, 'success'])->name('boo
 Route::get('/booking/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
 Route::post('webhook/khalti', [BookingController::class, 'webhook']);
 Route::get('/verify-ticket/{token}', [BookingController::class, 'verifyTicket'])->name('verify.ticket');
+
+Route::get('/event-categories', [MainEventCategoryController::class, 'index']) ->name('event-categories.index');
+Route::get('/events/category/{slug}', [MainEventCategoryController::class, 'show'])->name('events.category');
 
 
 
