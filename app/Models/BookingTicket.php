@@ -9,7 +9,7 @@ class BookingTicket extends Model
 {
     use HasFactory;
 
-    protected $table = 'booking_ticket';
+   protected $table = 'booking_ticket'; // ← THIS IS THE ONLY LINE YOU NEED TO ADD/FIX
 
     protected $guarded = [];
 
@@ -34,9 +34,14 @@ class BookingTicket extends Model
     }
 
     // Helper to get current remaining seats
+   public function getBookedQuantityAttribute()
+    {
+        return $this->bookingTickets()
+            ->whereHas('booking', fn($q) => $q->whereIn('payment_status', ['pending', 'paid']))
+            ->sum('quantity');
+    }
     public function getRemainingSeatsAttribute()
     {
-        $booked = $this->bookingItems()->sum('quantity');
-        return $this->total_seats - ($this->sold_seats + $booked);
+        return $this->total_seats - ($this->sold_seats + $this->getBookedQuantityAttribute());
     }
 }

@@ -28,10 +28,10 @@ class BookingController extends Controller
             return redirect()->route('login')->with('error', 'Please login to book tickets.');
         }
 
-        $bookedQuantity = BookingTicket::where('event_ticket_id', $eventTicket->id)
-            ->join('bookings', 'booking_tickets.booking_id', '=', 'bookings.id')
-            ->whereIn('bookings.payment_status', ['pending', 'paid'])
-            ->sum('booking_tickets.quantity');
+      $bookedQuantity = BookingTicket::where('event_ticket_id', $eventTicket->id)
+    ->join('bookings', 'booking_ticket.booking_id', '=', 'bookings.id') // use actual table name
+    ->whereIn('bookings.payment_status', ['pending', 'paid'])
+    ->sum('booking_ticket.quantity'); // use actual table name
 
         $remaining = $eventTicket->total_seats - ($eventTicket->sold_seats + $bookedQuantity);
 
@@ -60,80 +60,81 @@ class BookingController extends Controller
     /**
      * Create booking and initiate Khalti payment
      */
-    public function store(Request $request, KhaltiService $khalti)
-    {
-        $request->validate([
-            'event_ticket_id' => 'required|exists:event_tickets,id',
-            'quantity'        => 'required|integer|min:1|max:20',
-            'full_name'       => 'required|string|max:255',
-            'email'           => 'required|email|max:255',
-            'phone'           => 'required|string|max:20',
-            'payment_method'  => 'required|in:khalti',
+   public function store(Request $request, KhaltiService $khalti)
+{
+    $request->validate([
+        'event_ticket_id' => 'required|exists:event_tickets,id',
+        'quantity'        => 'required|integer|min:1|max:20',
+        'full_name'       => 'required|string|max:255',
+        'email'           => 'required|email|max:255',
+        'phone'           => 'required|string|max:20',
+        'payment_method'  => 'required|in:khalti',
+    ]);
+
+    $eventTicket = EventTicket::findOrFail($request->event_ticket_id);
+    $quantity    = (int) $request->quantity;
+
+    // Now this will work because model table is correctly defined
+    $bookedQuantity = BookingTicket::where('event_ticket_id', $eventTicket->id)
+        ->join('bookings', 'booking_ticket.booking_id', '=', 'bookings.id')
+        ->whereIn('bookings.payment_status', ['pending', 'paid'])
+        ->sum('booking_ticket.quantity');
+
+    $remaining = $eventTicket->total_seats - ($eventTicket->sold_seats + $bookedQuantity);
+
+    if ($quantity > $remaining) {
+        return back()->withInput()->with('error', "Only {$remaining} ticket(s) available.");
+    }
+
+    $totalAmount = $quantity * $eventTicket->price;
+
+    return DB::transaction(function () use ($request, $eventTicket, $quantity, $totalAmount, $khalti) {
+        $booking = Booking::create([
+            'user_id'         => Auth::id(),
+            'event_id'        => $eventTicket->event_id,
+            'full_name'       => $request->full_name,
+            'email'           => $request->email,
+            'phone'           => $request->phone,
+            'quantity'        => $quantity,
+            'total_amount'    => $totalAmount,
+            'payment_method'  => $request->payment_method,
+            'payment_status'  => 'pending',
+            'status'          => 'pending',
         ]);
 
-        $eventTicket = EventTicket::findOrFail($request->event_ticket_id);
-        $quantity    = (int) $request->quantity;
+        BookingTicket::create([
+            'booking_id'         => $booking->id,
+            'event_ticket_id'    => $eventTicket->id,
+            'quantity'           => $quantity,
+            'price_at_booking'   => $eventTicket->price,
+            'sub_total'          => $totalAmount,
+        ]);
 
-        $bookedQuantity = BookingTicket::where('event_ticket_id', $eventTicket->id)
-            ->join('bookings', 'booking_tickets.booking_id', '=', 'bookings.id')
-            ->whereIn('bookings.payment_status', ['pending', 'paid'])
-            ->sum('booking_tickets.quantity');
+        $payload = [
+            'return_url'         => route('booking.success'),
+            'website_url'        => config('services.khalti.website_url'),
+            'amount'             => (int) ($totalAmount * 100),
+            'purchase_order_id'  => 'booking-' . $booking->id,
+            'purchase_order_name' => $eventTicket->name . ' - ' . $eventTicket->event->title,
+            'customer_info'      => [
+                'name'  => $request->full_name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+            ],
+        ];
 
-        $remaining = $eventTicket->total_seats - ($eventTicket->sold_seats + $bookedQuantity);
+        $response = $khalti->initiatePayment($payload);
 
-        if ($quantity > $remaining) {
-            return back()->withInput()->with('error', "Only {$remaining} ticket(s) available.");
+        if (isset($response['payment_url']) && isset($response['pidx'])) {
+            $booking->transaction_id = $response['pidx'];
+            $booking->save();
+
+            return redirect()->away($response['payment_url']);
         }
 
-        $totalAmount = $quantity * $eventTicket->price;
-
-        return DB::transaction(function () use ($request, $eventTicket, $quantity, $totalAmount, $khalti, &$booking) {
-            $booking = Booking::create([
-                'user_id'         => Auth::id(),
-                'event_id'        => $eventTicket->event_id,
-                'full_name'       => $request->full_name,
-                'email'           => $request->email,
-                'phone'           => $request->phone,
-                'quantity'        => $quantity,
-                'total_amount'    => $totalAmount,
-                'payment_method'  => $request->payment_method,
-                'payment_status'  => 'pending',
-                'status'          => 'pending',
-            ]);
-
-            BookingTicket::create([
-                'booking_id'         => $booking->id,
-                'event_ticket_id'    => $eventTicket->id,
-                'quantity'           => $quantity,
-                'price_at_booking'   => $eventTicket->price,
-                'sub_total'          => $totalAmount,
-            ]);
-
-            $payload = [
-                'return_url'         => route('booking.success'),
-                'website_url'        => config('services.khalti.website_url'),
-                'amount'             => (int) ($totalAmount * 100), // in paisa
-                'purchase_order_id'  => 'booking-' . $booking->id,
-                'purchase_order_name' => $eventTicket->name . ' - ' . $eventTicket->event->title,
-                'customer_info'      => [
-                    'name'  => $request->full_name,
-                    'email' => $request->email,
-                    'phone' => $request->phone,
-                ],
-            ];
-
-            $response = $khalti->initiatePayment($payload);
-
-            if (isset($response['payment_url']) && isset($response['pidx'])) {
-                $booking->transaction_id = $response['pidx'];
-                $booking->save();
-
-                return redirect()->away($response['payment_url']);
-            }
-
-            throw new \Exception('Khalti payment initiation failed: ' . json_encode($response));
-        });
-    }
+        throw new \Exception('Khalti payment initiation failed: ' . json_encode($response));
+    });
+}
 
     /**
      * Khalti payment success callback

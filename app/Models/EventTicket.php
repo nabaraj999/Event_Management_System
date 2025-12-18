@@ -47,5 +47,8 @@ class EventTicket extends Model
         return $this->is_active && $this->remaining_seats > 0;
     }
 
-    
+    public function bookingTickets()
+{
+    return $this->hasMany(BookingTicket::class, 'event_ticket_id');
+}
 }
