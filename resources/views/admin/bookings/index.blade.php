@@ -1,282 +1,175 @@
-<x-admin.admin-layout>
+<x-admin.admin-layout title="Manage Bookings">
 
-    <div class="py-8 px-4 max-w-7xl mx-auto">
-        <!-- Header with Verify Ticket Button -->
-        <div class="bg-darkBlue text-white rounded-2xl shadow-xl p-8 mb-8">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 text-center sm:text-left">
-                <div>
-                    <h1 class="text-3xl font-bold">Manage Bookings</h1>
-                    <p class="text-blue-200 mt-1">View, manage and verify all event ticket bookings</p>
-                </div>
-                <div class="flex flex-col items-center sm:items-end">
-                    <div class="flex flex-col items-center sm:items-end">
-                        <a href="{{ route('admin.ticket-scanner') }}"
-                            class="inline-flex items-center px-6 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition shadow-lg text-lg whitespace-nowrap">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+          integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 4v1m6 11h2m-6-2v1m-6-11H5m14 6v1m-4-6v1m-8 11h2m-6-2v1m6-11H9m6 11h2m-6-2v1M9 7h1m4 0h1m-4 9h1m4 0h1m-8-2h2m-6 2h1m6-11H9m6 11h2m-6-2v1">
-                            </path>
-                            </svg>
-                            Verify Ticket
-                        </a>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+        <div class="bg-white shadow-2xl rounded-2xl overflow-hidden">
 
+            <!-- Header + Search -->
+            <div class="bg-[#063970] text-white px-6 py-5 lg:px-8 lg:py-6">
+                <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <div>
+                        <h1 class="text-2xl lg:text-3xl font-bold">Manage Bookings</h1>
+                        <p class="opacity-90 text-sm lg:text-base mt-1">All event ticket bookings</p>
                     </div>
-                    <p class="text-blue-200 text-sm mt-2">Scan QR code to check-in attendees</p>
+
+                    <!-- Search Form -->
+                    <form method="GET" action="{{ route('admin.bookings.index') }}" class="flex flex-col sm:flex-row gap-3">
+                        <input type="text" name="query" value="{{ request('query') }}"
+                               placeholder="Search by ID, name, email, phone or token"
+                               class="w-full sm:w-80 px-4 py-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-white" />
+
+                        <div class="flex gap-3">
+                            <button type="submit"
+                                    class="w-full sm:w-auto px-6 py-3 bg-white text-[#FF7A28] font-bold rounded-lg hover:bg-gray-100 transition shadow">
+                                Search
+                            </button>
+
+                            @if(request('query'))
+                                <a href="{{ route('admin.bookings.index') }}"
+                                   class="w-full sm:w-auto text-center px-6 py-3 bg-white text-[#FF7A28] font-bold rounded-lg hover:bg-gray-100 transition shadow">
+                                    Clear
+                                </a>
+                            @endif
+                        </div>
+                    </form>
                 </div>
             </div>
-        </div>
 
-        <!-- Search & Filters Bar -->
-        <div class="bg-white rounded-2xl shadow-xl p-6 mb-8">
-            <form id="filter-form" method="GET" action="{{ route('admin.bookings.index') }}"
-                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Booking ID</label>
-                    <input type="number" name="booking_id" value="{{ request('booking_id') }}" placeholder="e.g. 123"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary">
+            <!-- Success Message -->
+            @if(session('success'))
+                <div class="mx-6 lg:mx-8 mt-4 lg:mt-6 bg-orange-50 border-l-4 border-[#FF7A28] text-orange-800 px-5 py-4 rounded-r-lg text-sm lg:text-base">
+                    {{ session('success') }}
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">User (Name/Email)</label>
-                    <input type="text" name="user" value="{{ request('user') }}"
-                        placeholder="e.g. John or john@example.com"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Payment Status</label>
-                    <select name="payment_status"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary">
-                        <option value="">All</option>
-                        <option value="pending" {{ request('payment_status') == 'pending' ? 'selected' : '' }}>Pending
-                        </option>
-                        <option value="paid" {{ request('payment_status') == 'paid' ? 'selected' : '' }}>Paid</option>
-                        <option value="failed" {{ request('payment_status') == 'failed' ? 'selected' : '' }}>Failed
-                        </option>
-                        <option value="refunded" {{ request('payment_status') == 'refunded' ? 'selected' : '' }}>
-                            Refunded</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Booking Status</label>
-                    <select name="status"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary">
-                        <option value="">All</option>
-                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>Confirmed
-                        </option>
-                        <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled
-                        </option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Sort By</label>
-                    <select name="sort"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary">
-                        <option value="latest" {{ request('sort', 'latest') == 'latest' ? 'selected' : '' }}>Newest
-                            First</option>
-                        <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Oldest First
-                        </option>
-                        <option value="amount_desc" {{ request('sort') == 'amount_desc' ? 'selected' : '' }}>Highest
-                            Amount</option>
-                        <option value="amount_asc" {{ request('sort') == 'amount_asc' ? 'selected' : '' }}>Lowest
-                            Amount</option>
-                    </select>
-                </div>
-            </form>
+            @endif
 
-            <div class="flex flex-col sm:flex-row justify-end mt-4 gap-3">
-                <button type="submit" form="filter-form"
-                    class="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-orange-600 transition shadow-lg order-2 sm:order-1">
-                    Apply Filters
-                </button>
-                @if (request()->hasAny(['booking_id', 'user', 'payment_status', 'status', 'sort']))
-                    <a href="{{ route('admin.bookings.index') }}"
-                        class="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-100 transition text-center order-1 sm:order-2">
-                        Clear All
-                    </a>
-                @endif
-            </div>
-        </div>
+            <!-- Responsive Table / Cards -->
+            <div class="overflow-x-auto">
 
-        <!-- Active Filters -->
-        @if (request()->hasAny(['booking_id', 'user', 'payment_status', 'status', 'sort']))
-            <div class="mb-6 flex flex-wrap gap-2 justify-center lg:justify-start">
-                @if (request('booking_id'))
-                    <span
-                        class="inline-flex items-center px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium">ID:
-                        {{ request('booking_id') }} <a href="{{ request()->except('booking_id') }}"
-                            class="ml-2 text-primary hover:text-orange-700">×</a></span>
-                @endif
-                @if (request('user'))
-                    <span
-                        class="inline-flex items-center px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium">User:
-                        {{ request('user') }} <a href="{{ request()->except('user') }}"
-                            class="ml-2 text-primary hover:text-orange-700">×</a></span>
-                @endif
-                @if (request('payment_status'))
-                    <span
-                        class="inline-flex items-center px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium">Payment:
-                        {{ ucfirst(request('payment_status')) }} <a href="{{ request()->except('payment_status') }}"
-                            class="ml-2 text-primary hover:text-orange-700">×</a></span>
-                @endif
-                @if (request('status'))
-                    <span
-                        class="inline-flex items-center px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium">Status:
-                        {{ ucfirst(request('status')) }} <a href="{{ request()->except('status') }}"
-                            class="ml-2 text-primary hover:text-orange-700">×</a></span>
-                @endif
-                @if (request('sort') && request('sort') != 'latest')
-                    <span
-                        class="inline-flex items-center px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium">Sort:
-                        {{ ucwords(str_replace('_', ' ', request('sort'))) }} <a
-                            href="{{ request()->except('sort') }}"
-                            class="ml-2 text-primary hover:text-orange-700">×</a></span>
-                @endif
-            </div>
-        @endif
-
-        <!-- Mobile-Friendly Responsive List (Cards on mobile, Table on desktop) -->
-        <div class="space-y-6 lg:space-y-0">
-            <!-- Desktop Table -->
-            <div class="hidden lg:block bg-white rounded-2xl shadow-xl overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full table-auto">
-                        <thead class="bg-gray-50 border-b border-gray-200">
-                            <tr>
-                                <th
-                                    class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                    ID</th>
-                                <th
-                                    class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                    User</th>
-                                <th
-                                    class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                    Event</th>
-                                <th
-                                    class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                    Total</th>
-                                <th
-                                    class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                    Payment</th>
-                                <th
-                                    class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                    Status</th>
-                                <th
-                                    class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                    Booked On</th>
-                                <th
-                                    class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                    Actions</th>
+                <!-- Desktop Table -->
+                <table class="w-full text-sm text-left text-gray-700 hidden lg:table">
+                    <thead class="text-xs uppercase bg-gray-100 text-gray-600">
+                        <tr>
+                            <th class="px-6 py-4">#</th>
+                            <th class="px-6 py-4">Attendee</th>
+                            <th class="px-6 py-4">Event</th>
+                            <th class="px-6 py-4">Total Amount</th>
+                            <th class="px-6 py-4 text-center">Payment</th>
+                            <th class="px-6 py-4 text-center">Status</th>
+                            <th class="px-6 py-4 text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($bookings as $index => $booking)
+                            <tr class="bg-white border-b hover:bg-orange-50 transition">
+                                <td class="px-6 py-5 font-medium">#{{ $booking->id }}</td>
+                                <td class="px-6 py-5">
+                                    <p class="font-semibold text-[#063970]">{{ $booking->full_name }}</p>
+                                    <p class="text-xs text-gray-500">{{ $booking->email }}</p>
+                                </td>
+                                <td class="px-6 py-5 font-medium">
+                                    {{ Str::limit($booking->event->title ?? 'N/A', 40) }}
+                                </td>
+                                <td class="px-6 py-5 font-semibold text-[#FF7A28]">
+                                    NPR {{ number_format($booking->total_amount, 2) }}
+                                </td>
+                                <td class="px-6 py-5 text-center">
+                                    @include('admin.bookings.partials.payment-badge', ['status' => $booking->payment_status])
+                                </td>
+                                <td class="px-6 py-5 text-center">
+                                    @include('admin.bookings.partials.booking-status-badge', ['status' => $booking->status])
+                                </td>
+            
+                                <td class="px-6 py-5 text-center">
+                                    <a href="{{ route('admin.bookings.show', $booking) }}"
+                                       class="px-5 py-2 bg-[#063970] text-white rounded-lg hover:bg-[#052e5c] transition text-sm font-medium">
+                                        View
+                                    </a>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @forelse($bookings as $booking)
-                                <tr class="hover:bg-gray-50 transition text-sm">
-                                    <td class="px-4 py-4 font-medium text-gray-900">#{{ $booking->id }}</td>
-                                    <td class="px-4 py-4">
-                                        <div class="font-medium text-gray-900">{{ $booking->full_name }}</div>
-                                        <div class="text-xs text-gray-500">{{ $booking->email }}</div>
-                                    </td>
-                                    <td class="px-4 py-4 text-gray-900">
-                                        {{ Str::limit($booking->event->title ?? 'N/A', 35) }}</td>
-                                    <td class="px-4 py-4 font-semibold text-gray-900">NPR
-                                        {{ number_format($booking->total_amount, 2) }}</td>
-                                    <td class="px-4 py-4">
-                                        @include('admin.bookings.partials.payment-badge', [
-                                            'status' => $booking->payment_status,
-                                        ])
-                                    </td>
-                                    <td class="px-4 py-4">
-                                        @include('admin.bookings.partials.booking-status-badge', [
-                                            'status' => $booking->status,
-                                        ])
-                                    </td>
-                                    <td class="px-4 py-4 text-gray-600">
-                                        <div>{{ $booking->created_at->format('d M Y') }}</div>
-                                        <div class="text-xs text-gray-500">{{ $booking->created_at->format('h:i A') }}
-                                        </div>
-                                    </td>
-                                    <td class="px-4 py-4">
-                                        <a href="{{ route('admin.bookings.show', $booking) }}"
-                                            class="inline-block px-4 py-2 bg-primary text-white font-bold text-xs rounded-lg hover:bg-orange-600 transition shadow">
-                                            View
-                                        </a>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="8" class="px-6 py-12 text-center text-gray-500">No bookings found.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-                    {{ $bookings->appends(request()->query())->links() }}
+                        @empty
+                            <tr>
+                                <td colspan="8" class="px-6 py-20 text-center text-gray-500 text-lg">
+                                    @if(request('query'))
+                                        No results for "<strong>{{ request('query') }}</strong>"
+                                    @else
+                                        No bookings found
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+
+                <!-- Mobile Cards -->
+                <div class="lg:hidden">
+                    @forelse($bookings as $booking)
+                        <div class="m-4 p-5 bg-white border border-gray-200 rounded-xl shadow hover:shadow-lg transition">
+                            <div class="flex items-start justify-between mb-4">
+                                <div>
+                                    <h3 class="font-bold text-[#063970] text-lg">#{{ $booking->id }}</h3>
+                                    <p class="text-xs text-gray-500">
+                                        {{ $booking->created_at->format('d M Y, h:i A') }}
+                                    </p>
+                                </div>
+                                <div class="flex gap-2 flex-wrap">
+                                    @include('admin.bookings.partials.payment-badge', ['status' => $booking->payment_status])
+                                    @include('admin.bookings.partials.booking-status-badge', ['status' => $booking->status])
+                                </div>
+                            </div>
+
+                            <div class="space-y-3 text-sm">
+                                <div>
+                                    <p class="text-gray-500">Attendee</p>
+                                    <p class="font-semibold text-[#063970]">{{ $booking->full_name }}</p>
+                                    <p class="text-gray-600">{{ $booking->email }}</p>
+                                </div>
+
+                                <div>
+                                    <p class="text-gray-500">Event</p>
+                                    <p class="font-medium">{{ $booking->event->title ?? 'N/A' }}</p>
+                                </div>
+
+                                <div class="flex justify-between items-end">
+                                    <div>
+                                        <p class="text-gray-500">Total Amount</p>
+                                        <p class="font-bold text-2xl text-[#FF7A28]">
+                                            NPR {{ number_format($booking->total_amount, 2) }}
+                                        </p>
+                                    </div>
+                                    <a href="{{ route('admin.bookings.show', $booking) }}"
+                                       class="px-6 py-3 bg-[#063970] text-white rounded-lg hover:bg-[#052e5c] transition font-medium">
+                                        View →
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="m-6 p-10 text-center text-gray-500 bg-gray-50 rounded-xl">
+                            <p class="text-xl mb-4">
+                                @if(request('query'))
+                                    No results found
+                                @else
+                                    No bookings yet
+                                @endif
+                            </p>
+                        </div>
+                    @endforelse
                 </div>
             </div>
 
-            <!-- Mobile Cards -->
-            <div class="block lg:hidden space-y-4">
-                @forelse($bookings as $booking)
-                    <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <div class="text-lg font-bold text-gray-900">#{{ $booking->id }}</div>
-                                <div class="text-sm text-gray-600">{{ $booking->created_at->format('d M Y, h:i A') }}
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                @include('admin.bookings.partials.payment-badge', [
-                                    'status' => $booking->payment_status,
-                                ])
-                                <div class="mt-2">
-                                    @include('admin.bookings.partials.booking-status-badge', [
-                                        'status' => $booking->status,
-                                    ])
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="space-y-3 text-sm">
-                            <div>
-                                <span class="font-semibold text-gray-700">User:</span>
-                                <div class="mt-1">
-                                    <div class="font-medium text-gray-900">{{ $booking->full_name }}</div>
-                                    <div class="text-gray-600">{{ $booking->email }}</div>
-                                </div>
-                            </div>
-                            <div>
-                                <span class="font-semibold text-gray-700">Event:</span>
-                                <div class="font-medium text-gray-900 mt-1">{{ $booking->event->title ?? 'N/A' }}
-                                </div>
-                            </div>
-                            <div>
-                                <span class="font-semibold text-gray-700">Total:</span>
-                                <div class="font-bold text-lg text-primary mt-1">NPR
-                                    {{ number_format($booking->total_amount, 2) }}</div>
-                            </div>
-                        </div>
-
-                        <div class="mt-5">
-                            <a href="{{ route('admin.bookings.show', $booking) }}"
-                                class="block w-full text-center px-4 py-3 bg-primary text-white font-bold rounded-xl hover:bg-orange-600 transition shadow">
-                                View
-                            </a>
-                        </div>
-                    </div>
-                @empty
-                    <div class="text-center py-12 text-gray-500 bg-white rounded-2xl shadow-lg">
-                        No bookings found matching your criteria.
-                    </div>
-                @endforelse
-
-                <!-- Mobile Pagination -->
-                <div class="mt-6">
-                    {{ $bookings->appends(request()->query())->links() }}
+            <!-- Pagination -->
+            <div class="bg-gray-50 px-6 py-4 flex flex-col sm:flex-row items-center justify-between border-t text-sm">
+                <div class="text-gray-600 mb-3 sm:mb-0">
+                    Showing {{ $bookings->firstItem() ?? 0 }} to {{ $bookings->lastItem() ?? 0 }} of {{ $bookings->total() }} entries
+                </div>
+                <div>
+                    {{ $bookings->appends(request()->query())->links('pagination::tailwind') }}
                 </div>
             </div>
         </div>
     </div>
-
 </x-admin.admin-layout>

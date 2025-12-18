@@ -14,71 +14,60 @@ class AdminBookingController extends Controller
      */
     public function index(Request $request)
 {
-    $query = Booking::with(['user', 'event', 'bookingTickets.eventTicket'])
-                    ->withCount('bookingTickets')
-                    ->select('bookings.*');
+    $query = $request->query('query');
 
-    // Filter by Booking ID
-    if ($request->filled('booking_id')) {
-        $query->where('id', $request->booking_id);
-    }
-
-    // Search by User (full_name or email)
-    if ($request->filled('user')) {
-        $search = $request->user;
-        $query->where(function ($q) use ($search) {
-            $q->where('full_name', 'like', "%{$search}%")
-              ->orWhere('email', 'like', "%{$search}%");
-        });
-    }
-
-    // Filter by Payment Status
-    if ($request->filled('payment_status')) {
-        $query->where('payment_status', $request->payment_status);
-    }
-
-    // Filter by Booking Status
-    if ($request->filled('status')) {
-        $query->where('status', $request->status);
-    }
-
-    // Sorting
-    $sort = $request->get('sort', 'latest');
-    switch ($sort) {
-        case 'oldest':
-            $query->oldest();
-            break;
-        case 'amount_desc':
-            $query->orderByDesc('total_amount');
-            break;
-        case 'amount_asc':
-            $query->orderBy('total_amount');
-            break;
-        case 'latest':
-        default:
-            $query->latest();
-            break;
-    }
-
-    // Changed from 20 to 10
-    $bookings = $query->paginate(10)->withQueryString();
+    $bookings = Booking::query()
+        ->with('event')
+        ->when($query, function ($q) use ($query) {
+            return $q->where(function ($sq) use ($query) {
+                $sq->where('id', 'like', "%{$query}%")
+                   ->orWhere('full_name', 'like', "%{$query}%")
+                   ->orWhere('email', 'like', "%{$query}%")
+                   ->orWhere('phone', 'like', "%{$query}%")
+                   ->orWhere('ticket_token', 'like', "%{$query}%");
+            });
+        })
+        ->latest()
+        ->paginate(15);
 
     return view('admin.bookings.index', compact('bookings'));
 }
     /**
      * Display the specified booking details.
      */
-    public function show(Booking $booking)
-    {
-        $booking->load([
-            'user',
-            'event',
-            'bookingTickets.eventTicket',
-        ]);
+   public function show(Booking $booking)
+{
+    $booking->load([
+        'user',
+        'event',
+        'bookingTickets.eventTicket',
+    ]);
 
-        // Calculate total quantity
-        $totalTickets = $booking->bookingTickets->sum('quantity');
+    $totalTickets = $booking->bookingTickets->sum('quantity');
 
-        return view('admin.bookings.show', compact('booking', 'totalTickets'));
+    return view('admin.bookings.show', compact('booking', 'totalTickets'));
+}
+
+    /**
+ * Manually check-in a booking
+ */
+public function checkIn(Booking $booking)
+{
+    // Security: Only allow if payment is paid and not already checked in
+    if ($booking->payment_status !== 'paid') {
+        return redirect()->back()->with('error', 'Cannot check in: Payment is not completed.');
     }
+
+    if ($booking->is_checked_in) {
+        return redirect()->back()->with('info', 'Attendee is already checked in.');
+    }
+
+    // Perform check-in
+    $booking->update([
+        'is_checked_in' => true,
+        'checked_in_at' => now(),
+    ]);
+
+    return redirect()->back()->with('success', 'Attendee successfully checked in!');
+}
 }

@@ -135,4 +135,7 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
 
     Route::post('/ticket-scanner/checkin', [TicketScannerController::class, 'checkIn'])
         ->name('ticket-scanner.checkin');
+
+    Route::post('/admin/ticket-scanner/search', [TicketScannerController::class, 'search'])->name('ticket-scanner.search');
+   Route::post('admin/bookings/{booking}/check-in', [AdminBookingController::class, 'checkIn'])->name('bookings.check-in');
 });

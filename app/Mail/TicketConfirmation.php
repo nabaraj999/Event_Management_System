@@ -14,18 +14,20 @@ class TicketConfirmation extends Mailable
     use Queueable, SerializesModels;
 
     public $booking;
-    public $qrCodePng;  // This is binary string data
+    protected $qrCodePng;
+    protected $pdfContent;
 
-    public function __construct($booking, $qrCodePng)
+    public function __construct($booking, string $qrCodePng, string $pdfContent)
     {
         $this->booking = $booking;
-        $this->qrCodePng = $qrCodePng;  // Already cast to string in controller
+        $this->qrCodePng = $qrCodePng;
+        $this->pdfContent = $pdfContent;
     }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your Ticket - ' . $this->booking->event->title,
+            subject: '🎫 Ticket Confirmed – ' . $this->booking->event->title
         );
     }
 
@@ -33,14 +35,26 @@ class TicketConfirmation extends Mailable
     {
         return new Content(
             view: 'emails.ticket-confirmation',
+            with: [
+                'booking' => $this->booking,
+                // Keep small for email clients
+                'qrCodeBase64' => base64_encode($this->qrCodePng),
+            ]
         );
     }
 
-   public function attachments(): array
-{
-    return [
-        Attachment::fromData(fn () => $this->qrCodePng, 'Ticket-QR-Code.png')
-            ->withMime('image/png'),
-    ];
-}
+    public function attachments(): array
+    {
+        return [
+            Attachment::fromData(
+                fn () => $this->pdfContent,
+                'EventHUB-Ticket-' . $this->booking->ticket_token . '.pdf'
+            )->withMime('application/pdf'),
+
+            Attachment::fromData(
+                fn () => $this->qrCodePng,
+                'EventHUB-QR-' . $this->booking->ticket_token . '.png'
+            )->withMime('image/png'),
+        ];
+    }
 }
