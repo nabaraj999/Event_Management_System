@@ -114,7 +114,7 @@ class BookingController extends Controller
                 'website_url'        => config('services.khalti.website_url'),
                 'amount'             => (int) ($totalAmount * 100), // in paisa
                 'purchase_order_id'  => 'booking-' . $booking->id,
-                'purchase_order_name'=> $eventTicket->name . ' - ' . $eventTicket->event->title,
+                'purchase_order_name' => $eventTicket->name . ' - ' . $eventTicket->event->title,
                 'customer_info'      => [
                     'name'  => $request->full_name,
                     'email' => $request->email,

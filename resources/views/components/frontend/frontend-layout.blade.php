@@ -55,6 +55,7 @@
                 <a href="{{ route('home') }}" class="hover:text-primary transition">Home</a>
                 <a href="{{ route('events.index') }}" class="hover:text-primary transition">Events</a>
                 <a href="{{ route('event-categories.index') }}" class="hover:text-primary transition">Categories</a>
+                <a href="{{ route('organizer.apply') }}" class="hover:text-primary transition">Become an Organizer</a>
                 <a href="{{ route('about') }}" class="hover:text-primary transition">About Us</a>
                 <a href="{{ route('contact') }}" class="hover:text-primary transition">Contact</a>
             </div>
@@ -104,6 +105,7 @@
             <a href="{{ route('home') }}" class="block py-2 hover:text-primary transition">Home</a>
             <a href="{{ route('events.index') }}" class="block py-2 hover:text-primary transition">Events</a>
             <a href="#" class="block py-2 hover:text-primary transition">Categories</a>
+            <a href="{{ route('organizer.apply') }}" class="block py-2 hover:text-primary transition">Become an Organizer</a>
             <a href="#" class="block py-2 hover:text-primary transition">About Us</a>
             <a href="#" class="block py-2 hover:text-primary transition">Contact</a>
 
