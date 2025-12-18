@@ -30,6 +30,9 @@ class OrganizerApplication extends Authenticatable
         'password',
         'remember_token',
     ];
+    protected $casts = [
+        'applied_at' => 'datetime',  // ← This fixes the error
+    ];
 
     // Hash password automatically
     public function setPasswordAttribute($password)

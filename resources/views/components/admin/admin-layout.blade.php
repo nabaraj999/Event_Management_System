@@ -103,19 +103,14 @@
                     <span>Categories</span>
                 </a>
 
-                <a href="#"
-                    class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
-       {{ request()->routeIs('admin.organizers.*') ? 'sidebar-active' : '' }}">
-                    <i class="fa-solid fa-user-tie w-6 h-6 mr-3 text-lg"></i>
-                    <span>Organizers</span>
-                </a>
 
-                <a href="{{ route('admin.bookings.index') }}"
-                    class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
-       {{ request()->routeIs('admin.bookings.*') ? 'sidebar-active' : '' }}">
-                    <i class="fa-solid fa-file-invoice w-6 h-6 mr-3 text-lg"></i>
-                    <span>Bookings</span>
-                </a>
+
+              <a href="{{ route('admin.organizer-applications.index') }}"
+   class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
+          {{ request()->routeIs('admin.organizer-applications.*') ? 'sidebar-active' : '' }}">
+    <i class="fa-solid fa-users-gear w-6 h-6 mr-3 text-lg"></i>
+    <span>Organizer Applications</span>
+</a>
 
                 <a href="{{ route('admin.users.index') }}"
                     class="sidebar-link flex items-center px-4 py-3 rounded-lg transition

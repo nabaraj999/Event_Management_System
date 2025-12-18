@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminBookingController;
+use App\Http\Controllers\Admin\AdminOrganizerApplicationController;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\CompanyInfoController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -37,10 +38,12 @@ Route::get('/booking/cancel', [BookingController::class, 'cancel'])->name('booki
 Route::post('webhook/khalti', [BookingController::class, 'webhook']);
 Route::get('/verify-ticket/{token}', [BookingController::class, 'verifyTicket'])->name('verify.ticket');
 
-Route::get('/event-categories', [MainEventCategoryController::class, 'index']) ->name('event-categories.index');
+Route::get('/event-categories', [MainEventCategoryController::class, 'index'])->name('event-categories.index');
 Route::get('/events/category/{slug}', [MainEventCategoryController::class, 'show'])->name('events.category');
 
-Route::get('/about', function () {return view('frontend.about-us.index');})->name('about');
+Route::get('/about', function () {
+    return view('frontend.about-us.index');
+})->name('about');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
@@ -137,10 +140,17 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     // AJAX Routes for Scanner
     Route::post('/ticket-scanner/verify', [TicketScannerController::class, 'verify'])
         ->name('ticket-scanner.verify');
-
     Route::post('/ticket-scanner/checkin', [TicketScannerController::class, 'checkIn'])
         ->name('ticket-scanner.checkin');
-
     Route::post('/admin/ticket-scanner/search', [TicketScannerController::class, 'search'])->name('ticket-scanner.search');
-   Route::post('admin/bookings/{booking}/check-in', [AdminBookingController::class, 'checkIn'])->name('bookings.check-in');
+    Route::post('admin/bookings/{booking}/check-in', [AdminBookingController::class, 'checkIn'])->name('bookings.check-in');
+
+    Route::get('organizer-applications', [AdminOrganizerApplicationController::class, 'index'])
+        ->name('organizer-applications.index');
+    Route::get('organizer-applications/{application}', [AdminOrganizerApplicationController::class, 'show'])
+        ->name('organizer-applications.show');
+    Route::post('organizer-applications/{application}/approve', [AdminOrganizerApplicationController::class, 'approve'])
+        ->name('organizer-applications.approve');
+    Route::post('organizer-applications/{application}/reject', [AdminOrganizerApplicationController::class, 'reject'])
+        ->name('organizer-applications.reject');
 });
