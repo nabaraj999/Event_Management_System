@@ -96,16 +96,16 @@
                 Bookings
             </a>
 
-            <a href="#"
+            <a href="{{ route('org.profile.settings') }}"
                class="sidebar-link flex items-center px-4 py-3 rounded-lg
-               {{ request()->routeIs('organizer.settings') ? 'sidebar-active' : '' }}">
+               {{ request()->routeIs('org.settings') ? 'sidebar-active' : '' }}">
                 <i class="fa-solid fa-gear mr-3 text-lg"></i>
                 Settings
             </a>
 
             <a href="{{ route('org.profile.edit') }}"
                class="sidebar-link flex items-center px-4 py-3 rounded-lg
-               {{ request()->routeIs('or.profile') ? 'sidebar-active' : '' }}">
+               {{ request()->routeIs('org.profile') ? 'sidebar-active' : '' }}">
                 <i class="fa-solid fa-user mr-3 text-lg"></i>
                 Profile
             </a>

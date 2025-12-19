@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminBookingController;
 use App\Http\Controllers\Admin\AdminOrganizerApplicationController;
+use App\Http\Controllers\Admin\AdminOrganizerController;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\CompanyInfoController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -158,6 +159,11 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         ->name('organizer-applications.reject');
 
 
+        Route::get('/organizers', [AdminOrganizerController::class, 'index'])->name('organizers.index');
+    Route::get('/organizers/{id}', [AdminOrganizerController::class, 'show'])->name('organizers.show');
+    Route::patch('/organizers/{id}/toggle', [AdminOrganizerController::class, 'toggleStatus'])->name('organizers.toggle');
+
+
 });
 
 
@@ -171,8 +177,15 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     Route::prefix('org')->name('org.')->group(function () {
     Route::get('/login', [OrganizerLoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [OrganizerLoginController::class, 'login']);
-    Route::get('/profile', [OrganizerProfileController::class, 'edit'])->name('profile.edit');
+   Route::get('/profile', [OrganizerProfileController::class, 'show'])->name('profile.show');
+
+    // Full edit - only if not frozen
+    Route::get('/profile/edit', [OrganizerProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [OrganizerProfileController::class, 'update'])->name('profile.update');
+
+    // Always accessible settings
+    Route::get('/profile/settings', [OrganizerProfileController::class, 'settings'])->name('profile.settings');
+    Route::put('/profile/settings', [OrganizerProfileController::class, 'updateSettings'])->name('profile.settings.update');
     Route::post('/logout', [OrganizerLoginController::class, 'logout'])->name('logout');
 
 

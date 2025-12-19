@@ -112,6 +112,13 @@
     <span>Organizer Applications</span>
 </a>
 
+ <a href="{{ route('admin.organizers.index') }}"
+   class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
+          {{ request()->routeIs('admin.organizers.*') ? 'sidebar-active' : '' }}">
+    <i class="fa-solid fa-users-gear w-6 h-6 mr-3 text-lg"></i>
+    <span>Organizer </span>
+</a>
+
                 <a href="{{ route('admin.users.index') }}"
                     class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
        {{ request()->routeIs('admin.users.*') ? 'sidebar-active' : '' }}">
