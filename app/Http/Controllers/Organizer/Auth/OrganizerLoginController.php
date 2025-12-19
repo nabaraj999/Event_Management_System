@@ -31,10 +31,6 @@ class OrganizerLoginController extends Controller
             return back()->withErrors(['email' => 'Your application is not approved yet.']);
         }
 
-        if ($organizer->is_frozen) {
-            Auth::guard('organizer')->logout();
-            return back()->withErrors(['email' => 'Your account is frozen. Please complete your profile.']);
-        }
 
         return redirect()->intended(route('org.dashboard'));
     }
