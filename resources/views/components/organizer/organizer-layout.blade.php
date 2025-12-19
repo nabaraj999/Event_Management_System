@@ -82,7 +82,7 @@
                 Events
             </a>
 
-            <a href="#"
+            <a href="{{ route('org.categories.index') }}"
                class="sidebar-link flex items-center px-4 py-3 rounded-lg
                {{ request()->routeIs('organizer.categories.*') ? 'sidebar-active' : '' }}">
                 <i class="fa-solid fa-layer-group mr-3 text-lg"></i>

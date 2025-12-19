@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Organizer\Auth\OrganizerDashboardController;
 use App\Http\Controllers\Organizer\Auth\OrganizerLoginController;
 use App\Http\Controllers\Organizer\OrganizerProfileController;
+use App\Http\Controllers\Organizer\OrgEventCategoryController;
 use App\Http\Controllers\User\ContactController;
 use App\Http\Controllers\ProfileController as ControllersProfileController;
 use App\Http\Controllers\User\AboutController;
@@ -191,6 +192,8 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
 
     Route::middleware('auth:organizer')->group(function () {
         Route::get('/dashboard', [OrganizerDashboardController::class, 'index'])->name('dashboard');
+        Route::resource('categories', OrgEventCategoryController::class)
+         ->parameters(['categories' => 'category']);
     });
 
 

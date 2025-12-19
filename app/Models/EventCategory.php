@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class EventCategory extends Model
@@ -11,6 +12,7 @@ class EventCategory extends Model
     use HasFactory;
 
     protected $fillable = [
+        'organizer_id',
         'name',
         'slug',
         'description',
@@ -68,5 +70,27 @@ class EventCategory extends Model
     public function events()
     {
         return $this->hasMany(Event::class, 'category_id'); // Adjust Event model name and foreign key
+    }
+    public function organizer()
+    {
+        return $this->belongsTo(OrganizerApplication::class, 'organizer_id');
+    }
+    // Scope for global (admin) categories
+    public function scopeGlobal($query)
+    {
+        return $query->whereNull('organizer_id');
+    }
+    public function scopeMine($query)
+    {
+        $organizerId = Auth::guard('organizer')->id();
+        return $query->where('organizer_id', $organizerId);
+    }
+    public function scopeVisibleToOrganizer($query)
+    {
+        $organizerId = Auth::guard('organizer')->id();
+        return $query->where(function ($q) use ($organizerId) {
+            $q->where('organizer_id', $organizerId)
+              ->orWhereNull('organizer_id');
+        });
     }
 }
