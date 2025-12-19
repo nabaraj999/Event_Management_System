@@ -11,23 +11,25 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('organizer_applications', function (Blueprint $table) {
-    $table->id();
-    $table->string('organization_name');
-    $table->string('contact_person'); // or use as organizer name
-    $table->string('email')->unique();
-    $table->string('phone');
-    $table->string('password')->nullable()->change();
-    $table->string('company_type');
-    $table->string('website')->nullable();
-    $table->string('registration_document')->nullable();
-    $table->string('profile_image')->nullable();
-    $table->text('address');
-    $table->text('description')->nullable();
-    $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
-    $table->timestamp('applied_at')->useCurrent();
-    $table->timestamps();
-});
+        Schema::create('organizer_applications', function (Blueprint $table) {
+            $table->id();
+            $table->string('organization_name');
+            $table->string('contact_person'); // or use as organizer name
+            $table->string('email')->unique();
+            $table->string('phone');
+            $table->string('password')->nullable()->change();
+            $table->string('company_type');
+            $table->string('website')->nullable();
+            $table->string('registration_document')->nullable();
+            $table->string('profile_image')->nullable();
+            $table->text('address');
+            $table->text('description')->nullable();
+            $table->boolean('is_frozen')->default(false);
+            $table->timestamp('profile_completed_at')->nullable();
+            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->timestamp('applied_at')->useCurrent();
+            $table->timestamps();
+        });
     }
 
     /**
