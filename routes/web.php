@@ -11,6 +11,9 @@ use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\EventTicketController;
 use App\Http\Controllers\Admin\TicketScannerController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Organizer\Auth\OrganizerDashboardController;
+use App\Http\Controllers\Organizer\Auth\OrganizerLoginController;
+use App\Http\Controllers\Organizer\OrganizerProfileController;
 use App\Http\Controllers\User\ContactController;
 use App\Http\Controllers\ProfileController as ControllersProfileController;
 use App\Http\Controllers\User\AboutController;
@@ -153,4 +156,29 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         ->name('organizer-applications.approve');
     Route::post('organizer-applications/{application}/reject', [AdminOrganizerApplicationController::class, 'reject'])
         ->name('organizer-applications.reject');
+
+
+});
+
+
+
+
+
+
+
+
+
+    Route::prefix('org')->name('org.')->group(function () {
+    Route::get('/login', [OrganizerLoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [OrganizerLoginController::class, 'login']);
+    Route::get('/profile', [OrganizerProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [OrganizerProfileController::class, 'update'])->name('profile.update');
+    Route::post('/logout', [OrganizerLoginController::class, 'logout'])->name('logout');
+
+
+    Route::middleware('auth:organizer')->group(function () {
+        Route::get('/dashboard', [OrganizerDashboardController::class, 'index'])->name('dashboard');
+    });
+
+
 });

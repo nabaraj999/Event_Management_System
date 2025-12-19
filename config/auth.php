@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Admin;
+use App\Models\OrganizerApplication;
 use App\Models\User;
 
 return [
@@ -47,6 +48,11 @@ return [
         'driver' => 'session',
         'provider' => 'admins',
     ],
+
+    'organizer' => [
+        'driver' => 'session',
+        'provider' => 'organizers',
+    ],
     ],
 
     /*
@@ -75,10 +81,10 @@ return [
         'driver' => 'eloquent',
         'model' => Admin::class,  // ← This line is critical
     ],
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+       'organizers' => [
+        'driver' => 'eloquent',
+        'model' => OrganizerApplication::class,
+    ],
     ],
 
     /*

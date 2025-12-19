@@ -26,7 +26,7 @@
             <p style="margin:4px 0;"><strong>Temporary Password:</strong> {{ $plainPassword }}</p>
         </div>
 
-        <a href="{{ url('/organizer/login') }}"
+        <a href="{{ url('/org/login') }}"
            style="display:inline-block; background:#2563eb; color:#ffffff; padding:12px 20px;
                   text-decoration:none; border-radius:6px; font-weight:bold;">
             Login to Dashboard
