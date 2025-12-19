@@ -25,38 +25,24 @@ class AdminOrganizerApplicationController extends Controller
         return view('admin.organizer-applications.show', compact('application'));
     }
 
-   public function approve(OrganizerApplication $application)
-    {
-        // Update application status
-        $application->update(['status' => 'approved']);
+  public function approve(OrganizerApplication $application)
+{
+    $temporaryPassword = Str::random(12);
 
-        // Generate temporary password
-        $temporaryPassword = Str::random(12);
+    $application->update([
+        'status'   => 'approved',
+        'password' => Hash::make($temporaryPassword), // Manual hash – safe
+        // Optional: reset freeze if any
+        'is_frozen' => false,
+    ]);
 
-        // Create Organizer account
-        $organizer = OrganizerApplication::create([
-            'name'              => $application->organization_name,
-            'contact_person'    => $application->contact_person,
-            'email'             => $application->email,
-            'password'          => Hash::make($temporaryPassword),
-            'phone'             => $application->phone,
-            'company_type'      => $application->company_type,
-            'website'           => $application->website,
-            'address'           => $application->address,
-            'description'       => $application->description,
-            'profile_image'     => $application->profile_image,
-            'registration_document' => $application->registration_document,
-            // is_frozen defaults to false
-        ]);
+    Mail::to($application->email)->send(
+        new OrganizerApprovedMail($application, $temporaryPassword)
+    );
 
-        // Send approval email with credentials
-        Mail::to($application->email)->send(
-            new OrganizerApprovedMail($organizer, $temporaryPassword)
-        );
-
-        return redirect()->route('admin.organizer-applications.index')
-            ->with('success', "Application from {$application->organization_name} has been APPROVED and account created.");
-    }
+    return redirect()->route('admin.organizer-applications.index')
+        ->with('success', "Application from {$application->organization_name} approved successfully!");
+}
 
     public function reject(OrganizerApplication $application)
     {

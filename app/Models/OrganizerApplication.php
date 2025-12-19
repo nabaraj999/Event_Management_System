@@ -9,34 +9,38 @@ class OrganizerApplication extends Authenticatable
 {
     use Notifiable;
 
-    protected $guard = 'organizer'; // Important for login
+    protected $guard = 'organizer';
 
     protected $fillable = [
-    'organization_name',
-    'contact_person',
-    'email',
-    'phone',
-    'address',
-    'website',
-    'company_type',
-    'description',
-    'status',
-    'applied_at',
-    'profile_image',
-    'registration_document',
-];
+        'organization_name',
+        'contact_person',
+        'email',
+        'phone',
+        'password',                  // Needed for approval update
+        'address',
+        'website',
+        'company_type',
+        'description',
+        'status',
+        'applied_at',
+        'profile_image',
+        'registration_document',
+        'is_frozen',                 // ← Added: for freezing logic
+        'profile_completed_at',      // ← Added: to track completion
+    ];
 
     protected $hidden = [
         'password',
         'remember_token',
     ];
+
     protected $casts = [
-        'applied_at' => 'datetime',  // ← This fixes the error
+        'applied_at' => 'datetime',
+        'profile_completed_at' => 'datetime',
+        'is_frozen' => 'boolean',
+        'email_verified_at' => 'datetime', // optional, if you add verification later
     ];
 
-    // Hash password automatically
-    public function setPasswordAttribute($password)
-    {
-        $this->attributes['password'] = bcrypt($password);
-    }
+    // REMOVED the setPasswordAttribute mutator completely!
+    // We hash manually in controller → safer and cleaner
 }
