@@ -1,5 +1,5 @@
-{{-- resources/views/admin/events/index.blade.php --}}
-<x-admin.admin-layout>
+{{-- resources/views/organizer/events/index.blade.php --}}
+<x-organizer.organizer-layout>
 
     <div class="py-8 px-4 max-w-7xl mx-auto">
 
@@ -11,14 +11,14 @@
                     <p class="text-blue-200 mt-1">Manage your events</p>
                 </div>
                 <div class="flex gap-3">
-                    <form method="GET" action="{{ route('admin.events.index') }}" class="flex gap-2">
+                    <form method="GET" action="{{ route('org.events.index') }}" class="flex gap-2">
                         <input type="text" name="search" value="{{ request('search') }}"
                             placeholder="Search events..."
                             class="px-5 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-orange-400 w-64">
                         <button type="submit"
                             class="px-6 py-3 bg-primary hover:bg-orange-600 text-white rounded-xl font-medium transition shadow">Search</button>
                     </form>
-                    <a href="{{ route('admin.events.create') }}"
+                    <a href="{{ route('org.events.create') }}"
                         class="px-8 py-3 bg-primary hover:bg-orange-600 text-white rounded-xl font-medium transition shadow-lg">
                         Add New Event
                     </a>
@@ -98,7 +98,7 @@
                                     <div class="flex items-center gap-3">
 
                                         <!-- Edit Button -->
-                                        <a href="{{ route('admin.events.edit', $event) }}"
+                                        <a href="{{ route('org.events.edit', $event) }}"
                                             class="px-4 py-2.5 rounded-lg bg-[#063970] text-white font-medium
                   shadow-sm hover:bg-blue-700 hover:shadow-md
                   transition-all duration-200 text-center min-w-[70px]">
@@ -106,7 +106,7 @@
                                         </a>
 
                                         <!-- Delete Button -->
-                                        <form action="{{ route('admin.events.destroy', $event) }}" method="POST">
+                                        <form action="{{ route('org.events.destroy', $event) }}" method="POST">
                                             @csrf @method('DELETE')
                                             <button type="submit"
                                                 onclick="return confirm('Delete {{ addslashes($event->title) }}?')"
@@ -125,7 +125,7 @@
                                 <tr>
                                     <td colspan="6" class="text-center py-20 text-gray-500">
                                         <p class="text-2xl font-medium">No events found</p>
-                                        <a href="{{ route('admin.events.create') }}"
+                                        <a href="{{ route('org.events.create') }}"
                                             class="text-primary hover:underline mt-4 inline-block">
                                             Create your first event →
                                         </a>
@@ -177,4 +177,4 @@
             </script>
         @endpush
 
-    </x-admin.admin-layout>
+    </x-organizer.organizer-layout>

@@ -81,16 +81,16 @@ class EventCategory extends Model
         return $query->whereNull('organizer_id');
     }
     public function scopeMine($query)
-    {
-        $organizerId = Auth::guard('organizer')->id();
-        return $query->where('organizer_id', $organizerId);
-    }
+{
+    return $query->where('organizer_id', Auth::guard('organizer')->id());
+}
     public function scopeVisibleToOrganizer($query)
-    {
-        $organizerId = Auth::guard('organizer')->id();
-        return $query->where(function ($q) use ($organizerId) {
-            $q->where('organizer_id', $organizerId)
-              ->orWhereNull('organizer_id');
-        });
-    }
+{
+    $organizerId = Auth::guard('organizer')->id();
+
+    return $query->where(function ($q) use ($organizerId) {
+        $q->where('organizer_id', $organizerId)
+          ->orWhereNull('organizer_id');
+    });
+}
 }

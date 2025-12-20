@@ -75,9 +75,9 @@
                 Dashboard
             </a>
 
-            <a href="#"
+            <a href="{{ route('org.events.index') }}"
                class="sidebar-link flex items-center px-4 py-3 rounded-lg
-               {{ request()->routeIs('organizer.events.*') ? 'sidebar-active' : '' }}">
+               {{ request()->routeIs('org.events.*') ? 'sidebar-active' : '' }}">
                 <i class="fa-solid fa-calendar-days mr-3 text-lg"></i>
                 Events
             </a>

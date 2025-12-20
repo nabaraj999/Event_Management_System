@@ -1,6 +1,6 @@
 <!-- resources/views/admin/events/edit.blade.php -->
 
-<x-admin.admin-layout>
+<x-organizer.organizer-layout>
 
 <div class="py-8 px-4 max-w-4xl mx-auto">
     <!-- Header -->
@@ -10,7 +10,7 @@
                 <h1 class="text-3xl font-bold">Edit Event</h1>
                 <p class="text-blue-200 mt-1">Update event information</p>
             </div>
-            <a href="{{ route('admin.events.index') }}"
+            <a href="{{ route('org.events.index') }}"
                class="px-6 py-3 bg-white/20 hover:bg-white/30 rounded-xl transition font-medium">
                 ← Back to Events
             </a>
@@ -19,7 +19,7 @@
 
     <!-- Edit Form -->
     <div class="bg-white rounded-2xl shadow-xl p-8">
-        <form action="{{ route('admin.events.update', $event) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('org.events.update', $event) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -168,7 +168,7 @@
 
             <!-- Submit Buttons -->
             <div class="flex justify-end gap-4 mt-12">
-                <a href="{{ route('admin.events.index') }}"
+                <a href="{{ route('org.events.index') }}"
                    class="px-10 py-4 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-100 font-medium transition">
                     Cancel
                 </a>
@@ -207,4 +207,4 @@ function updateSlug() {
 @endif
 </script>
 
-</x-admin.admin-layout>
+</x-organizer.organizer-layout>
