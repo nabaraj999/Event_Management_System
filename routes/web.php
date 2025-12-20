@@ -17,6 +17,7 @@ use App\Http\Controllers\Organizer\Auth\OrganizerLoginController;
 use App\Http\Controllers\Organizer\OrganizerProfileController;
 use App\Http\Controllers\Organizer\OrgEventCategoryController;
 use App\Http\Controllers\Organizer\OrgEventController;
+use App\Http\Controllers\Organizer\OrgEventTicketController;
 use App\Http\Controllers\User\ContactController;
 use App\Http\Controllers\ProfileController as ControllersProfileController;
 use App\Http\Controllers\User\AboutController;
@@ -195,6 +196,7 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::get('/dashboard', [OrganizerDashboardController::class, 'index'])->name('dashboard');
         Route::resource('categories', OrgEventCategoryController::class)->parameters(['categories' => 'category']);
         Route::resource('events', OrgEventController::class)->parameters(['events' => 'event']);
+        Route::resource('event-tickets', OrgEventTicketController::class)->parameters(['event-tickets' => 'eventTicket']);
     });
 
 

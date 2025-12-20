@@ -89,6 +89,13 @@
                 Categories
             </a>
 
+             <a href="{{ route('org.event-tickets.index') }}"
+                    class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
+   {{ request()->routeIs('org.event-tickets.*') ? 'sidebar-active' : '' }}">
+                    <i class="fa-solid fa-ticket w-6 h-6 mr-3 text-lg"></i>
+                    <span>Tickets</span>
+                </a>
+
             <a href="#"
                class="sidebar-link flex items-center px-4 py-3 rounded-lg
                {{ request()->routeIs('organizer.bookings.*') ? 'sidebar-active' : '' }}">
