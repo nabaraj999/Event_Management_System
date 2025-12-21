@@ -64,7 +64,7 @@ class BookingController extends Controller
 {
     $request->validate([
         'event_ticket_id' => 'required|exists:event_tickets,id',
-        'quantity'        => 'required|integer|min:1|max:20',
+        'quantity'        => 'required|integer|min:1|max:20', // ← UNCOMMENT & KEEP THIS
         'full_name'       => 'required|string|max:255',
         'email'           => 'required|email|max:255',
         'phone'           => 'required|string|max:20',
@@ -72,9 +72,9 @@ class BookingController extends Controller
     ]);
 
     $eventTicket = EventTicket::findOrFail($request->event_ticket_id);
-    $quantity    = (int) $request->quantity;
+    $quantity    = (int) $request->quantity; // ← This is needed!
 
-    // Now this will work because model table is correctly defined
+    // Check available seats
     $bookedQuantity = BookingTicket::where('event_ticket_id', $eventTicket->id)
         ->join('bookings', 'booking_ticket.booking_id', '=', 'bookings.id')
         ->whereIn('bookings.payment_status', ['pending', 'paid'])
@@ -89,27 +89,29 @@ class BookingController extends Controller
     $totalAmount = $quantity * $eventTicket->price;
 
     return DB::transaction(function () use ($request, $eventTicket, $quantity, $totalAmount, $khalti) {
+        // 1. Create main booking (NO quantity here — correct!)
         $booking = Booking::create([
             'user_id'         => Auth::id(),
             'event_id'        => $eventTicket->event_id,
             'full_name'       => $request->full_name,
             'email'           => $request->email,
             'phone'           => $request->phone,
-            'quantity'        => $quantity,
             'total_amount'    => $totalAmount,
             'payment_method'  => $request->payment_method,
             'payment_status'  => 'pending',
             'status'          => 'pending',
         ]);
 
+        // 2. Save quantity in the pivot table — THIS IS CRITICAL
         BookingTicket::create([
-            'booking_id'         => $booking->id,
-            'event_ticket_id'    => $eventTicket->id,
-            'quantity'           => $quantity,
-            'price_at_booking'   => $eventTicket->price,
-            'sub_total'          => $totalAmount,
+            'booking_id'       => $booking->id,
+            'event_ticket_id'  => $eventTicket->id,
+            'quantity'         => $quantity,                    // ← UNCOMMENT THIS
+            'price_at_booking' => $eventTicket->price,
+            'sub_total'        => $totalAmount,
         ]);
 
+        // 3. Initiate Khalti payment
         $payload = [
             'return_url'         => route('booking.success'),
             'website_url'        => config('services.khalti.website_url'),

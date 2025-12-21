@@ -96,9 +96,9 @@
                     <span>Tickets</span>
                 </a>
 
-            <a href="#"
+            <a href="{{ route('org.bookings.index') }}"
                class="sidebar-link flex items-center px-4 py-3 rounded-lg
-               {{ request()->routeIs('organizer.bookings.*') ? 'sidebar-active' : '' }}">
+               {{ request()->routeIs('org.bookings.*') ? 'sidebar-active' : '' }}">
                 <i class="fa-solid fa-ticket mr-3 text-lg"></i>
                 Bookings
             </a>

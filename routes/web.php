@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Organizer\Auth\OrganizerDashboardController;
 use App\Http\Controllers\Organizer\Auth\OrganizerLoginController;
 use App\Http\Controllers\Organizer\OrganizerProfileController;
+use App\Http\Controllers\Organizer\OrgBookingController;
 use App\Http\Controllers\Organizer\OrgEventCategoryController;
 use App\Http\Controllers\Organizer\OrgEventController;
 use App\Http\Controllers\Organizer\OrgEventTicketController;
@@ -197,6 +198,9 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::resource('categories', OrgEventCategoryController::class)->parameters(['categories' => 'category']);
         Route::resource('events', OrgEventController::class)->parameters(['events' => 'event']);
         Route::resource('event-tickets', OrgEventTicketController::class)->parameters(['event-tickets' => 'eventTicket']);
+    Route::get('/bookings', [OrgBookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/{booking}', [OrgBookingController::class, 'show'])->name('bookings.show');
+    Route::post('/bookings/{booking}/check-in', [OrgBookingController::class, 'checkIn'])->name('bookings.check-in');
     });
 
 
