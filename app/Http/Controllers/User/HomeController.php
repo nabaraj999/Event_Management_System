@@ -23,8 +23,15 @@ class HomeController extends Controller
                                ->orderBy('sort_order')
                                ->get();
 
+    // NEW: Fetch verified & active organizers with profile image
+    $organizers = \App\Models\OrganizerApplication::where('is_frozen', true)
+        ->whereNotNull('profile_image')
+        ->inRandomOrder()
+        ->limit(6) // Show 6 featured organizers
+        ->get();
+
     $showInterestModal = auth()->check() && auth()->user()->interests()->count() === 0;
 
-    return view('dashboard', compact('events', 'categories', 'showInterestModal'));
+    return view('dashboard', compact('events','organizers', 'categories', 'showInterestModal'));
 }
 }

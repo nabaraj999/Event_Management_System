@@ -58,4 +58,15 @@ public function bookings()
 {
     return $this->hasMany(Booking::class);
 }
+
+public function isOrganizer(): bool
+{
+    return $this->organizer()->exists();
+}
+
+public function organizer()
+{
+    return $this->hasOne(OrganizerApplication::class, 'email', 'email');
+}
+
 }
