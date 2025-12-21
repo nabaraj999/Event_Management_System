@@ -104,20 +104,29 @@
                 </a>
 
 
+                <a href="{{ route('admin.bookings.index') }}"
+                    class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
+       {{ request()->routeIs('admin.bookings.*') ? 'sidebar-active' : '' }}">
+                    <i class="fa-solid fa-book w-6 h-6 mr-3 text-lg"></i>
+                    <span>Bookings</span>
+                </a>
 
-              <a href="{{ route('admin.organizer-applications.index') }}"
-   class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
+
+
+                <a href="{{ route('admin.organizer-applications.index') }}"
+                    class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
           {{ request()->routeIs('admin.organizer-applications.*') ? 'sidebar-active' : '' }}">
-    <i class="fa-solid fa-users-gear w-6 h-6 mr-3 text-lg"></i>
-    <span>Organizer Applications</span>
-</a>
+                    <i class="fa-solid fa-person-chalkboard w-6 h-6 mr-3 text-lg"></i>
+                   
+                    <span>Organizer Applications</span>
+                </a>
 
- <a href="{{ route('admin.organizers.index') }}"
-   class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
+                <a href="{{ route('admin.organizers.index') }}"
+                    class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
           {{ request()->routeIs('admin.organizers.*') ? 'sidebar-active' : '' }}">
-    <i class="fa-solid fa-users-gear w-6 h-6 mr-3 text-lg"></i>
-    <span>Organizer </span>
-</a>
+                    <i class="fa-solid fa-users-gear w-6 h-6 mr-3 text-lg"></i>
+                    <span>Organizer </span>
+                </a>
 
                 <a href="{{ route('admin.users.index') }}"
                     class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
@@ -153,17 +162,17 @@
 
             <!-- Logout -->
             <div class="p-4 border-t border-white/10">
-    <form action="{{ route('admin.logout') }}" method="POST">
-        @csrf
-        <button type="submit"
-            class="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg bg-red-600 hover:bg-red-700 transition font-semibold">
+                <form action="{{ route('admin.logout') }}" method="POST">
+                    @csrf
+                    <button type="submit"
+                        class="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg bg-red-600 hover:bg-red-700 transition font-semibold">
 
-            <i class="fa-solid fa-right-from-bracket text-lg"></i>
-            <span>Logout</span>
+                        <i class="fa-solid fa-right-from-bracket text-lg"></i>
+                        <span>Logout</span>
 
-        </button>
-    </form>
-</div>
+                    </button>
+                </form>
+            </div>
 
         </aside>
 

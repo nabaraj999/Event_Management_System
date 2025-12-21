@@ -129,6 +129,7 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     Route::get('/events/{event}/edit', [EventController::class, 'edit'])->name('events.edit');
     Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');
     Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
+    Route::get('/events/pending', [EventController::class, 'pending'])->name('events.pending');
 
     Route::get('/event-tickets', [EventTicketController::class, 'index'])->name('event-tickets.index');
     Route::get('/event-tickets/create', [EventTicketController::class, 'create'])->name('event-tickets.create');
