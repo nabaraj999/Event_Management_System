@@ -292,4 +292,27 @@ class BookingController extends Controller
 
         return response()->json(['success' => false]);
     }
+
+
+
+public function history()
+{
+    $bookings = Auth::user()->bookings()
+        ->with(['event', 'bookingTickets.eventTicket'])
+        ->latest()
+        ->paginate(10);
+
+    return view('profile.history', compact('bookings'));
+}
+
+
+public function invoice($ticket_token)
+{
+    $booking = Auth::user()->bookings()
+        ->with(['event', 'bookingTickets.eventTicket'])
+        ->where('ticket_token', $ticket_token)
+        ->firstOrFail();
+
+    return view('profile.invoice', compact('booking'));
+}
 }
