@@ -3,7 +3,17 @@
 
             <!-- Logo -->
             <div>
-                <h3 class="text-2xl font-bold mb-3">EventHUB</h3>
+               <a href="{{ route('home') }}" class="inline-block p-2">
+    @if ($company && $company->logo)
+        <img src="{{ asset('storage/' . $company->logo) }}" alt="{{ $company->name ?? 'EventHUB' }} Logo"
+            class="w-8 h-8 bg-white rounded-lg">
+    @else
+        <!-- Fallback Placeholder Logo -->
+        <div class="w-8 h-8 text-lg flex items-center justify-center">
+            {{ strtoupper(substr($company->name ?? 'EventHUB', 0, 1)) }}
+        </div>
+    @endif
+</a>
                 <p class="opacity-80 text-sm leading-relaxed">
                     Nepal’s complete digital event booking platform.
                     Discover, book, and manage events effortlessly.

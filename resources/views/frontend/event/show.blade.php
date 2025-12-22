@@ -15,11 +15,11 @@
                     <span class="flex items-center gap-2">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd"
-                                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1  1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
                                 clip-rule="evenodd" />
                         </svg>
                         {{ $event->start_date->format('F d, Y') }}
-                        @if ($event->end_date)
+                        @if ($event->end_date && $event->end_date->ne($event->start_date))
                             - {{ $event->end_date->format('F d, Y') }}
                         @endif
                     </span>
@@ -57,7 +57,7 @@
                 @endif
             </div>
 
-            <!-- Tickets Sidebar - ALWAYS show if tickets exist in DB -->
+            <!-- Tickets Sidebar -->
             @if ($event->tickets->isNotEmpty())
                 <aside class="lg:col-span-1">
                     <div class="bg-softGray p-8 rounded-2xl shadow-lg sticky top-24">
@@ -69,7 +69,6 @@
                                     $remaining = $ticket->total_seats - $ticket->sold_seats;
                                     $now = now();
 
-                                    // Check if ticket is currently on sale
                                     $isOnSale = true;
                                     if ($ticket->sale_start && $now->lt($ticket->sale_start)) {
                                         $isOnSale = false;
@@ -78,12 +77,10 @@
                                         $isOnSale = false;
                                     }
 
-                                    // Can book only if seats left AND on sale
                                     $canBook = $remaining > 0 && $isOnSale;
                                 @endphp
 
-                                <div
-                                    class="border-2 {{ $canBook ? 'border-primary/30' : 'border-gray-300' }} rounded-xl p-6 {{ !$canBook ? 'opacity-75' : '' }}">
+                                <div class="border-2 {{ $canBook ? 'border-primary/30' : 'border-gray-300' }} rounded-xl p-6 {{ !$canBook ? 'opacity-75' : '' }}">
                                     <div class="flex justify-between items-start mb-3">
                                         <div>
                                             <h4 class="text-xl font-bold text-darkBlue">{{ $ticket->name }}</h4>
@@ -92,9 +89,13 @@
                                             @endif
                                         </div>
                                         <div class="text-right">
-                                            <span class="text-2xl font-extrabold text-primary">
-                                                Rs. {{ number_format($ticket->price, 2) }}
-                                            </span>
+                                            @if ($ticket->price == 0)
+                                                <span class="text-2xl font-extrabold text-green-600">Free</span>
+                                            @else
+                                                <span class="text-2xl font-extrabold text-primary">
+                                                    Rs. {{ number_format($ticket->price, 2) }}
+                                                </span>
+                                            @endif
                                         </div>
                                     </div>
 
@@ -105,15 +106,14 @@
                                         @if (!$isOnSale)
                                             <span class="block mt-2 text-red-600 font-semibold">
                                                 @if ($ticket->sale_start && $now->lt($ticket->sale_start))
-                                                    Sale starts on
-                                                    {{ $ticket->sale_start->format('M d, Y \a\t h:i A') }}
+                                                    Sale starts on {{ $ticket->sale_start->format('M d, Y \a\t h:i A') }}
                                                 @else
                                                     Sale has ended
                                                 @endif
                                             </span>
-                                        @elseif($remaining == 0)
+                                        @elseif ($remaining == 0)
                                             <span class="block mt-2 text-red-600 font-semibold">Sold Out</span>
-                                        @elseif($remaining <= 10)
+                                        @elseif ($remaining <= 10)
                                             <span class="ml-2 text-orange-600 font-semibold">Hurry! Limited seats</span>
                                         @endif
                                     </div>
@@ -124,13 +124,8 @@
                                             Book Now
                                         </a>
                                     @else
-                                        <button disabled
-                                            class="w-full py-3 bg-gray-500 text-white font-bold rounded-lg cursor-not-allowed">
-                                            @if ($remaining == 0)
-                                                Sold Out
-                                            @else
-                                                Not Available
-                                            @endif
+                                        <button disabled class="w-full py-3 bg-gray-500 text-white font-bold rounded-lg cursor-not-allowed">
+                                            @if ($remaining == 0) Sold Out @else Not Available @endif
                                         </button>
                                     @endif
                                 </div>
@@ -138,11 +133,107 @@
                         </div>
                     </div>
                 </aside>
+            @else
+                <aside class="lg:col-span-1">
+                    <div class="bg-softGray p-8 rounded-2xl shadow-lg text-center">
+                        <p class="text-xl text-gray-600">No tickets available for this event.</p>
+                    </div>
+                </aside>
             @endif
         </div>
 
+        <!-- Related / Recommended Events Section (Inline Cards - No Component) -->
+        @if ($relatedEvents->isNotEmpty())
+            <section class="mt-20">
+                <div class="flex justify-between items-center mb-10">
+                    <h2 class="text-3xl font-extrabold text-darkBlue">
+                        @auth
+                            Recommended For You
+                        @else
+                            Related Events
+                        @endauth
+                    </h2>
+                    <a href="{{ route('events.index') }}" class="text-primary font-semibold hover:underline">
+                        View All Events →
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    @foreach ($relatedEvents as $relatedEvent)
+                        <a href="{{ route('events.show', $relatedEvent) }}" class="block group">
+                            <div class="bg-white rounded-xl overflow-hidden shadow-lg transform transition hover:-translate-y-2 hover:shadow-2xl duration-300">
+                                <!-- Image -->
+                                <div class="relative">
+                                    <img
+                                        src="{{ $relatedEvent->banner_image ? asset('storage/' . $relatedEvent->banner_image) : 'https://via.placeholder.com/1200x520' }}"
+                                        alt="{{ $relatedEvent->title }}"
+                                        class="w-full h-52 object-cover"
+                                    >
+
+                                    <!-- Featured Badge -->
+                                    @if($relatedEvent->is_featured)
+                                        <div class="absolute top-4 left-4">
+                                            <span class="bg-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow">
+                                                Featured
+                                            </span>
+                                        </div>
+                                    @endif
+
+                                    <!-- Category Badge -->
+                                    @if($relatedEvent->category)
+                                        <div class="absolute bottom-4 left-4">
+                                            <span class="bg-primary/90 text-white text-xs font-medium px-3 py-1 rounded-lg">
+                                                {{ $relatedEvent->category->name }}
+                                            </span>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <!-- Content -->
+                                <div class="p-6">
+                                    <h3 class="font-bold text-xl text-darkBlue mb-2 line-clamp-2 group-hover:text-primary transition">
+                                        {{ $relatedEvent->title }}
+                                    </h3>
+
+                                    <p class="text-gray-600 text-sm mb-1">
+                                        {{ $relatedEvent->location }} • {{ $relatedEvent->start_date->format('M d, Y') }}
+                                    </p>
+
+                                    @if($relatedEvent->end_date && $relatedEvent->end_date->gt($relatedEvent->start_date))
+                                        <p class="text-gray-600 text-sm mb-3">
+                                            Ends: {{ $relatedEvent->end_date->format('M d, Y') }}
+                                        </p>
+                                    @endif
+
+                                    <p class="text-gray-700 text-sm mb-4 line-clamp-3">
+                                        {{ $relatedEvent->short_description ?? 'No description available.' }}
+                                    </p>
+
+                                    <div class="mt-4 flex gap-3">
+                                        <span class="px-4 py-2 border border-primary rounded-lg text-primary font-semibold hover:bg-primary hover:text-white transition">
+                                            Details
+                                        </span>
+                                    </div>
+
+                                    <div class="mt-5 text-right">
+                                        @if(isset($relatedEvent->min_price) && $relatedEvent->min_price > 0)
+                                            <span class="text-2xl font-extrabold text-primary">
+                                                Rs. {{ number_format($relatedEvent->min_price) }}+
+                                            </span>
+                                        @else
+                                            
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            </section>
+        @endif
+
         <!-- Back to Events -->
-        <div class="mt-12 text-center">
+        <div class="mt-16 text-center">
             <a href="{{ route('events.index') }}"
                 class="inline-flex items-center gap-2 text-primary font-semibold hover:underline">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
