@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\EventCategory;
+use App\Models\OrganizerApplication;
 use App\Services\EventRecommendationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,55 +19,70 @@ class UserEventController extends Controller
         $this->recommendationService = $recommendationService;
     }
 
-    public function index(Request $request)
-    {
-        $query = Event::query()
-                      ->where('status', 'published')
-                      ->where('start_date', '>=', now());
+   public function index(Request $request)
+{
+    $query = Event::query()
+                  ->where('status', 'published')
+                  ->where('start_date', '>=', now());
 
-        // Keyword Search
-        if ($request->filled('query')) {
-            $searchTerm = $request->input('query');
-            $query->where(function ($q) use ($searchTerm) {
-                $q->where('title', 'like', "%{$searchTerm}%")
-                  ->orWhere('short_description', 'like', "%{$searchTerm}%")
-                  ->orWhere('location', 'like', "%{$searchTerm}%");
-            });
-        }
-
-        // Filter by categories
-        if ($request->has('categories') && is_array($request->input('categories'))) {
-            $query->whereIn('category_id', $request->input('categories'));
-        }
-
-        // Filter by date range
-        if ($request->filled('start_date_from')) {
-            $query->whereDate('start_date', '>=', $request->input('start_date_from'));
-        }
-        if ($request->filled('start_date_to')) {
-            $query->whereDate('start_date', '<=', $request->input('start_date_to'));
-        }
-
-        // Sorting
-        $sort = $request->input('sort', 'newest');
-        if ($sort === 'newest') {
-            $query->orderBy('start_date', 'asc'); // Soonest first
-        } elseif ($sort === 'oldest') {
-            $query->orderBy('start_date', 'desc');
-        } else {
-            $query->orderBy('start_date', 'asc');
-        }
-
-        $events = $query->paginate(12)->withQueryString();
-
-        $categories = EventCategory::where('is_active', true)
-                                   ->orderBy('sort_order')
-                                   ->orderBy('name')
-                                   ->get();
-
-        return view('frontend.event.index', compact('events', 'categories', 'sort'));
+    // Keyword Search
+    if ($request->filled('query')) {
+        $searchTerm = $request->input('query');
+        $query->where(function ($q) use ($searchTerm) {
+            $q->where('title', 'like', "%{$searchTerm}%")
+              ->orWhere('short_description', 'like', "%{$searchTerm}%")
+              ->orWhere('location', 'like', "%{$searchTerm}%");
+        });
     }
 
+    // Filter by categories
+    if ($request->has('categories') && is_array($request->input('categories'))) {
+        $query->whereIn('category_id', $request->input('categories'));
+    }
+
+    // NEW: Filter by organizers
+    if ($request->has('organizers') && is_array($request->input('organizers'))) {
+        $query->whereIn('organizer_id', $request->input('organizers')); // assuming column is organizer_id
+    }
+
+    // Filter by date range
+    if ($request->filled('start_date_from')) {
+        $query->whereDate('start_date', '>=', $request->input('start_date_from'));
+    }
+    if ($request->filled('start_date_to')) {
+        $query->whereDate('start_date', '<=', $request->input('start_date_to'));
+    }
+
+    // Sorting
+    $sort = $request->input('sort', 'newest');
+    if ($sort === 'newest') {
+        $query->orderBy('start_date', 'asc');
+    } elseif ($sort === 'oldest') {
+        $query->orderBy('start_date', 'desc');
+    } else {
+        $query->orderBy('start_date', 'asc');
+    }
+
+    $events = $query->paginate(12)->withQueryString();
+
+    // Categories
+    $categories = EventCategory::where('is_active', true)
+                               ->orderBy('sort_order')
+                               ->orderBy('name')
+                               ->get();
+
+    // NEW: Get organizers who have published upcoming events
+   $organizers = OrganizerApplication::where('status', 'approved')
+    ->where('is_frozen', true)
+    ->whereHas('events', function ($q) {
+        $q->where('status', 'published')
+          ->where('start_date', '>=', now());
+    })
+    ->orderBy('organization_name')
+    ->get();
+
+    return view('frontend.event.index', compact('events', 'categories', 'organizers', 'sort'));
+}
     public function show(Event $event)
     {
         if ($event->status !== 'published') {

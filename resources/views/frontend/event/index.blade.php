@@ -43,6 +43,9 @@
                     @foreach(request()->input('categories', []) as $cat)
                         <input type="hidden" name="categories[]" value="{{ $cat }}">
                     @endforeach
+                    @foreach(request()->input('organizers', []) as $org)
+                        <input type="hidden" name="organizers[]" value="{{ $org }}">
+                    @endforeach
                     <input type="hidden" name="start_date_from" value="{{ request()->input('start_date_from') }}">
                     <input type="hidden" name="start_date_to" value="{{ request()->input('start_date_to') }}">
                     <input type="hidden" name="sort" value="{{ $sort }}">
@@ -53,6 +56,9 @@
                     @foreach(request()->input('categories', []) as $cat)
                         <input type="hidden" name="categories[]" value="{{ $cat }}">
                     @endforeach
+                    @foreach(request()->input('organizers', []) as $org)
+                        <input type="hidden" name="organizers[]" value="{{ $org }}">
+                    @endforeach
                     <input type="hidden" name="start_date_from" value="{{ request()->input('start_date_from') }}">
                     <input type="hidden" name="start_date_to" value="{{ request()->input('start_date_to') }}">
                     <input type="hidden" name="query" value="{{ request()->input('query') }}">
@@ -62,76 +68,108 @@
                         onchange="this.form.submit()"
                         class="px-8 py-4 border-2 border-primary rounded-xl text-gray-700 focus:border-darkBlue focus:ring-4 focus:ring-primary/30 font-medium text-lg w-full md:w-auto"
                     >
-                        <option value="newest" {{ $sort === 'newest' ? 'selected' : '' }}>Sort by Newest</option>
-                        <option value="oldest" {{ $sort === 'oldest' ? 'selected' : '' }}>Sort by Oldest</option>
+                        <option value="newest" {{ $sort === 'newest' ? 'selected' : '' }}>Soonest First</option>
+                        <option value="oldest" {{ $sort === 'oldest' ? 'selected' : '' }}>Latest First</option>
                     </select>
                 </form>
             </div>
         </div>
 
         <div class="grid lg:grid-cols-4 gap-8">
-            <!-- Left Sidebar: Filters (Sticky on large, appears BELOW cards on mobile) -->
+            <!-- Left Sidebar: Filters -->
             <aside class="lg:col-span-1 lg:sticky lg:top-20 lg:self-start order-2 lg:order-1">
-                <form method="GET" action="{{ route('events.index') }}" class="bg-softGray p-6 rounded-xl shadow-md">
-                    <h3 class="text-xl font-bold text-darkBlue mb-4">Filters</h3>
+                <div class="bg-softGray p-6 rounded-xl shadow-md">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-darkBlue">Filters</h3>
+                        @if(request()->except(['page', 'sort']) != [])
+                            <a href="{{ route('events.index') }}" class="text-sm text-primary hover:underline">
+                                Clear All
+                            </a>
+                        @endif
+                    </div>
 
-                    <!-- Categories -->
-                    <div class="mb-6">
-                        <h4 class="text-lg font-semibold text-gray-800 mb-2">Categories</h4>
-                        <div class="space-y-2 max-h-48 overflow-y-auto">
-                            @foreach($categories as $category)
-                                <label class="flex items-center">
+                    <form method="GET" action="{{ route('events.index') }}" class="space-y-6">
+                        <!-- Categories -->
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-800 mb-3">Categories</h4>
+                            <div class="space-y-2 max-h-48 overflow-y-auto">
+                                @foreach($categories as $category)
+                                    <label class="flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            name="categories[]"
+                                            value="{{ $category->id }}"
+                                            {{ in_array($category->id, request()->input('categories', [])) ? 'checked' : '' }}
+                                            class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                                        >
+                                        <span class="ml-2 text-sm text-gray-700">{{ $category->name }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <!-- Organizers (Looks exactly like Categories) -->
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-800 mb-3">Organizers</h4>
+                            <div class="space-y-2 max-h-48 overflow-y-auto">
+                                @foreach($organizers as $organizer)
+                                    <label class="flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            name="organizers[]"
+                                            value="{{ $organizer->id }}"
+                                            {{ in_array($organizer->id, request()->input('organizers', [])) ? 'checked' : '' }}
+                                            class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                                        >
+                                        <span class="ml-2 text-sm text-gray-700">{{ $organizer->organization_name }}</span>
+                                    </label>
+                                @endforeach
+                                @if($organizers->isEmpty())
+                                    <p class="text-sm text-gray-500 italic">No organizers available</p>
+                                @endif
+                            </div>
+                        </div>
+
+                        <!-- Date Range -->
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-800 mb-3">Date Range</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="start_date_from" class="block text-sm font-medium text-gray-700 mb-1">From</label>
                                     <input
-                                        type="checkbox"
-                                        name="categories[]"
-                                        value="{{ $category->id }}"
-                                        {{ in_array($category->id, request()->input('categories', [])) ? 'checked' : '' }}
-                                        class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                                        type="date"
+                                        name="start_date_from"
+                                        id="start_date_from"
+                                        value="{{ request()->input('start_date_from') }}"
+                                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary py-2 px-3"
                                     >
-                                    <span class="ml-2 text-sm text-gray-700">{{ $category->name }}</span>
-                                </label>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <!-- Date Range -->
-                    <div class="mb-6">
-                        <h4 class="text-lg font-semibold text-gray-800 mb-2">Date Range</h4>
-                        <div class="space-y-4">
-                            <div>
-                                <label for="start_date_from" class="block text-sm font-medium text-gray-700">From</label>
-                                <input
-                                    type="date"
-                                    name="start_date_from"
-                                    id="start_date_from"
-                                    value="{{ request()->input('start_date_from') }}"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary py-2 px-3"
-                                >
-                            </div>
-                            <div>
-                                <label for="start_date_to" class="block text-sm font-medium text-gray-700">To</label>
-                                <input
-                                    type="date"
-                                    name="start_date_to"
-                                    id="start_date_to"
-                                    value="{{ request()->input('start_date_to') }}"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary py-2 px-3"
-                                >
+                                </div>
+                                <div>
+                                    <label for="start_date_to" class="block text-sm font-medium text-gray-700 mb-1">To</label>
+                                    <input
+                                        type="date"
+                                        name="start_date_to"
+                                        id="start_date_to"
+                                        value="{{ request()->input('start_date_to') }}"
+                                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring-primary py-2 px-3"
+                                    >
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Preserve search and sort -->
-                    <input type="hidden" name="query" value="{{ request()->input('query') }}">
-                    <input type="hidden" name="sort" value="{{ $sort }}">
+                        <!-- Preserve search and sort -->
+                        <input type="hidden" name="query" value="{{ request()->input('query') }}">
+                        <input type="hidden" name="sort" value="{{ $sort }}">
 
-                    <button type="submit" class="w-full px-4 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-darkBlue transition">
-                        Apply Filters
-                    </button>
-                </form>
+                        <!-- Apply Button -->
+                        <button type="submit" class="w-full px-4 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-darkBlue transition">
+                            Apply Filters
+                        </button>
+                    </form>
+                </div>
             </aside>
 
-            <!-- Main Content: Events Grid (Appears FIRST on mobile) -->
+            <!-- Main Content: Events Grid -->
             <main class="lg:col-span-3 order-1 lg:order-2">
                 <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     @forelse($events as $event)
@@ -179,4 +217,5 @@
         </div>
     </div>
 </div>
+
 <x-frontend.footer-card />

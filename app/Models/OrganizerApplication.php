@@ -43,4 +43,11 @@ class OrganizerApplication extends Authenticatable
 
     // REMOVED the setPasswordAttribute mutator completely!
     // We hash manually in controller → safer and cleaner
+
+    public function events()
+    {
+        return $this->hasMany(Event::class, 'organizer_id');
+        // If your foreign key is different (e.g., user_id), change it:
+        // return $this->hasMany(Event::class, 'user_id');
+    }
 }
