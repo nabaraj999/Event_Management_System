@@ -30,7 +30,7 @@ class CompanyInfoController extends Controller
             'reg_no'        => ['nullable', 'string', Rule::unique('company_infos')->ignore($company->id ?? null)],
             'pan_no'        => ['nullable', 'string', Rule::unique('company_infos')->ignore($company->id ?? null)],
             'logo'          => 'nullable|image|mimes:jpg,jpeg,png,webp,svg|max:2048',
-            'favicon'       => 'nullable|image|mimes:png,ico,svg|max:512',
+            'favicon'       => 'nullable|image|mimes:png,jpg,ico,svg|max:512',
             'bg_image'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'about_us_image'=> 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'working_hours' => 'nullable|json',

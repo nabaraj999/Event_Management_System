@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EventHub - Admin Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="{{ asset('storage/' . $company->favicon) }}" type="image/x-icon">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -53,17 +54,31 @@
         <!-- SIDEBAR - FINAL VERSION -->
         <aside id="sidebar"
             class="fixed inset-y-0 left-0 w-64 bg-darkBlue text-white z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col">
-            <!-- Logo -->
-            <div class="p-6 border-b border-white/10 flex items-center space-x-3">
-                <div
-                    class="w-12 h-12 rounded-lg bg-primary flex items-center justify-center text-white text-xl font-bold shadow-lg">
-                    EH
+
+
+            <div class="p-6 border-b border-white/10 flex items-center gap-3">
+                <div class="w-12 h-12 rounded-lg bg-white flex items-center justify-center text-xl font-bold shadow-lg">
+                    <a href="{{ route('admin.dashboard') }}" class="inline-block p-2">
+                        @if ($company && $company->logo)
+                            <img src="{{ asset('storage/' . $company->logo) }}"
+                                alt="{{ $company->name ?? 'EventHub' }} Logo"
+                                class="w-10 h-10 rounded-lg object-contain">
+                        @else
+                            <div
+                                class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white text-xl font-bold shadow-lg">
+                                {{ strtoupper(substr($company->name ?? 'EventHub', 0, 2)) }}
+                            </div>
+                        @endif
+                    </a>
                 </div>
                 <div>
                     <h2 class="text-xl font-bold">EventHub</h2>
                     <p class="text-xs opacity-80">Admin Panel</p>
                 </div>
             </div>
+
+
+
 
             <!-- Navigation Links -->
             <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
@@ -117,7 +132,7 @@
                     class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
           {{ request()->routeIs('admin.organizer-applications.*') ? 'sidebar-active' : '' }}">
                     <i class="fa-solid fa-person-chalkboard w-6 h-6 mr-3 text-lg"></i>
-                   
+
                     <span>Organizer Applications</span>
                 </a>
 

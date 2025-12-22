@@ -7,7 +7,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
+<link rel="icon" href="{{ asset('storage/' . $company->favicon) }}" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
@@ -56,8 +56,19 @@
 
         <!-- Logo -->
         <div class="p-6 border-b border-white/10 flex items-center gap-3">
-            <div class="w-12 h-12 rounded-lg bg-primary flex items-center justify-center text-xl font-bold shadow-lg">
-                EH
+            <div class="w-12 h-12 rounded-lg bg-white flex items-center justify-center text-xl font-bold shadow-lg">
+             <a href="{{ route('org.dashboard') }}" class="inline-block p-2">
+                        @if ($company && $company->logo)
+                            <img src="{{ asset('storage/' . $company->logo) }}"
+                                alt="{{ $company->name ?? 'EventHub' }} Logo"
+                                class="w-10 h-10 rounded-lg object-contain">
+                        @else
+                            <div
+                                class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white text-xl font-bold shadow-lg">
+                                {{ strtoupper(substr($company->name ?? 'EventHub', 0, 2)) }}
+                            </div>
+                        @endif
+                    </a>
             </div>
             <div>
                 <h2 class="text-xl font-bold">EventHub</h2>
