@@ -10,7 +10,7 @@
                 <div>
                     <div class="flex items-center gap-4 mb-3">
                         <a href="{{ route('org.support.index') }}"
-                           class="text-blue-200 hover:text-white transition flex items-center font-medium">
+                            class="text-blue-200 hover:text-white transition flex items-center font-medium">
                             ← Back to Tickets
                         </a>
                     </div>
@@ -25,7 +25,7 @@
         </div>
 
         <!-- Success Message -->
-        @if(session('success'))
+        @if (session('success'))
             <div class="mb-8 p-6 bg-green-100 border border-green-400 text-green-800 rounded-2xl shadow">
                 <p class="text-lg font-medium">{{ session('success') }}</p>
             </div>
@@ -42,13 +42,9 @@
                         <label for="subject" class="block text-lg font-medium text-gray-700 mb-3">
                             Subject <span class="text-red-500">*</span>
                         </label>
-                        <input type="text"
-                               name="subject"
-                               id="subject"
-                               value="{{ old('subject') }}"
-                               required
-                               class="w-full px-6 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-200 focus:border-primary transition text-lg"
-                               placeholder="Brief summary of your issue (e.g., Can't publish event)">
+                        <input type="text" name="subject" id="subject" value="{{ old('subject') }}" required
+                            class="w-full px-6 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-200 focus:border-primary transition text-lg"
+                            placeholder="Brief summary of your issue (e.g., Can't publish event)">
                         @error('subject')
                             <p class="mt-3 text-sm text-red-600 font-medium">{{ $message }}</p>
                         @enderror
@@ -59,18 +55,19 @@
                         <label for="priority" class="block text-lg font-medium text-gray-700 mb-3">
                             Priority Level
                         </label>
-                        <select name="priority"
-                                id="priority"
-                                class="w-full px-6 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-200 focus:border-primary transition text-lg">
+                        <select name="priority" id="priority"
+                            class="w-full px-6 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-200 focus:border-primary transition text-lg">
                             <option value="normal" {{ old('priority', 'normal') == 'normal' ? 'selected' : '' }}>
                                 Normal
                             </option>
-                            <option value="urgent" class="text-red-600 font-bold" {{ old('priority') == 'urgent' ? 'selected' : '' }}>
+                            <option value="urgent" class="text-red-600 font-bold"
+                                {{ old('priority') == 'urgent' ? 'selected' : '' }}>
                                 Urgent – Blocks my work (immediate help needed)
                             </option>
                         </select>
                         <p class="mt-3 text-sm text-gray-500">
-                            Use <strong>Urgent</strong> only if the issue completely prevents you from using the platform.
+                            Use <strong>Urgent</strong> only if the issue completely prevents you from using the
+                            platform.
                         </p>
                     </div>
 
@@ -79,12 +76,9 @@
                         <label for="message" class="block text-lg font-medium text-gray-700 mb-3">
                             Describe Your Issue <span class="text-red-500">*</span>
                         </label>
-                        <textarea name="message"
-                                  id="message"
-                                  rows="10"
-                                  required
-                                  class="w-full px-6 py-5 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-200 focus:border-primary transition resize-none text-base"
-                                  placeholder="Please explain:
+                        <textarea name="message" id="message" rows="10" required
+                            class="w-full px-6 py-5 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-200 focus:border-primary transition resize-none text-base"
+                            placeholder="Please explain:
 • What you were trying to do
 • What happened instead
 • Steps to reproduce the issue
@@ -99,12 +93,9 @@
                         <label for="attachments" class="block text-lg font-medium text-gray-700 mb-4">
                             Attach Screenshots or Files (Optional)
                         </label>
-                        <input type="file"
-                               name="attachments[]"
-                               id="attachments"
-                               multiple
-                               accept="image/*,.pdf,.doc,.docx,.txt,.zip"
-                               class="w-full px-6 py-5 border border-gray-200 rounded-xl file:mr-6 file:py-4 file:px-8 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-primary file:text-white hover:file:bg-orange-600 cursor-pointer transition text-gray-600">
+                        <input type="file" name="attachments[]" id="attachments" multiple
+                            accept="image/*,.pdf,.doc,.docx,.txt,.zip"
+                            class="w-full px-6 py-5 border border-gray-200 rounded-xl file:mr-6 file:py-4 file:px-8 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-primary file:text-white hover:file:bg-orange-600 cursor-pointer transition text-gray-600">
 
                         <p class="mt-4 text-sm text-gray-500">
                             Supported: Images, PDFs, Word docs, text files, ZIP (max 10MB per file)
@@ -117,7 +108,7 @@
                     <!-- Submit Button -->
                     <div class="flex justify-end">
                         <button type="submit"
-                                class="px-12 py-5 bg-primary hover:bg-orange-600 text-white font-bold text-xl rounded-xl shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-orange-300 transition duration-300">
+                            class="px-12 py-5 bg-primary hover:bg-orange-600 text-white font-bold text-xl rounded-xl shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-orange-300 transition duration-300">
                             Submit Ticket
                         </button>
                     </div>

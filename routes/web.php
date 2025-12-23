@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\EventCategoryController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\EventTicketController;
+use App\Http\Controllers\Admin\SupportTicketAdminController;
 use App\Http\Controllers\Admin\TicketScannerController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Organizer\Auth\OrganizerDashboardController;
@@ -170,9 +171,17 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     Route::patch('/organizers/{id}/toggle', [AdminOrganizerController::class, 'toggleStatus'])->name('organizers.toggle');
 
 
-    Route::get('/admin/support/tickets/{id}', function ($id) {
-    return redirect()->route('admin.dashboard')->with('info', "New support ticket #{$id} awaits your review!");
-})->name('admin.support.show');
+    Route::get('/support', [SupportTicketAdminController::class, 'index'])
+        ->name('support.index');
+
+    Route::get('/support/{ticket}', [SupportTicketAdminController::class, 'show'])
+        ->name('support.show');
+
+    Route::post('/support/{ticket}/reply', [SupportTicketAdminController::class, 'reply'])
+        ->name('support.reply');
+
+    Route::post('/support/{ticket}/close', [SupportTicketAdminController::class, 'close'])
+        ->name('support.close');
 });
 
 

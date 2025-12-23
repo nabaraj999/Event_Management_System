@@ -164,13 +164,19 @@
                     <span>SEO</span>
                 </a>
 
+                <a href="{{ route('admin.support.index') }}"
+                    class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
+       {{ request()->routeIs('admin.support.*') ? 'sidebar-active' : '' }}">
+                    <i class="fa-solid fa-headset w-6 h-6 mr-3 text-lg"></i>
+                    <span>Support Tickets</span>
+                </a>
+
                 <a href="{{ route('admin.profile') }}"
                     class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
        {{ request()->routeIs('admin.profile') ? 'sidebar-active' : '' }}">
                     <i class="fa-solid fa-user w-6 h-6 mr-3 text-lg"></i>
                     <span>Profile</span>
                 </a>
-
             </nav>
 
 
