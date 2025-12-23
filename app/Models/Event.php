@@ -112,4 +112,10 @@ class Event extends Model
     {
         return $query->published()->upcoming();
     }
+
+    public function organizerApplication()
+{
+    return $this->belongsTo(OrganizerApplication::class, 'organizer_id');
+}
+
 }

@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\CompanyInfoController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventCategoryController;
 use App\Http\Controllers\Admin\EventController;
+use App\Http\Controllers\Admin\EventReportController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\EventTicketController;
 use App\Http\Controllers\Admin\SupportTicketAdminController;
@@ -171,17 +172,14 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     Route::patch('/organizers/{id}/toggle', [AdminOrganizerController::class, 'toggleStatus'])->name('organizers.toggle');
 
 
-    Route::get('/support', [SupportTicketAdminController::class, 'index'])
-        ->name('support.index');
+    Route::get('/support', [SupportTicketAdminController::class, 'index'])->name('support.index');
+Route::get('/support/{ticket}', [SupportTicketAdminController::class, 'show']) ->name('support.show');
+Route::post('/support/{ticket}/reply', [SupportTicketAdminController::class, 'reply'])->name('support.reply');
+Route::post('/support/{ticket}/close', [SupportTicketAdminController::class, 'close'])->name('support.close');
 
-    Route::get('/support/{ticket}', [SupportTicketAdminController::class, 'show'])
-        ->name('support.show');
+Route::get('/reports/events', [EventReportController::class, 'index'])->name('reports.events.index');
+    Route::post('/reports/events/generate', [EventReportController::class, 'generate'])->name('reports.events.generate');
 
-    Route::post('/support/{ticket}/reply', [SupportTicketAdminController::class, 'reply'])
-        ->name('support.reply');
-
-    Route::post('/support/{ticket}/close', [SupportTicketAdminController::class, 'close'])
-        ->name('support.close');
 });
 
 
