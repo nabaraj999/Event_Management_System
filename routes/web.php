@@ -174,20 +174,20 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
 
 
     Route::get('/support', [SupportTicketAdminController::class, 'index'])->name('support.index');
-Route::get('/support/{ticket}', [SupportTicketAdminController::class, 'show']) ->name('support.show');
-Route::post('/support/{ticket}/reply', [SupportTicketAdminController::class, 'reply'])->name('support.reply');
-Route::post('/support/{ticket}/close', [SupportTicketAdminController::class, 'close'])->name('support.close');
+    Route::get('/support/{ticket}', [SupportTicketAdminController::class, 'show'])->name('support.show');
+    Route::post('/support/{ticket}/reply', [SupportTicketAdminController::class, 'reply'])->name('support.reply');
+    Route::post('/support/{ticket}/close', [SupportTicketAdminController::class, 'close'])->name('support.close');
 
-Route::get('/reports/events', [EventReportController::class, 'index'])->name('reports.events.index');
+    Route::get('/reports/events', [EventReportController::class, 'index'])->name('reports.events.index');
     Route::post('/reports/events/generate', [EventReportController::class, 'generate'])->name('reports.events.generate');
 
-Route::get('/settlements', [SettlementController::class, 'index'])->name('settlements.index');
+    Route::get('/settlements', [SettlementController::class, 'index'])->name('settlements.index');
 
     Route::get('/settlements/show', [SettlementController::class, 'showSettlement'])
-         ->name('settlements.show');
+        ->name('settlements.show');
 
     Route::post('/settlements/store', [SettlementController::class, 'storeSettlement'])
-         ->name('settlements.store');
+        ->name('settlements.store');
 });
 
 
