@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\EventReportController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\EventTicketController;
+use App\Http\Controllers\Admin\SettlementController;
 use App\Http\Controllers\Admin\SupportTicketAdminController;
 use App\Http\Controllers\Admin\TicketScannerController;
 use App\Http\Controllers\Admin\UserController;
@@ -180,6 +181,13 @@ Route::post('/support/{ticket}/close', [SupportTicketAdminController::class, 'cl
 Route::get('/reports/events', [EventReportController::class, 'index'])->name('reports.events.index');
     Route::post('/reports/events/generate', [EventReportController::class, 'generate'])->name('reports.events.generate');
 
+Route::get('/settlements', [SettlementController::class, 'index'])->name('settlements.index');
+
+    Route::get('/settlements/show', [SettlementController::class, 'showSettlement'])
+         ->name('settlements.show');
+
+    Route::post('/settlements/store', [SettlementController::class, 'storeSettlement'])
+         ->name('settlements.store');
 });
 
 

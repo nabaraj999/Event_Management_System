@@ -157,6 +157,15 @@
                     <span>Reports</span>
                 </a>
 
+
+                <a href="{{ route('admin.settlements.index') }}"
+                    class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
+       {{ request()->routeIs('admin.settlements.*') ? 'sidebar-active' : '' }}">
+                    <i class="fa-solid fa-hand-holding-dollar w-6 h-6 mr-3 text-lg"></i>
+                    <span>Settlements</span>
+                </a>
+
+                
                 <a href="#"
                     class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
        {{ request()->routeIs('admin.seo.*') ? 'sidebar-active' : '' }}">

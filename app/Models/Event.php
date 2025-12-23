@@ -117,5 +117,12 @@ class Event extends Model
 {
     return $this->belongsTo(OrganizerApplication::class, 'organizer_id');
 }
+/**
+ * Get the settlement record for this event
+ */
+public function settlement()
+{
+    return $this->hasOne(EventSettlement::class);
+}
 
 }
