@@ -50,4 +50,11 @@ class OrganizerApplication extends Authenticatable
         // If your foreign key is different (e.g., user_id), change it:
         // return $this->hasMany(Event::class, 'user_id');
     }
+    // In app/Models/Organizer.php
+    public function supportTickets()
+    {
+        return $this->hasMany(SupportTicket::class, 'organizer_id');
+        //                                      ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+        // Wrong foreign key!
+    }
 }

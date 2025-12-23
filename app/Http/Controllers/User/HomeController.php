@@ -44,7 +44,6 @@ class HomeController extends Controller
                 ->limit(6)
                 ->get();
         } else {
-            // All logged-in cases → Use service
             $events = $this->recommendationService->getHomeRecommendations($user);
         }
 

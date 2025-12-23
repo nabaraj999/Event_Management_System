@@ -121,6 +121,12 @@
                 Settings
             </a>
 
+             <a href="{{ route('org.support.index') }}"
+               class="sidebar-link flex items-center px-4 py-3 rounded-lg
+               {{ request()->routeIs('org.support.*') ? 'sidebar-active' : '' }}">
+                <i class="fa-solid fa-headset mr-3 text-lg"></i>
+                Help & Support
+            </a>
             <a href="{{ route('org.profile.edit') }}"
                class="sidebar-link flex items-center px-4 py-3 rounded-lg
                {{ request()->routeIs('org.profile') ? 'sidebar-active' : '' }}">

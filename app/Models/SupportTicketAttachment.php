@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class SupportTicketAttachment extends Model
+{
+    protected $fillable = ['ticket_id', 'reply_id', 'file_name', 'file_path', 'file_type', 'file_size'];
+
+   public function ticket()
+    {
+        return $this->belongsTo(SupportTicket::class, 'ticket_id');
+    }
+
+    public function reply()
+    {
+        return $this->belongsTo(SupportTicketReply::class, 'reply_id');
+    }
+
+    public function getUrlAttribute()
+    {
+        return asset('storage/' . $this->file_path);
+    }
+}

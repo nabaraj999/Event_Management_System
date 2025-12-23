@@ -15,8 +15,9 @@ class Booking extends Model
     protected $casts = [
         'total_amount' => 'decimal:2',
         'payment_response' => 'array', // since we store JSON
+        'checked_in_at' => 'datetime',
     ];
-    
+
 
     // Relationships
     public function user()

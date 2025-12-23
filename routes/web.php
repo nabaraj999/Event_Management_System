@@ -19,6 +19,7 @@ use App\Http\Controllers\Organizer\OrgBookingController;
 use App\Http\Controllers\Organizer\OrgEventCategoryController;
 use App\Http\Controllers\Organizer\OrgEventController;
 use App\Http\Controllers\Organizer\OrgEventTicketController;
+use App\Http\Controllers\Organizer\SupportTicketController;
 use App\Http\Controllers\User\ContactController;
 use App\Http\Controllers\ProfileController as ControllersProfileController;
 use App\Http\Controllers\User\AboutController;
@@ -164,11 +165,14 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         ->name('organizer-applications.reject');
 
 
-        Route::get('/organizers', [AdminOrganizerController::class, 'index'])->name('organizers.index');
+    Route::get('/organizers', [AdminOrganizerController::class, 'index'])->name('organizers.index');
     Route::get('/organizers/{id}', [AdminOrganizerController::class, 'show'])->name('organizers.show');
     Route::patch('/organizers/{id}/toggle', [AdminOrganizerController::class, 'toggleStatus'])->name('organizers.toggle');
 
 
+    Route::get('/admin/support/tickets/{id}', function ($id) {
+    return redirect()->route('admin.dashboard')->with('info', "New support ticket #{$id} awaits your review!");
+})->name('admin.support.show');
 });
 
 
@@ -179,10 +183,10 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
 
 
 
-    Route::prefix('org')->name('org.')->group(function () {
+Route::prefix('org')->name('org.')->group(function () {
     Route::get('/login', [OrganizerLoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [OrganizerLoginController::class, 'login']);
-   Route::get('/profile', [OrganizerProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile', [OrganizerProfileController::class, 'show'])->name('profile.show');
 
     // Full edit - only if not frozen
     Route::get('/profile/edit', [OrganizerProfileController::class, 'edit'])->name('profile.edit');
@@ -199,10 +203,16 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::resource('categories', OrgEventCategoryController::class)->parameters(['categories' => 'category']);
         Route::resource('events', OrgEventController::class)->parameters(['events' => 'event']);
         Route::resource('event-tickets', OrgEventTicketController::class)->parameters(['event-tickets' => 'eventTicket']);
-    Route::get('/bookings', [OrgBookingController::class, 'index'])->name('bookings.index');
-    Route::get('/bookings/{booking}', [OrgBookingController::class, 'show'])->name('bookings.show');
-    Route::post('/bookings/{booking}/check-in', [OrgBookingController::class, 'checkIn'])->name('bookings.check-in');
+        Route::get('/bookings', [OrgBookingController::class, 'index'])->name('bookings.index');
+        Route::get('/bookings/{booking}', [OrgBookingController::class, 'show'])->name('bookings.show');
+        Route::post('/bookings/{booking}/check-in', [OrgBookingController::class, 'checkIn'])->name('bookings.check-in');
+
+
+        // List all tickets
+        Route::get('/support', [SupportTicketController::class, 'index'])->name('support.index');
+        Route::get('/support/create', [SupportTicketController::class, 'create'])->name('support.create');
+        Route::post('/support', [SupportTicketController::class, 'store'])->name('support.store');
+        Route::get('/support/{ticket}', [SupportTicketController::class, 'show'])->name('support.show');
+        Route::post('/support/{ticket}/reply', [SupportTicketController::class, 'reply'])->name('support.reply');
     });
-
-
 });
