@@ -36,6 +36,7 @@ class OrganizerApplication extends Authenticatable
 
     protected $casts = [
         'applied_at' => 'datetime',
+        'address' => 'array',
         'profile_completed_at' => 'datetime',
         'is_frozen' => 'boolean',
         'email_verified_at' => 'datetime', // optional, if you add verification later
@@ -57,4 +58,17 @@ class OrganizerApplication extends Authenticatable
         //                                      ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
         // Wrong foreign key!
     }
+
+    public function getFormattedAddressAttribute(): string
+{
+    $addr = $this->address ?? [];
+    $parts = array_filter([
+        $addr['street'] ?? $addr['address_line_1'] ?? $addr['address'] ?? null,
+        $addr['city'] ?? null,
+        $addr['state'] ?? $addr['province'] ?? null,
+        $addr['zip'] ?? $addr['postal_code'] ?? null,
+        $addr['country'] ?? null,
+    ]);
+    return $parts ? implode(', ', $parts) : 'Location not specified';
+}
 }

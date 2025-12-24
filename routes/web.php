@@ -33,6 +33,7 @@ use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\InterestController;
 use App\Http\Controllers\User\MainEventCategoryController;
 use App\Http\Controllers\User\OrganizerApplicationController;
+use App\Http\Controllers\User\OrganizerController;
 use App\Http\Controllers\User\UserEventCategoryController;
 use App\Http\Controllers\User\UserEventController;
 use Illuminate\Support\Facades\Route;
@@ -63,6 +64,10 @@ Route::post('/contact', [ContactController::class, 'store'])->name('contact.stor
 
 Route::get('/become-organizer', [OrganizerApplicationController::class, 'create'])->name('organizer.apply.form');
 Route::post('/become-organizer', [OrganizerApplicationController::class, 'store'])->name('organizer.apply');
+
+
+Route::get('/organizers', [OrganizerController::class, 'index'])->name('organizers.index');
+Route::get('/organizers/{id}', [OrganizerController::class, 'show'])->name('organizers.show');
 
 
 
