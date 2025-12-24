@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Organizer\Auth\OrganizerDashboardController;
 use App\Http\Controllers\Organizer\Auth\OrganizerLoginController;
 use App\Http\Controllers\Organizer\OrganizerProfileController;
+use App\Http\Controllers\Organizer\OrganizerSettlementController;
 use App\Http\Controllers\Organizer\OrgBookingController;
 use App\Http\Controllers\Organizer\OrgEventCategoryController;
 use App\Http\Controllers\Organizer\OrgEventController;
@@ -229,5 +230,8 @@ Route::prefix('org')->name('org.')->group(function () {
         Route::post('/support', [SupportTicketController::class, 'store'])->name('support.store');
         Route::get('/support/{ticket}', [SupportTicketController::class, 'show'])->name('support.show');
         Route::post('/support/{ticket}/reply', [SupportTicketController::class, 'reply'])->name('support.reply');
+
+        Route::get('/settlements', [OrganizerSettlementController::class, 'index'])->name('settlements.index');
+    Route::get('/settlements/{event}', [OrganizerSettlementController::class, 'show'])->name('settlements.show');
     });
 });
