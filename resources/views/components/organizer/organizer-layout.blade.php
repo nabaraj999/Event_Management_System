@@ -127,6 +127,11 @@
                     <i class="fa-solid fa-hand-holding-dollar w-6 text-center mr-4"></i>
                     Settlements
                 </a>
+                <a href="{{ route('org.insights') }}"
+                    class="sidebar-link flex items-center px-5 py-3 rounded-xl {{ request()->routeIs('org.insights') ? 'sidebar-active' : '' }}">
+                    <i class="fa-solid fa-chart-line w-6 text-center mr-4"></i>
+                    Insights
+                </a>
 
                 <a href="{{ route('org.profile.settings') }}"
                     class="sidebar-link flex items-center px-5 py-3 rounded-xl {{ request()->routeIs('org.profile.settings') ? 'sidebar-active' : '' }}">

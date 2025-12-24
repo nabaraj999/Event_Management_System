@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\TicketScannerController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Organizer\Auth\OrganizerDashboardController;
 use App\Http\Controllers\Organizer\Auth\OrganizerLoginController;
+use App\Http\Controllers\Organizer\InsightsController;
 use App\Http\Controllers\Organizer\OrganizerProfileController;
 use App\Http\Controllers\Organizer\OrganizerSettlementController;
 use App\Http\Controllers\Organizer\OrgBookingController;
@@ -238,5 +239,7 @@ Route::prefix('org')->name('org.')->group(function () {
 
         Route::get('/settlements', [OrganizerSettlementController::class, 'index'])->name('settlements.index');
     Route::get('/settlements/{event}', [OrganizerSettlementController::class, 'show'])->name('settlements.show');
+
+    Route::get('/insights', [InsightsController::class, 'index'])->name('insights');
     });
 });
