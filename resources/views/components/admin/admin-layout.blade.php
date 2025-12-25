@@ -165,8 +165,8 @@
                     <span>Settlements</span>
                 </a>
 
-                
-                <a href="#"
+
+                <a href="{{ route('admin.seo.index') }}"
                     class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
        {{ request()->routeIs('admin.seo.*') ? 'sidebar-active' : '' }}">
                     <i class="fa-solid fa-globe w-6 h-6 mr-3 text-lg"></i>
