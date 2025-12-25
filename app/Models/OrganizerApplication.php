@@ -51,24 +51,55 @@ class OrganizerApplication extends Authenticatable
         // If your foreign key is different (e.g., user_id), change it:
         // return $this->hasMany(Event::class, 'user_id');
     }
-    // In app/Models/Organizer.php
+
+    // app/Models/OrganizerApplication.php
+
+    public function categories()
+    {
+        return $this->hasMany(EventCategory::class, 'organizer_id');
+    }
+
+    // app/Models/OrganizerApplication.php
+
+
+    // Settlements through the organizer's events
+    public function settlements()
+    {
+        return $this->hasManyThrough(
+            EventSettlement::class,  // your settlement model name
+            Event::class,
+            'created_by',            // Foreign key on events table
+            'event_id',              // Foreign key on event_settlements table
+            'id',                    // Local key on organizer_applications
+            'id'                     // Local key on events
+        );
+    }
+
+
+    /**
+     * Get all support tickets created by this organizer
+     */
     public function supportTickets()
     {
-        return $this->hasMany(SupportTicket::class, 'organizer_id');
-        //                                      ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-        // Wrong foreign key!
+        return $this->hasMany(\App\Models\SupportTicket::class, 'organizer_id');
+    }
+
+    // Add this accessor for efficient ticket count
+    public function getEventTicketsCountAttribute()
+    {
+        return $this->events()->withCount('tickets')->get()->sum('tickets_count');
     }
 
     public function getFormattedAddressAttribute(): string
-{
-    $addr = $this->address ?? [];
-    $parts = array_filter([
-        $addr['street'] ?? $addr['address_line_1'] ?? $addr['address'] ?? null,
-        $addr['city'] ?? null,
-        $addr['state'] ?? $addr['province'] ?? null,
-        $addr['zip'] ?? $addr['postal_code'] ?? null,
-        $addr['country'] ?? null,
-    ]);
-    return $parts ? implode(', ', $parts) : 'Location not specified';
-}
+    {
+        $addr = $this->address ?? [];
+        $parts = array_filter([
+            $addr['street'] ?? $addr['address_line_1'] ?? $addr['address'] ?? null,
+            $addr['city'] ?? null,
+            $addr['state'] ?? $addr['province'] ?? null,
+            $addr['zip'] ?? $addr['postal_code'] ?? null,
+            $addr['country'] ?? null,
+        ]);
+        return $parts ? implode(', ', $parts) : 'Location not specified';
+    }
 }

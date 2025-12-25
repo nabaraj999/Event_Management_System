@@ -19,77 +19,92 @@ class UserEventController extends Controller
         $this->recommendationService = $recommendationService;
     }
 
-   public function index(Request $request)
-{
-    $query = Event::query()
-                  ->where('status', 'published')
+    /**
+     * Display a listing of upcoming published events with filters.
+     */
+    public function index(Request $request)
+    {
+        $query = Event::query()
+            ->with(['category', 'organizer']) // Eager load for performance
+            ->where('status', 'published')
+            ->where('start_date', '>=', now());
+
+        // Keyword Search
+        if ($request->filled('query')) {
+            $searchTerm = $request->input('query');
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('title', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('short_description', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('location', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('venue', 'LIKE', "%{$searchTerm}%");
+            });
+        }
+
+        // Filter by categories
+        if ($request->filled('categories') && is_array($request->input('categories'))) {
+            $query->whereIn('category_id', $request->input('categories'));
+        }
+
+        // Filter by organizers (fixed: use organizer_id from events table)
+        if ($request->filled('organizers') && is_array($request->input('organizers'))) {
+            $query->whereIn('organizer_id', $request->input('organizers'));
+        }
+
+        // Date range filtering
+        if ($request->filled('start_date_from')) {
+            $query->whereDate('start_date', '>=', $request->input('start_date_from'));
+        }
+        if ($request->filled('start_date_to')) {
+            $query->whereDate('start_date', '<=', $request->input('start_date_to'));
+        }
+
+        // Sorting
+        $sort = $request->input('sort', 'newest');
+        if ($sort === 'newest') {
+            $query->orderBy('start_date', 'asc'); // Soonest first
+        } elseif ($sort === 'oldest') {
+            $query->orderBy('start_date', 'desc'); // Latest first
+        } else {
+            $query->orderBy('start_date', 'asc'); // Default: soonest
+        }
+
+        $events = $query->paginate(12)->withQueryString();
+
+        // Load active categories
+        $categories = EventCategory::where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
+
+        // Load approved & active organizers who have upcoming events
+        $organizers = OrganizerApplication::where('status', 'approved')
+            ->where('is_frozen', false) // Note: I assume frozen = inactive, so use NOT frozen
+            ->whereHas('events', function ($q) {
+                $q->where('status', 'published')
                   ->where('start_date', '>=', now());
+            })
+            ->withCount(['events' => function ($q) {
+                $q->where('status', 'published')->where('start_date', '>=', now());
+            }])
+            ->orderBy('organization_name')
+            ->get();
 
-    // Keyword Search
-    if ($request->filled('query')) {
-        $searchTerm = $request->input('query');
-        $query->where(function ($q) use ($searchTerm) {
-            $q->where('title', 'like', "%{$searchTerm}%")
-              ->orWhere('short_description', 'like', "%{$searchTerm}%")
-              ->orWhere('location', 'like', "%{$searchTerm}%");
-        });
+        $sort = $sort; // Already defined, but pass explicitly
+
+        return view('frontend.event.index', compact('events', 'categories', 'organizers', 'sort'));
     }
 
-    // Filter by categories
-    if ($request->has('categories') && is_array($request->input('categories'))) {
-        $query->whereIn('category_id', $request->input('categories'));
-    }
-
-    // NEW: Filter by organizers
-    if ($request->has('organizers') && is_array($request->input('organizers'))) {
-        $query->whereIn('organizer_id', $request->input('organizers')); // assuming column is organizer_id
-    }
-
-    // Filter by date range
-    if ($request->filled('start_date_from')) {
-        $query->whereDate('start_date', '>=', $request->input('start_date_from'));
-    }
-    if ($request->filled('start_date_to')) {
-        $query->whereDate('start_date', '<=', $request->input('start_date_to'));
-    }
-
-    // Sorting
-    $sort = $request->input('sort', 'newest');
-    if ($sort === 'newest') {
-        $query->orderBy('start_date', 'asc');
-    } elseif ($sort === 'oldest') {
-        $query->orderBy('start_date', 'desc');
-    } else {
-        $query->orderBy('start_date', 'asc');
-    }
-
-    $events = $query->paginate(12)->withQueryString();
-
-    // Categories
-    $categories = EventCategory::where('is_active', true)
-                               ->orderBy('sort_order')
-                               ->orderBy('name')
-                               ->get();
-
-    // NEW: Get organizers who have published upcoming events
-   $organizers = OrganizerApplication::where('status', 'approved')
-    ->where('is_frozen', true)
-    ->whereHas('events', function ($q) {
-        $q->where('status', 'published')
-          ->where('start_date', '>=', now());
-    })
-    ->orderBy('organization_name')
-    ->get();
-
-    return view('frontend.event.index', compact('events', 'categories', 'organizers', 'sort'));
-}
+    /**
+     * Display the specified event.
+     */
     public function show(Event $event)
     {
-        if ($event->status !== 'published') {
+        // Abort if not published or in the past
+        if ($event->status !== 'published' || $event->start_date < now()) {
             abort(404);
         }
 
-        // Load active tickets + category
+        // Eager load necessary relations
         $event->load([
             'tickets' => function ($query) {
                 $query->where('is_active', true)
@@ -97,18 +112,20 @@ class UserEventController extends Controller
                       ->orderBy('price');
             },
             'category',
-            'organizer' // if you have organizer relation
+            'organizer'
         ]);
 
-        // === RELATED / RECOMMENDED EVENTS ===
+        // Increment view count (optional - if you have a views column)
+        // $event->increment('views');
+
+        // === RECOMMENDED / RELATED EVENTS ===
         $relatedEvents = collect();
 
         if (Auth::check()) {
-            // Use your smart recommendation service
             $relatedEvents = $this->recommendationService->getRelatedRecommendations(Auth::user(), $event);
         }
 
-        // Fallback: Same category events
+        // Fallback 1: Same category, upcoming, exclude current
         if ($relatedEvents->isEmpty() && $event->category_id) {
             $relatedEvents = Event::where('status', 'published')
                 ->where('start_date', '>=', now())
@@ -119,7 +136,7 @@ class UserEventController extends Controller
                 ->get();
         }
 
-        // Final fallback: Popular upcoming events
+        // Fallback 2: Featured or popular upcoming events
         if ($relatedEvents->isEmpty()) {
             $relatedEvents = Event::where('status', 'published')
                 ->where('start_date', '>=', now())
@@ -130,7 +147,6 @@ class UserEventController extends Controller
                 ->get();
         }
 
-        // Pass BOTH event and relatedEvents
         return view('frontend.event.show', compact('event', 'relatedEvents'));
     }
 }

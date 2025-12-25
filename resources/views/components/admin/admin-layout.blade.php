@@ -81,6 +81,7 @@
 
 
             <!-- Navigation Links -->
+            <!-- Navigation Links -->
             <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
 
                 <a href="{{ route('admin.dashboard') }}"
@@ -97,57 +98,120 @@
                     <span>Company Info</span>
                 </a>
 
+                <!-- Events Section -->
                 <a href="{{ route('admin.events.index') }}"
-                    class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
+                    class="sidebar-link flex items-center justify-between px-4 py-3 rounded-lg transition
        {{ request()->routeIs('admin.events.*') ? 'sidebar-active' : '' }}">
-                    <i class="fa-solid fa-calendar-days w-6 h-6 mr-3 text-lg"></i>
-                    <span>Events</span>
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-calendar-days w-6 h-6 mr-3 text-lg"></i>
+                        <span>Events</span>
+                    </div>
+                    <span class="bg-primary/20 text-primary text-xs font-bold px-2.5 py-1 rounded-full">
+                        {{ \App\Models\Event::count() }}
+                    </span>
                 </a>
 
                 <a href="{{ route('admin.event-tickets.index') }}"
                     class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
-   {{ request()->routeIs('admin.event-tickets.*') ? 'sidebar-active' : '' }}">
+       {{ request()->routeIs('admin.event-tickets.*') ? 'sidebar-active' : '' }}">
                     <i class="fa-solid fa-ticket w-6 h-6 mr-3 text-lg"></i>
                     <span>Tickets</span>
                 </a>
 
                 <a href="{{ route('admin.categories.index') }}"
-                    class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
+                    class="sidebar-link flex items-center justify-between px-4 py-3 rounded-lg transition
        {{ request()->routeIs('admin.categories.*') ? 'sidebar-active' : '' }}">
-                    <i class="fa-solid fa-table-cells-large w-6 h-6 mr-3 text-lg"></i>
-                    <span>Categories</span>
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-table-cells-large w-6 h-6 mr-3 text-lg"></i>
+                        <span>Categories</span>
+                    </div>
+                    <span class="bg-primary/20 text-primary text-xs font-bold px-2.5 py-1 rounded-full">
+                        {{ \App\Models\EventCategory::count() }}
+                    </span>
                 </a>
 
 
                 <a href="{{ route('admin.bookings.index') }}"
-                    class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
+                    class="sidebar-link flex items-center justify-between px-4 py-3 rounded-lg transition
        {{ request()->routeIs('admin.bookings.*') ? 'sidebar-active' : '' }}">
-                    <i class="fa-solid fa-book w-6 h-6 mr-3 text-lg"></i>
-                    <span>Bookings</span>
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-book w-6 h-6 mr-3 text-lg"></i>
+                        <span>Bookings</span>
+                    </div>
+                    <span class="bg-primary/20 text-primary text-xs font-bold px-2.5 py-1 rounded-full">
+                        {{ \App\Models\Booking::count() }}
+                    </span>
                 </a>
 
-
+                <!-- Divider / Group Title -->
+                <div class="px-4 py-3 text-xs font-bold text-white/60 uppercase tracking-wider">
+                    User & Organizer Management
+                </div>
 
                 <a href="{{ route('admin.organizer-applications.index') }}"
-                    class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
-          {{ request()->routeIs('admin.organizer-applications.*') ? 'sidebar-active' : '' }}">
-                    <i class="fa-solid fa-person-chalkboard w-6 h-6 mr-3 text-lg"></i>
-
-                    <span>Organizer Applications</span>
+                    class="sidebar-link flex items-center justify-between px-4 py-3 rounded-lg transition
+       {{ request()->routeIs('admin.organizer-applications.*') ? 'sidebar-active' : '' }}">
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-person-chalkboard w-6 h-6 mr-3 text-lg"></i>
+                        <span>Organizer Applications</span>
+                    </div>
+                    @php
+                        $pendingApps = \App\Models\OrganizerApplication::where('status', 'pending')->count();
+                    @endphp
+                    @if ($pendingApps > 0)
+                        <span class="bg-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-full animate-pulse">
+                            {{ $pendingApps }}
+                        </span>
+                    @endif
                 </a>
 
                 <a href="{{ route('admin.organizers.index') }}"
-                    class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
-          {{ request()->routeIs('admin.organizers.*') ? 'sidebar-active' : '' }}">
-                    <i class="fa-solid fa-users-gear w-6 h-6 mr-3 text-lg"></i>
-                    <span>Organizer </span>
+                    class="sidebar-link flex items-center justify-between px-4 py-3 rounded-lg transition
+       {{ request()->routeIs('admin.organizers.*') ? 'sidebar-active' : '' }}">
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-users-gear w-6 h-6 mr-3 text-lg"></i>
+                        <span>Organizers</span>
+                    </div>
+                    <span class="bg-primary/20 text-primary text-xs font-bold px-2.5 py-1 rounded-full">
+                        {{ \App\Models\OrganizerApplication::where('status', 'approved')->count() }}
+                    </span>
                 </a>
 
                 <a href="{{ route('admin.users.index') }}"
-                    class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
+                    class="sidebar-link flex items-center justify-between px-4 py-3 rounded-lg transition
        {{ request()->routeIs('admin.users.*') ? 'sidebar-active' : '' }}">
-                    <i class="fa-solid fa-users w-6 h-6 mr-3 text-lg"></i>
-                    <span>Users</span>
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-users w-6 h-6 mr-3 text-lg"></i>
+                        <span>Users</span>
+                    </div>
+                    <span class="bg-primary/20 text-primary text-xs font-bold px-2.5 py-1 rounded-full">
+                        {{ \App\Models\User::count() }}
+                    </span>
+                </a>
+
+                <!-- Support & Reports Group -->
+                <div class="px-4 py-3 text-xs font-bold text-white/60 uppercase tracking-wider mt-4">
+                    Support & Analytics
+                </div>
+
+                <a href="{{ route('admin.support.index') }}"
+                    class="sidebar-link flex items-center justify-between px-4 py-3 rounded-lg transition
+       {{ request()->routeIs('admin.support.*') ? 'sidebar-active' : '' }}">
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-headset w-6 h-6 mr-3 text-lg"></i>
+                        <span>Support Tickets</span>
+                    </div>
+                    @php
+                        $openTickets = \App\Models\SupportTicket::whereIn('status', [
+                            'open',
+                            'waiting_for_reply',
+                        ])->count();
+                    @endphp
+                    @if ($openTickets > 0)
+                        <span class="bg-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-full animate-pulse">
+                            {{ $openTickets }}
+                        </span>
+                    @endif
                 </a>
 
                 <a href="{{ route('admin.reports.events.index') }}"
@@ -157,7 +221,6 @@
                     <span>Reports</span>
                 </a>
 
-
                 <a href="{{ route('admin.settlements.index') }}"
                     class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
        {{ request()->routeIs('admin.settlements.*') ? 'sidebar-active' : '' }}">
@@ -165,19 +228,11 @@
                     <span>Settlements</span>
                 </a>
 
-                
-                <a href="#"
+                <a href="{{ route('admin.seo.index') }}"
                     class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
        {{ request()->routeIs('admin.seo.*') ? 'sidebar-active' : '' }}">
                     <i class="fa-solid fa-globe w-6 h-6 mr-3 text-lg"></i>
                     <span>SEO</span>
-                </a>
-
-                <a href="{{ route('admin.support.index') }}"
-                    class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
-       {{ request()->routeIs('admin.support.*') ? 'sidebar-active' : '' }}">
-                    <i class="fa-solid fa-headset w-6 h-6 mr-3 text-lg"></i>
-                    <span>Support Tickets</span>
                 </a>
 
                 <a href="{{ route('admin.profile') }}"
@@ -214,7 +269,8 @@
                 class="fixed top-0 left-0 lg:left-64 right-0 bg-white shadow-lg border-b border-gray-200 z-40 h-16 lg:h-20 flex items-center">
                 <div class="w-full flex items-center justify-between px-6">
                     <button id="openSidebar" class="lg:hidden text-darkBlue hover:text-primary">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </button>

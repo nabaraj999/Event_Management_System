@@ -69,7 +69,7 @@
                     @if ($company && $company->logo)
                         <img src="{{ asset('storage/' . $company->logo) }}"
                             alt="{{ $company->name ?? 'EventHub' }} Logo"
-                            class="w-12 h-12 rounded-lg object-contain shadow-lg bg-white">
+                            class="w-12 h-12 rounded-lg object-contain shadow-lg bg-white" />
                     @else
                         <div
                             class="w-12 h-12 rounded-lg bg-white flex items-center justify-center text-xl font-bold shadow-lg">
@@ -84,60 +84,148 @@
             </div>
 
             <!-- NAVIGATION -->
+            <!-- NAVIGATION -->
             <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2">
 
                 <a href="{{ route('org.dashboard') }}"
                     class="sidebar-link flex items-center px-5 py-3 rounded-xl {{ request()->routeIs('org.dashboard') ? 'sidebar-active' : '' }}">
                     <i class="fa-solid fa-house w-6 text-center mr-4"></i>
-                    Dashboard
+                    <span>Dashboard</span>
                 </a>
+
+                <!-- Events Management Group -->
+                <div class="px-5 mt-6 mb-2 text-xs font-bold text-white/60 uppercase tracking-wider">
+                    Event Management
+                </div>
 
                 <a href="{{ route('org.events.index') }}"
-                    class="sidebar-link flex items-center px-5 py-3 rounded-xl {{ request()->routeIs('org.events.*') ? 'sidebar-active' : '' }}">
-                    <i class="fa-solid fa-calendar-days w-6 text-center mr-4"></i>
-                    Events
+                    class="sidebar-link flex items-center justify-between px-5 py-3 rounded-xl {{ request()->routeIs('org.events.*') ? 'sidebar-active' : '' }}">
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-calendar-days w-6 text-center mr-4"></i>
+                        <span>Events</span>
+                    </div>
+                    <span class="bg-primary/20 text-primary text-xs font-bold px-2.5 py-1 rounded-full">
+                        {{ Auth::guard('organizer')->user()->events()->count() }}
+                    </span>
                 </a>
+
 
                 <a href="{{ route('org.categories.index') }}"
-                    class="sidebar-link flex items-center px-5 py-3 rounded-xl {{ request()->routeIs('org.categories.*') ? 'sidebar-active' : '' }}">
-                    <i class="fa-solid fa-layer-group w-6 text-center mr-4"></i>
-                    Categories
+                    class="sidebar-link flex items-center justify-between px-5 py-3 rounded-xl {{ request()->routeIs('org.categories.*') ? 'sidebar-active' : '' }}">
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-layer-group w-6 text-center mr-4"></i>
+                        <span>Categories</span>
+                    </div>
+                    <span class="bg-primary/20 text-primary text-xs font-bold px-2.5 py-1 rounded-full">
+                        {{ Auth::guard('organizer')->user()->categories()->count() }}
+                    </span>
                 </a>
 
-                <a href="{{ route('org.event-tickets.index') }}"
+
+                {{-- <a href="{{ route('org.event-tickets.index') }}"
                     class="sidebar-link flex items-center px-5 py-3 rounded-xl {{ request()->routeIs('org.event-tickets.*') ? 'sidebar-active' : '' }}">
                     <i class="fa-solid fa-ticket w-6 text-center mr-4"></i>
-                    Tickets
+                    <span>Tickets</span>
+                </a> --}}
+
+                <a href="{{ route('org.event-tickets.index') }}"
+                    class="sidebar-link flex items-center justify-between px-5 py-3 rounded-xl {{ request()->routeIs('org.event-tickets.*') ? 'sidebar-active' : '' }}">
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-ticket w-6 text-center mr-4"></i>
+                        <span>Tickets</span>
+                    </div>
+                    <span class="bg-primary/20 text-primary text-xs font-bold px-2.5 py-1 rounded-full">
+                        {{ Auth::guard('organizer')->user()->event_tickets_count }}
+                    </span>
                 </a>
+
+
+                <!-- Sales & Bookings Group -->
+                <div class="px-5 mt-6 mb-2 text-xs font-bold text-white/60 uppercase tracking-wider">
+                    Sales & Bookings
+                </div>
 
                 <a href="{{ route('org.bookings.index') }}"
-                    class="sidebar-link flex items-center px-5 py-3 rounded-xl {{ request()->routeIs('org.bookings.*') ? 'sidebar-active' : '' }}">
-                    <i class="fa-solid fa-receipt w-6 text-center mr-4"></i>
-                    Bookings
-                </a>
-
-                <a href="{{ route('org.support.index') }}"
-                    class="sidebar-link flex items-center px-5 py-3 rounded-xl {{ request()->routeIs('org.support.*') ? 'sidebar-active' : '' }}">
-                    <i class="fa-solid fa-headset w-6 text-center mr-4"></i>
-                    Help & Support
+                    class="sidebar-link flex items-center justify-between px-5 py-3 rounded-xl {{ request()->routeIs('org.bookings.*') ? 'sidebar-active' : '' }}">
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-receipt w-6 text-center mr-4"></i>
+                        <span>Bookings</span>
+                    </div>
+                    @php
+                        $totalBookings = Auth::guard('organizer')
+                            ->user()
+                            ->events()
+                            ->withCount('bookings')
+                            ->get()
+                            ->sum('bookings_count');
+                    @endphp
+                    <span class="bg-primary/20 text-primary text-xs font-bold px-2.5 py-1 rounded-full">
+                        {{ $totalBookings }}
+                    </span>
                 </a>
 
                 <a href="{{ route('org.settlements.index') }}"
                     class="sidebar-link flex items-center px-5 py-3 rounded-xl {{ request()->routeIs('org.settlements.*') ? 'sidebar-active' : '' }}">
                     <i class="fa-solid fa-hand-holding-dollar w-6 text-center mr-4"></i>
-                    Settlements
+                    <span>Settlements</span>
+                </a>
+
+                 
+
+
+                <a href="{{ route('org.insights') }}"
+                    class="sidebar-link flex items-center px-5 py-3 rounded-xl {{ request()->routeIs('org.insights') ? 'sidebar-active' : '' }}">
+                    <i class="fa-solid fa-chart-line w-6 text-center mr-4"></i>
+                    <span>Insights</span>
+                </a>
+
+
+                 <a href="{{ route('org.event-tickets.index') }}"
+                    class="sidebar-link flex items-center justify-between px-5 py-3 rounded-xl {{ request()->routeIs('org.event-tickets.*') ? 'sidebar-active' : '' }}">
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-ticket w-6 text-center mr-4"></i>
+                        <span>Tickets</span>
+                    </div>
+                    <span class="bg-primary/20 text-primary text-xs font-bold px-2.5 py-1 rounded-full">
+                        {{ Auth::guard('organizer')->user()->event_tickets_count }}
+                    </span>
+                </a>
+
+                <!-- Support & Account Group -->
+                <div class="px-5 mt-6 mb-2 text-xs font-bold text-white/60 uppercase tracking-wider">
+                    Support & Account
+                </div>
+
+                <a href="{{ route('org.support.index') }}"
+                    class="sidebar-link flex items-center justify-between px-5 py-3 rounded-xl {{ request()->routeIs('org.support.*') ? 'sidebar-active' : '' }}">
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-headset w-6 text-center mr-4"></i>
+                        <span>Help & Support</span>
+                    </div>
+                    @php
+                        $openTickets = Auth::guard('organizer')
+                            ->user()
+                            ->supportTickets()
+                            ->whereIn('status', ['open', 'waiting_for_reply'])
+                            ->count();
+                    @endphp
+                    @if ($openTickets > 0)
+                        <span class="bg-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-full animate-pulse">
+                            {{ $openTickets }}
+                        </span>
+                    @endif
                 </a>
 
                 <a href="{{ route('org.profile.settings') }}"
                     class="sidebar-link flex items-center px-5 py-3 rounded-xl {{ request()->routeIs('org.profile.settings') ? 'sidebar-active' : '' }}">
                     <i class="fa-solid fa-gear w-6 text-center mr-4"></i>
-                    Settings
+                    <span>Settings</span>
                 </a>
 
                 <a href="{{ route('org.profile.edit') }}"
                     class="sidebar-link flex items-center px-5 py-3 rounded-xl {{ request()->routeIs('org.profile.edit') ? 'sidebar-active' : '' }}">
                     <i class="fa-solid fa-user w-6 text-center mr-4"></i>
-                    Profile
+                    <span>Profile</span>
                 </a>
 
             </nav>

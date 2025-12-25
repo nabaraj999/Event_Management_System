@@ -32,5 +32,5 @@ class EventSettlement extends Model
         return $this->settlement_proof ? asset('storage/' . $this->settlement_proof) : null;
     }
 
-   
+
 }

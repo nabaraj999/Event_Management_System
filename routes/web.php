@@ -11,12 +11,14 @@ use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\EventReportController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\EventTicketController;
+use App\Http\Controllers\Admin\SeoPageController;
 use App\Http\Controllers\Admin\SettlementController;
 use App\Http\Controllers\Admin\SupportTicketAdminController;
 use App\Http\Controllers\Admin\TicketScannerController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Organizer\Auth\OrganizerDashboardController;
 use App\Http\Controllers\Organizer\Auth\OrganizerLoginController;
+use App\Http\Controllers\Organizer\InsightsController;
 use App\Http\Controllers\Organizer\OrganizerProfileController;
 use App\Http\Controllers\Organizer\OrganizerSettlementController;
 use App\Http\Controllers\Organizer\OrgBookingController;
@@ -194,6 +196,16 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
 
     Route::post('/settlements/store', [SettlementController::class, 'storeSettlement'])
         ->name('settlements.store');
+
+    Route::get('/seo', [SeoPageController::class, 'index'])->name('seo.index');
+
+    // Create New SEO Page
+    Route::get('/seo/create', [SeoPageController::class, 'create'])->name('seo.create');
+    Route::post('/seo', [SeoPageController::class, 'store'])->name('seo.store');
+
+    // Edit & Update Existing
+    Route::get('/seo/{seoPage}/edit', [SeoPageController::class, 'edit'])->name('seo.edit');
+    Route::put('/seo/{seoPage}', [SeoPageController::class, 'update'])->name('seo.update');
 });
 
 
@@ -237,6 +249,8 @@ Route::prefix('org')->name('org.')->group(function () {
         Route::post('/support/{ticket}/reply', [SupportTicketController::class, 'reply'])->name('support.reply');
 
         Route::get('/settlements', [OrganizerSettlementController::class, 'index'])->name('settlements.index');
-    Route::get('/settlements/{event}', [OrganizerSettlementController::class, 'show'])->name('settlements.show');
+        Route::get('/settlements/{event}', [OrganizerSettlementController::class, 'show'])->name('settlements.show');
+
+        Route::get('/insights', [InsightsController::class, 'index'])->name('insights');
     });
 });
