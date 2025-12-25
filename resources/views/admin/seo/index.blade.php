@@ -9,12 +9,15 @@
                 </div>
                 <div class="flex gap-3">
                     <form method="GET" class="flex gap-2">
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by page key..."
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            placeholder="Search by page key..."
                             class="px-5 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-orange-400 w-64">
-                        <button type="submit" class="px-6 py-3 bg-primary hover:bg-orange-600 text-white rounded-xl font-medium transition shadow">Search</button>
+                        <button type="submit"
+                            class="px-6 py-3 bg-primary hover:bg-orange-600 text-white rounded-xl font-medium transition shadow">Search</button>
                     </form>
-                    <a href="{{ route('admin.seo.create') }}" class="px-8 py-3 bg-primary hover:bg-orange-600 text-white rounded-xl font-medium transition shadow-lg">
-                       New
+                    <a href="{{ route('admin.seo.create') }}"
+                        class="px-8 py-3 bg-primary hover:bg-orange-600 text-white rounded-xl font-medium transition shadow-lg">
+                        New
                     </a>
                 </div>
             </div>
@@ -45,7 +48,8 @@
                                     <div class="font-bold text-darkBlue text-lg">
                                         {{ ucfirst(str_replace(['.', '_'], ' ', $seo->page_key)) }}
                                     </div>
-                                    <div class="text-sm text-gray-500">Route: <code class="bg-gray-100 px-2 py-1 rounded">{{ $seo->page_key }}</code></div>
+                                    <div class="text-sm text-gray-500">Route: <code
+                                            class="bg-gray-100 px-2 py-1 rounded">{{ $seo->page_key }}</code></div>
                                 </td>
                                 <td class="px-6 py-5 font-medium text-gray-900">
                                     {{ Str::limit($seo->meta_title, 10) }}
@@ -57,12 +61,14 @@
                                     {{ $seo->meta_keywords ? Str::limit($seo->meta_keywords, 10) : '— No keywords —' }}
                                 </td>
                                 <td class="px-6 py-5 text-center">
-                                    <span class="px-4 py-1.5 rounded-full text-xs font-medium {{ $seo->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                    <span
+                                        class="px-4 py-1.5 rounded-full text-xs font-medium {{ $seo->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                         {{ $seo->is_active ? 'Active' : 'Inactive' }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-5 text-center">
-                                    <a href="{{ route('admin.seo.edit', $seo) }}" class="px-5 py-2.5 rounded-lg bg-darkBlue text-white font-medium shadow-sm hover:bg-blue-700 transition">
+                                    <a href="{{ route('admin.seo.edit', $seo) }}"
+                                        class="px-5 py-2.5 rounded-lg bg-darkBlue text-white font-medium shadow-sm hover:bg-blue-700 transition">
                                         Edit
                                     </a>
                                 </td>
@@ -71,7 +77,8 @@
                             <tr>
                                 <td colspan="7" class="text-center py-20 text-gray-500">
                                     <p class="text-2xl font-medium">No SEO pages found</p>
-                                    <a href="{{ route('admin.seo.create') }}" class="mt-6 inline-block px-8 py-3 bg-primary hover:bg-orange-600 text-white rounded-xl font-medium shadow-lg">
+                                    <a href="{{ route('admin.seo.create') }}"
+                                        class="mt-6 inline-block px-8 py-3 bg-primary hover:bg-orange-600 text-white rounded-xl font-medium shadow-lg">
                                         Add Your First SEO Page →
                                     </a>
                                 </td>
@@ -80,15 +87,15 @@
                     </tbody>
                 </table>
             </div>
-           <div class="px-6 py-5 bg-gray-50 border-t text-center">
-    {{ $seoPages->links() }}
-</div>
+            <div class="px-6 py-5 bg-gray-50 border-t text-center">
+                {{ $seoPages->links() }}
+            </div>
         </div>
 
         @push('scripts')
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <script>
-                @if(session('swal_success'))
+                @if (session('swal_success'))
                     Swal.fire({
                         icon: 'success',
                         title: 'Success!',
