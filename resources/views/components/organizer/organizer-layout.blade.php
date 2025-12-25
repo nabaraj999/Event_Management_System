@@ -69,7 +69,7 @@
                     @if ($company && $company->logo)
                         <img src="{{ asset('storage/' . $company->logo) }}"
                             alt="{{ $company->name ?? 'EventHub' }} Logo"
-                            class="w-12 h-12 rounded-lg object-contain shadow-lg bg-white">
+                            class="w-12 h-12 rounded-lg object-contain shadow-lg bg-white" />
                     @else
                         <div
                             class="w-12 h-12 rounded-lg bg-white flex items-center justify-center text-xl font-bold shadow-lg">

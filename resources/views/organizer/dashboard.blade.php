@@ -2,7 +2,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
 
         <!-- Welcome Header -->
-        <div class="text-center mb-10">
+        <div class="text-center mb-10 bg-white rounded-2xl p-6 shadow">
             <h1 class="text-4xl lg:text-5xl font-extrabold text-darkBlue mb-3">
                 Welcome back, {{ $organizer->contact_person ?? 'Organizer' }}!
             </h1>
