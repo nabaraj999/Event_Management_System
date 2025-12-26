@@ -74,3 +74,33 @@ MAIL_PASSWORD=YOUR_MAIL_PASSWORD
 MAIL_FROM_ADDRESS=YOUR_FROM_EMAIL
 MAIL_FROM_NAME="${APP_NAME}"
 
+
+2️⃣ INSTALLATION (ALL COMMANDS)
+
+git clone https://github.com/nabaraj999/Event_Management_System.git
+cd Event_Management_System
+composer install
+npm install
+php artisan key:generate
+php artisan optimize:clear
+php artisan migrate --seed
+npm run dev
+php artisan serve
+
+
+3️⃣ TEST ACCOUNTS
+Admin
+Url :http://127.0.0.1:8000/admin-login
+Email : admin@example.com
+Password : Nepal@1234#
+
+Organizer
+Url :http://127.0.0.1:8000/org/login
+Email : technabu2025@gmail.com
+Password :ThLVL4ZehlZX
+
+
+
+
+
+
