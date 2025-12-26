@@ -108,11 +108,12 @@
                                     class="w-full px-5 py-4 border-2 rounded-xl"
                                     required>
 
-                                <input type="email" name="email"
-                                    value="{{ old('email', auth()->user()->email ?? '') }}"
-                                    placeholder="Email Address"
-                                    class="w-full px-5 py-4 border-2 rounded-xl"
-                                    required>
+                               <input type="email" name="email"
+       value="{{ old('email', auth()->user()->email ?? '') }}"
+       placeholder="Email Address"
+       class="w-full px-5 py-4 border-2 rounded-xl"
+       readonly
+       required>
 
                                 <input type="text" name="phone"
                                     placeholder="Phone Number"
