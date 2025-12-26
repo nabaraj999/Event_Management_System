@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\OrganizerApplication;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class OrganizerApplicationController extends Controller
 {
@@ -15,16 +16,19 @@ class OrganizerApplicationController extends Controller
 
     public function store(Request $request)
 {
-    $validated = $request->validate([
-        'organization_name' => 'required|string|max:255',
-        'contact_person'    => 'required|string|max:255',   // ← Add this
-        'phone'             => 'required|string|max:20',
-        'email'             => 'required|email|unique:organizer_applications,email',
-        'address'           => 'required|string|max:1000',
-        'website'           => 'nullable|url|max:255',
-        'company_type'      => 'required|string',
-        'description'       => 'nullable|string|max:2000',
-    ]);
+
+
+$validated = $request->validate([
+    'organization_name' => ['required', 'string','min:2','max:255','regex:/^[\pL\pN\s\-\.&\'()]+$/u',],
+    'contact_person' => ['required','string','min:3','max:255','regex:/^[\pL\pN\s\-\.\' ]+$/u', ],
+    'phone' => ['required','string','regex:/^\+[1-9]\d{1,14}$/', 'max:20',],
+    'email' => ['required','email:rfc,dns',  'max:255',Rule::unique('organizer_applications', 'email'),  ],
+    'address' => [ 'required','string','min:10','max:1000',],
+    'website' => ['nullable','url:http,https','max:255', ],
+    'company_type' => [ 'required','string','in:LLC,private_limited,public_limited,Sole Proprietorship,ngo,event_agency,Other', ],
+    'description' => ['nullable','string','min:50', 'max:2000',
+    ],
+]);
 
     OrganizerApplication::create([
         'organization_name' => $validated['organization_name'],
