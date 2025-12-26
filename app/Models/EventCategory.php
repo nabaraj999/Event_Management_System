@@ -93,4 +93,19 @@ class EventCategory extends Model
           ->orWhereNull('organizer_id');
     });
 }
+
+public function scopeActive($query)
+{
+    return $query->where('is_active', true);
+}
+
+    /**
+     * Scope to filter only inactive categories (optional, for future use)
+     */
+    public function scopeInactive($query)
+    {
+        return $query->where('is_active', false);
+    }
+
+
 }

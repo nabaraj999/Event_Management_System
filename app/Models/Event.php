@@ -91,18 +91,14 @@ class Event extends Model
     {
         return $this->belongsTo(OrganizerApplication::class);
     }
-    public function scopePublished(Builder $query): Builder
+    public function scopePublished($query)
     {
         return $query->where('status', 'published');
     }
 
-    /**
-     * Scope: Only upcoming events (start_date >= now)
-     */
-    public function scopeUpcoming(Builder $query): Builder
+    public function scopeUpcoming($query)
     {
         return $query->where('start_date', '>=', now());
-        // or Carbon::now() if you prefer
     }
 
     /**
@@ -114,15 +110,14 @@ class Event extends Model
     }
 
     public function organizerApplication()
-{
-    return $this->belongsTo(OrganizerApplication::class, 'organizer_id');
-}
-/**
- * Get the settlement record for this event
- */
-public function settlement()
-{
-    return $this->hasOne(EventSettlement::class);
-}
-
+    {
+        return $this->belongsTo(OrganizerApplication::class, 'organizer_id');
+    }
+    /**
+     * Get the settlement record for this event
+     */
+    public function settlement()
+    {
+        return $this->hasOne(EventSettlement::class);
+    }
 }

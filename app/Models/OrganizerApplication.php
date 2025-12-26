@@ -45,11 +45,10 @@ class OrganizerApplication extends Authenticatable
     // REMOVED the setPasswordAttribute mutator completely!
     // We hash manually in controller → safer and cleaner
 
+    // In OrganizerApplication.php model
     public function events()
     {
         return $this->hasMany(Event::class, 'organizer_id');
-        // If your foreign key is different (e.g., user_id), change it:
-        // return $this->hasMany(Event::class, 'user_id');
     }
 
     // app/Models/OrganizerApplication.php
@@ -102,4 +101,38 @@ class OrganizerApplication extends Authenticatable
         ]);
         return $parts ? implode(', ', $parts) : 'Location not specified';
     }
+    public function scopeApproved($query)
+    {
+        return $query->where('status', 'approved');
+    }
+
+    /**
+     * Scope to filter organizers that are not frozen
+     */
+    public function scopeNotFrozen($query)
+    {
+        return $query->where('is_frozen', false);
+    }
+
+    // Optional: useful for admin panels
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+
+    public function scopeRejected($query)
+    {
+        return $query->where('status', 'rejected');
+    }
+
+    public function scopeFrozen($query)
+    {
+        return $query->where('is_frozen', true);
+    }
+    
+    public function scopeActive($query)
+{
+    return $query->where('status', 'approved')
+                 ->where('is_frozen', false);
+}
 }
