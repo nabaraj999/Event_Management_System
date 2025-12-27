@@ -1,6 +1,5 @@
 <x-frontend.frontend-layout />
 <!-- HERO -->
-<!-- HERO -->
 <section class="relative h-[75vh] sm:h-[90vh] flex items-center">
     <!-- Background Image + Gradient -->
     <div class="absolute inset-0">
