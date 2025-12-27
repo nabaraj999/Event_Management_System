@@ -111,11 +111,24 @@
                     </span>
                 </a>
 
-                <a href="{{ route('admin.event-tickets.index') }}"
+                {{-- <a href="{{ route('admin.event-tickets.index') }}"
                     class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
        {{ request()->routeIs('admin.event-tickets.*') ? 'sidebar-active' : '' }}">
                     <i class="fa-solid fa-ticket w-6 h-6 mr-3 text-lg"></i>
                     <span>Tickets</span>
+                </a> --}}
+
+                 <!-- Events Section -->
+                <a href="{{ route('admin.event-tickets.index') }}"
+                    class="sidebar-link flex items-center justify-between px-4 py-3 rounded-lg transition
+       {{ request()->routeIs('admin.event-tickets.*') ? 'sidebar-active' : '' }}">
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-ticket w-6 h-6 mr-3 text-lg"></i>
+                        <span>Tickets</span>
+                    </div>
+                    <span class="bg-primary/20 text-primary text-xs font-bold px-2.5 py-1 rounded-full">
+                        {{ \App\Models\EventTicket::count() }}
+                    </span>
                 </a>
 
                 <a href="{{ route('admin.categories.index') }}"
@@ -228,11 +241,24 @@
                     <span>Settlements</span>
                 </a>
 
-                <a href="{{ route('admin.seo.index') }}"
+                {{-- <a href="{{ route('admin.seo.index') }}"
                     class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
        {{ request()->routeIs('admin.seo.*') ? 'sidebar-active' : '' }}">
                     <i class="fa-solid fa-globe w-6 h-6 mr-3 text-lg"></i>
                     <span>SEO</span>
+                </a> --}}
+
+                 <!-- Events Section -->
+                <a href="{{ route('admin.seo.index') }}"
+                    class="sidebar-link flex items-center justify-between px-4 py-3 rounded-lg transition
+       {{ request()->routeIs('admin.seo.*') ? 'sidebar-active' : '' }}">
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-globe w-6 h-6 mr-3 text-lg"></i>
+                        <span>Seo</span>
+                    </div>
+                    <span class="bg-primary/20 text-primary text-xs font-bold px-2.5 py-1 rounded-full">
+                        {{ \App\Models\SeoPage::count() }}
+                    </span>
                 </a>
 
                 <a href="{{ route('admin.profile') }}"
