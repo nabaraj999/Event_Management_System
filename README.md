@@ -2,9 +2,8 @@
 
 A complete **Event Management System** built with **Laravel**, **Tailwind CSS**, and **JavaScript**.  
 Supports digital ticketing, organizer dashboard, admin panel, QR code attendance tracking, Khalti payment gateway integration, and SMTP email notifications.
+<img width="1839" height="928" alt="image" src="https://github.com/user-attachments/assets/4ac5b403-bb24-4577-bf60-895756c15291" />
 
-![EventHub Banner](https://via.placeholder.com/1200x400.png?text=EventHub+Banner)  
-*(Replace with an actual project screenshot or banner)*
 
 ## Features
 
