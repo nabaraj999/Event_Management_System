@@ -107,28 +107,35 @@
       <a href="{{ route('home') }}" class="{{ $route==='home'?'text-primary font-bold border-b-2 border-primary':'hover:text-primary' }}">Home</a>
       <a href="{{ route('events.index') }}" class="{{ $route==='events.index'?'text-primary font-bold border-b-2 border-primary':'hover:text-primary' }}">Events</a>
       <a href="{{ route('event-categories.index') }}" class="{{ $route==='event-categories.index'?'text-primary font-bold border-b-2 border-primary':'hover:text-primary' }}">Categories</a>
-      <a href="{{ route('organizer.apply') }}" class="{{ $route==='organizer.apply'?'text-primary font-bold border-b-2 border-primary':'hover:text-primary' }}">Become an Organizer</a>
+      <a href="{{ route('organizer.apply') }}" class="{{ $route==='organizer.apply.form'?'text-primary font-bold border-b-2 border-primary':'hover:text-primary' }}">Become an Organizer</a>
       <a href="{{ route('about') }}" class="{{ $route==='about'?'text-primary font-bold border-b-2 border-primary':'hover:text-primary' }}">About</a>
       <a href="{{ route('contact') }}" class="{{ $route==='contact'?'text-primary font-bold border-b-2 border-primary':'hover:text-primary' }}">Contact</a>
     </div>
 
-    <!-- Right -->
+    <!-- Right Side -->
     <div class="flex items-center space-x-4">
       @guest
-        <a href="{{ route('login') }}" class="hidden md:inline bg-darkBlue text-white px-6 py-2 rounded-lg hover:bg-primary">Login</a>
+        <a href="{{ route('login') }}" class="hidden md:inline bg-darkBlue text-white px-6 py-2 rounded-lg hover:bg-primary transition">Login</a>
       @else
-        <div class="hidden md:block relative group">
-          <button class="flex items-center space-x-2">
+        <!-- Fixed Click-Based Dropdown -->
+        <div class="hidden md:block relative">
+          <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none">
             <div class="w-9 h-9 bg-darkBlue text-white rounded-full flex items-center justify-center">
               <i class="fas fa-user"></i>
             </div>
-            <span>{{ Auth::user()->name }}</span>
+            <span class="font-medium">{{ Auth::user()->name }}</span>
+            <i class="fas fa-chevron-down text-xs ml-1 transition-transform duration-200"></i>
           </button>
-          <div class="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg opacity-0 group-hover:opacity-100 invisible group-hover:visible transition">
-            <a href="{{ route('user.profile.edit') }}" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
-            <a href="{{ route('user.profile.history') }}" class="block px-4 py-2 hover:bg-gray-100">My Events</a>
-            <form method="POST" action="{{ route('logout') }}">@csrf
-              <button class="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100">Logout</button>
+
+          <!-- Dropdown Menu -->
+          <div id="user-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg opacity-0 invisible transition-all duration-200 origin-top-right transform scale-95 z-50">
+            <a href="{{ route('user.profile.edit') }}" class="block px-4 py-3 hover:bg-gray-100 rounded-t-xl transition">Profile</a>
+            <a href="{{ route('user.profile.history') }}" class="block px-4 py-3 hover:bg-gray-100 transition">My Events</a>
+            <form method="POST" action="{{ route('logout') }}" class="block">
+              @csrf
+              <button type="submit" class="w-full text-left px-4 py-3 text-red-600 hover:bg-gray-100 rounded-b-xl transition">
+                Logout
+              </button>
             </form>
           </div>
         </div>
@@ -139,12 +146,10 @@
   </div>
 </nav>
 
-<!-- MOBILE OVERLAY (outside nav) -->
+<!-- MOBILE OVERLAY -->
 <div id="mobile-overlay" class="fixed inset-0 z-[999] hidden">
-  <!-- Backdrop -->
   <div id="mobile-backdrop" class="absolute inset-0 bg-black/40"></div>
 
-  <!-- Panel -->
   <div class="absolute right-0 top-0 h-full w-[85%] max-w-sm bg-white shadow-2xl p-6 overflow-y-auto">
     <div class="flex items-center justify-between mb-6">
       <span class="text-xl font-extrabold text-darkBlue">Menu</span>
@@ -183,36 +188,68 @@
   </div>
 </div>
 
+<!-- JavaScript for Mobile Menu & User Dropdown -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const toggleBtn = document.getElementById("mobile-toggle");
-  const overlay = document.getElementById("mobile-overlay");
-  const closeBtn = document.getElementById("mobile-close");
-  const backdrop = document.getElementById("mobile-backdrop");
+  // Mobile Menu
+  const mobileToggle = document.getElementById("mobile-toggle");
+  const mobileOverlay = document.getElementById("mobile-overlay");
+  const mobileClose = document.getElementById("mobile-close");
+  const mobileBackdrop = document.getElementById("mobile-backdrop");
 
-  if (!toggleBtn || !overlay || !closeBtn || !backdrop) return;
-
-  const openMenu = () => {
-    overlay.classList.remove("hidden");
+  const openMobileMenu = () => {
+    mobileOverlay.classList.remove("hidden");
     document.body.classList.add("overflow-hidden");
   };
 
-  const closeMenu = () => {
-    overlay.classList.add("hidden");
+  const closeMobileMenu = () => {
+    mobileOverlay.classList.add("hidden");
     document.body.classList.remove("overflow-hidden");
   };
 
-  toggleBtn.addEventListener("click", openMenu);
-  closeBtn.addEventListener("click", closeMenu);
-  backdrop.addEventListener("click", closeMenu);
-
+  mobileToggle?.addEventListener("click", openMobileMenu);
+  mobileClose?.addEventListener("click", closeMobileMenu);
+  mobileBackdrop?.addEventListener("click", closeMobileMenu);
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeMenu();
+    if (e.key === "Escape") closeMobileMenu();
   });
+
+  // User Dropdown (Desktop)
+  const userButton = document.getElementById("user-menu-button");
+  const userDropdown = document.getElementById("user-dropdown");
+  const chevron = userButton?.querySelector("i.fa-chevron-down");
+
+  if (userButton && userDropdown) {
+    userButton.addEventListener("click", (e) => {
+      e.stopPropagation();
+
+      const isHidden = userDropdown.classList.contains("opacity-0");
+
+      // Reset state
+      userDropdown.classList.add("opacity-0", "invisible", "scale-95");
+      userDropdown.classList.remove("opacity-100", "visible", "scale-100");
+      if (chevron) chevron.classList.remove("rotate-180");
+
+      // Open if was hidden
+      if (isHidden) {
+        userDropdown.classList.remove("opacity-0", "invisible", "scale-95");
+        userDropdown.classList.add("opacity-100", "visible", "scale-100");
+        if (chevron) chevron.classList.add("rotate-180");
+      }
+    });
+
+    // Close when clicking outside
+    document.addEventListener("click", () => {
+      userDropdown.classList.add("opacity-0", "invisible", "scale-95");
+      userDropdown.classList.remove("opacity-100", "visible", "scale-100");
+      if (chevron) chevron.classList.remove("rotate-180");
+    });
+
+    // Prevent closing when clicking inside dropdown
+    userDropdown.addEventListener("click", (e) => e.stopPropagation());
+  }
 });
 </script>
-
-
 
     <!-- Main Content Slot -->
     @yield('content')
