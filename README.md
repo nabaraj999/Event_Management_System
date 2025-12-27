@@ -102,8 +102,17 @@ php artisan serve
 
 
 Role,Login URL,Email,Password
-Admin,http://127.0.0.1:8000/admin-login,admin@example.com,Nepal@1234#
-Organizer,http://127.0.0.1:8000/org/login,technabu2025@gmail.com,ThLVL4ZehlZX
+
+Admin,
+Url : http://127.0.0.1:8000/admin-login
+Email : admin@example.com
+Password: Nepal@1234#
+
+
+Organizer,
+Url : http://127.0.0.1:8000/org/login
+Email : technabu2025@gmail.com
+Password :ThLVL4ZehlZX
 
 
 This version consolidates all essential information (installation, environment, test accounts, troubleshooting) into a single, clean, and complete `README.md` file.  
