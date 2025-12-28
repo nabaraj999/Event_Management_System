@@ -199,7 +199,7 @@
 
         <!-- Explore All Button -->
         <div class="text-center mt-14">
-            <a href="{{ route('organizers.index') }}"
+            <a href="#"
                class="inline-block px-10 py-5 bg-darkBlue text-white font-bold text-lg rounded-2xl hover:bg-primary transition shadow-xl hover:shadow-2xl">
                 Explore All Organizers →
             </a>

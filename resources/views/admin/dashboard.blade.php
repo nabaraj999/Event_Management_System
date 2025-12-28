@@ -109,7 +109,7 @@
         </div>
     </div>
 
-    
+
     <!-- Recent Events + Quick Actions -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Recent Events -->
