@@ -9,7 +9,7 @@
                     About Us
                 </h1>
                 <p class="text-xl md:text-2xl text-white/90 leading-relaxed max-w-3xl mx-auto">
-                    We create unforgettable moments through exceptional event planning and flawless execution.
+                   {{ $company->about_us_description }}
                 </p>
             </div>
         </div>
@@ -43,7 +43,7 @@
 
                 <div class="order-1 md:order-2">
                     <div class="rounded-2xl overflow-hidden shadow-2xl">
-                        <img src="https://cdn.pixabay.com/photo/2016/11/23/15/48/audience-1853662_1280.jpg"
+                        <img src="{{ Storage::url($company->about_us_image) }}"
                              alt="Our Team Planning Event"
                              class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700">
                     </div>
@@ -100,7 +100,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                 <div class="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition-all duration-300 text-center">
                     <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <span class="text-3xl font-bold text-primary">10+</span>
+                        <span class="text-3xl font-bold text-primary">{{ $company->company_start }}+</span>
                     </div>
                     <h4 class="text-xl font-semibold text-darkBlue mb-3">Years of Experience</h4>
                     <p class="text-gray-600">Successfully planning and executing events with proven excellence</p>
@@ -108,7 +108,7 @@
 
                 <div class="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition-all duration-300 text-center">
                     <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <span class="text-3xl font-bold text-primary">500+</span>
+                        <span class="text-3xl font-bold text-primary">{{ $company->total_events }}</span>
                     </div>
                     <h4 class="text-xl font-semibold text-darkBlue mb-3">Events Delivered</h4>
                     <p class="text-gray-600">From weddings to corporate functions — all with outstanding results</p>
@@ -116,7 +116,7 @@
 
                 <div class="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition-all duration-300 text-center">
                     <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <span class="text-3xl font-bold text-primary">100%</span>
+                        <span class="text-3xl font-bold text-primary">{{ $company->satisfied_clients }}%</span>
                     </div>
                     <h4 class="text-xl font-semibold text-darkBlue mb-3">Client Satisfaction</h4>
                     <p class="text-gray-600">Happy clients who trust us with their most important celebrations</p>

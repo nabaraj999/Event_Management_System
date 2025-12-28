@@ -21,12 +21,12 @@
 
         <!-- Buttons -->
         <div class="flex flex-col sm:flex-row mt-8 sm:mt-10 gap-4 sm:gap-6 w-full sm:w-auto">
-            <a href="#"
+            <a href="{{ route('events.index') }}"
                 class="px-8 py-3 sm:px-10 sm:py-4 bg-primary text-white rounded-full font-bold text-base sm:text-lg text-center hover:opacity-90 transition">
                 <i class="fas fa-ticket mr-2"></i> Explore Events
             </a>
 
-            <a href="#"
+            <a href="{{ route('organizer.apply.form') }}"
                 class="px-8 py-3 sm:px-10 sm:py-4 bg-white/20 backdrop-blur-md border border-white rounded-full text-white font-bold text-base sm:text-lg text-center hover:bg-white hover:text-darkBlue transition">
                 <i class="fas fa-plus mr-2"></i> Create Event
             </a>
