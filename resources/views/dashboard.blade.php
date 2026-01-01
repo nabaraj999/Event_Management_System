@@ -117,8 +117,8 @@
                         {{-- <p class="font-bold text-primary text-lg mt-2">Rs. {{ number_format($event->price ?? 0, 0) }}</p> --}}
 
                         <div class="mt-4 flex gap-3">
-                            <a href="#" class="px-4 py-2 border border-primary rounded-lg text-primary font-semibold hover:bg-primary hover:text-white transition">View Details</a>
-                            <a href="#" class="px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-darkBlue transition">Book Now</a>
+                            <a href="{{ route('events.show', $event->id) }}" class="px-4 py-2 border border-primary rounded-lg text-primary font-semibold hover:bg-primary hover:text-white transition">View Details</a>
+                            <a href="{{ route('events.show', $event->id) }}" class="px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-darkBlue transition">Book Now</a>
                         </div>
                     </div>
                 </div>
