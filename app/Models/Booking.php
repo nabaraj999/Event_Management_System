@@ -4,12 +4,29 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Booking extends Model
 {
     use HasFactory;
 
     protected $guarded = [];
+
+    protected $fillable = [
+        'user_id',
+        'event_id',
+        'full_name',
+        'email',
+        'phone',
+        'address',
+        'total_amount',
+        'payment_method',
+        'payment_status',
+        'status',
+        'transaction_id',
+        'payment_response',
+        'slug',               // ← add this
+    ];
 
     // Optional: Cast fields
     protected $casts = [
@@ -62,4 +79,37 @@ public function bookingTickets()
 {
     return $this->hasMany(BookingTicket::class);
 }
+public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($booking) {
+            // Option 1: Use transaction_id directly as slug (clean & simple)
+            if (empty($booking->slug) && !empty($booking->transaction_id)) {
+                $booking->slug = $booking->transaction_id;  // e.g. "khalti-abc123xyz"
+            }
+
+            // Option 2: Make it more readable / prefixed (recommended)
+            // if (empty($booking->slug) && !empty($booking->transaction_id)) {
+            //     $prefix = strtoupper(substr($booking->payment_method ?? 'pay', 0, 3)); // KHA, ESE, etc.
+            //     $booking->slug = $prefix . '-' . $booking->transaction_id;
+            //     // or: 'BK-' . Str::upper(Str::random(4)) . '-' . $booking->transaction_id;
+            // }
+
+            // Fallback if no transaction_id yet (rare, but safe)
+            if (empty($booking->slug)) {
+                $booking->slug = 'bk-' . Str::upper(Str::random(10));
+            }
+        });
+
+        // Optional: If transaction_id can change (very rare), sync slug
+        static::updating(function ($booking) {
+            if ($booking->isDirty('transaction_id') && !empty($booking->transaction_id)) {
+                $booking->slug = $booking->transaction_id; // or prefixed version
+            }
+        });
+    }
 }

@@ -57,7 +57,9 @@ Route::get('/verify-ticket/{token}', [BookingController::class, 'verifyTicket'])
 Route::get('/event-categories', [MainEventCategoryController::class, 'index'])->name('event-categories.index');
 Route::get('/events/category/{slug}', [MainEventCategoryController::class, 'show'])->name('events.category');
 
-Route::get('/about', function () {return view('frontend.about-us.index');})->name('about');
+Route::get('/about', function () {
+    return view('frontend.about-us.index');
+})->name('about');
 
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
@@ -193,9 +195,10 @@ Route::prefix('org')->name('org.')->group(function () {
         Route::get('/dashboard', [OrganizerDashboardController::class, 'index'])->name('dashboard');
         Route::resource('categories', OrgEventCategoryController::class)->parameters(['categories' => 'category']);
         Route::resource('events', OrgEventController::class)->parameters(['events' => 'event']);
-        Route::resource('event-tickets', OrgEventTicketController::class)->parameters(['event-tickets' => 'eventTicket']);
+        Route::resource('event-tickets', OrgEventTicketController::class)
+            ->parameters(['event-tickets' => 'eventTicket']);
         Route::get('/bookings', [OrgBookingController::class, 'index'])->name('bookings.index');
-        Route::get('/bookings/{booking}', [OrgBookingController::class, 'show'])->name('bookings.show');
+Route::get('/bookings/{booking:slug}', [OrgBookingController::class, 'show'])->name('bookings.show');
         Route::post('/bookings/{booking}/check-in', [OrgBookingController::class, 'checkIn'])->name('bookings.check-in');
 
 
