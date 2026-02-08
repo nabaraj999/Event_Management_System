@@ -120,4 +120,9 @@ class Event extends Model
     {
         return $this->hasOne(EventSettlement::class);
     }
+
+    public function getRouteKeyName()
+    {
+        return 'slug';           // ← change this line
+    }
 }
