@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\EventReportController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\EventTicketController;
 use App\Http\Controllers\Admin\SeoPageController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SettlementController;
 use App\Http\Controllers\Admin\SupportTicketAdminController;
 use App\Http\Controllers\Admin\TicketScannerController;
@@ -166,6 +167,9 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     Route::post('/seo', [SeoPageController::class, 'store'])->name('seo.store');
     Route::get('/seo/{seoPage:slug}/edit', [SeoPageController::class, 'edit'])->name('seo.edit');
     Route::put('/seo/{seoPage}', [SeoPageController::class, 'update'])->name('seo.update');
+
+    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::patch('/settings', [SettingController::class, 'update'])->name('settings.update');
 });
 
 
@@ -198,7 +202,7 @@ Route::prefix('org')->name('org.')->group(function () {
         Route::resource('event-tickets', OrgEventTicketController::class)
             ->parameters(['event-tickets' => 'eventTicket']);
         Route::get('/bookings', [OrgBookingController::class, 'index'])->name('bookings.index');
-Route::get('/bookings/{booking:slug}', [OrgBookingController::class, 'show'])->name('bookings.show');
+        Route::get('/bookings/{booking:slug}', [OrgBookingController::class, 'show'])->name('bookings.show');
         Route::post('/bookings/{booking}/check-in', [OrgBookingController::class, 'checkIn'])->name('bookings.check-in');
 
 
