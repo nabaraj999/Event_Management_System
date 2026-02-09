@@ -96,7 +96,6 @@
 
 
     <!-- TRENDING EVENTS -->
-    <!-- TRENDING EVENTS -->
 <section class="py-20 bg-softGray">
     <div class="max-w-7xl mx-auto px-6">
 
@@ -187,7 +186,7 @@
                         </div>
 
                         <!-- View Profile Button - Using only primary & darkBlue -->
-                        <a href="{{ route('organizers.show', $organizer->id) }}"
+                        <a href="{{ route('organizers.show', $organizer) }}"
                            class="w-full block text-center py-4 bg-darkBlue text-white font-bold rounded-xl hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3">
                             <span>View Profile & Events</span>
                             <i class="fas fa-arrow-right"></i>

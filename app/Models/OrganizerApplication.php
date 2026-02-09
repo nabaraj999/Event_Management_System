@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 class OrganizerApplication extends Authenticatable
 {
@@ -25,8 +26,9 @@ class OrganizerApplication extends Authenticatable
         'applied_at',
         'profile_image',
         'registration_document',
-        'is_frozen',                 // ← Added: for freezing logic
-        'profile_completed_at',      // ← Added: to track completion
+        'is_frozen',
+        'profile_completed_at',
+        'slug',
     ];
 
     protected $hidden = [
@@ -129,10 +131,51 @@ class OrganizerApplication extends Authenticatable
     {
         return $query->where('is_frozen', true);
     }
-    
+
     public function scopeActive($query)
+    {
+        return $query->where('status', 'approved')
+            ->where('is_frozen', false);
+    }
+
+    public function getRouteKeyName()
 {
-    return $query->where('status', 'approved')
-                 ->where('is_frozen', false);
+    return 'slug';
 }
+
+ protected static function booted()
+{
+    static::creating(function ($application) {
+        if (empty($application->slug)) {
+            $application->generateUniqueSlug();
+        }
+    });
+
+    static::updating(function ($application) {
+        if (empty($application->slug) ||
+            ($application->isDirty('organization_name') && !$application->isDirty('slug'))) {
+            $application->generateUniqueSlug();
+        }
+    });
+}
+
+    public function generateUniqueSlug()
+{
+    $base = Str::slug($this->organization_name ?: 'org-' . Str::random(8));
+
+    $slug = $base;
+    $counter = 1;
+
+    // Use query builder instead of static:: to avoid issues in some contexts
+    while (self::where('slug', $slug)
+               ->where('id', '!=', $this->id ?? 0)
+               ->exists()) {
+        $slug = $base . '-' . $counter++;
+    }
+
+    $this->slug = $slug;
+}
+
+
+
 }

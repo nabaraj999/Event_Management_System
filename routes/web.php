@@ -67,8 +67,8 @@ Route::post('/contact', [ContactController::class, 'store'])->name('contact.stor
 Route::get('/become-organizer', [OrganizerApplicationController::class, 'create'])->name('organizer.apply.form');
 Route::post('/become-organizer', [OrganizerApplicationController::class, 'store'])->name('organizer.apply');
 Route::get('/organizers', [OrganizerController::class, 'index'])->name('organizers.index');
-Route::get('/organizers/{id}', [OrganizerController::class, 'show'])->name('organizers.show');
-
+Route::get('/organizers/{organizer:slug}', [OrganizerController::class, 'show'])
+    ->name('organizers.show');
 
 
 

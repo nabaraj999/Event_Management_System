@@ -25,24 +25,19 @@ class OrganizerController extends Controller
     /**
      * Display the specified organizer's profile and their upcoming events.
      */
-    public function show($id)
-    {
-        $organizer = OrganizerApplication::where('is_frozen', true)
-            ->withCount(['events' => function ($query) {
-                $query->published()->upcoming();
-            }])
-            ->findOrFail($id);
+   public function show(OrganizerApplication $organizer)
+{
+    // $organizer is now automatically the model found by slug
 
-        $events = Event::published()
-            ->upcoming()
-            ->where('organizer_id', $organizer->id)
-            ->orderBy('start_date', 'asc')
-            ->limit(10)
-            ->get();
+    $events = Event::published()
+        ->upcoming()
+        ->where('organizer_id', $organizer->id)
+        ->orderBy('start_date', 'asc')
+        ->limit(10)
+        ->get();
 
-        // Optional: Add SEO-friendly title
-        $pageTitle = $organizer->organization_name . ' - Organizer Profile';
+    $pageTitle = $organizer->organization_name . ' - Organizer Profile';
 
-        return view('frontend.organizer.show', compact('organizer', 'events', 'pageTitle'));
-    }
+    return view('frontend.organizer.show', compact('organizer', 'events', 'pageTitle'));
+}
 }
