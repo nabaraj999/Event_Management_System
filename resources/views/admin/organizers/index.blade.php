@@ -83,9 +83,9 @@
                                     {{ $org->applied_at?->format('d M Y') ?? '-' }}
                                 </td>
                                 <td class="px-6 py-5 text-center">
-                                    <a href="{{ route('admin.organizers.show', $org->id) }}"
+                                    <a href="{{ route('admin.organizers.show', $org) }}"
                                        class="px-5 py-2 bg-[#063970] text-white rounded-lg hover:bg-[#052e5c] transition text-xs font-medium">
-                                        <i class="fas fa-eye mr-1"></i> 
+                                        <i class="fas fa-eye mr-1"></i>
                                     </a>
                                 </td>
                             </tr>

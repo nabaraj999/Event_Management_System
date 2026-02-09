@@ -34,11 +34,11 @@ class AdminOrganizerController extends Controller
     }
 
     // Show detailed view of one organizer
-    public function show($id)
-    {
-        $organizer = OrganizerApplication::findOrFail($id);
-        return view('admin.organizers.show', compact('organizer'));
-    }
+    public function show(OrganizerApplication $organizer)
+{
+    // $organizer is already loaded by slug
+    return view('admin.organizers.show', compact('organizer'));
+}
 
     // Toggle active/inactive status (is_frozen)
     public function toggleStatus(Request $request, $id)
