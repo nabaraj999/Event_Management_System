@@ -144,9 +144,10 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     Route::post('organizer-applications/{application}/approve', [AdminOrganizerApplicationController::class, 'approve'])->name('organizer-applications.approve');
     Route::post('organizer-applications/{application}/reject', [AdminOrganizerApplicationController::class, 'reject'])->name('organizer-applications.reject');
 
-    Route::get('/organizers', [AdminOrganizerController::class, 'index'])->name('organizers.index');
-    Route::get('/organizers/{id}', [AdminOrganizerController::class, 'show'])->name('organizers.show');
-    Route::patch('/organizers/{id}/toggle', [AdminOrganizerController::class, 'toggleStatus'])->name('organizers.toggle');
+        Route::get('/organizers', [AdminOrganizerController::class, 'index'])->name('organizers.index');
+        Route::get('/organizers/{organizer:slug}', [AdminOrganizerController::class, 'show'])
+    ->name('organizers.show');
+        Route::patch('/organizers/{id}/toggle', [AdminOrganizerController::class, 'toggleStatus'])->name('organizers.toggle');
 
     Route::get('/support', [SupportTicketAdminController::class, 'index'])->name('support.index');
     Route::get('/support/{ticket}', [SupportTicketAdminController::class, 'show'])->name('support.show');
