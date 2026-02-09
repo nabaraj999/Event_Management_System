@@ -145,8 +145,7 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     Route::post('organizer-applications/{application}/reject', [AdminOrganizerApplicationController::class, 'reject'])->name('organizer-applications.reject');
 
         Route::get('/organizers', [AdminOrganizerController::class, 'index'])->name('organizers.index');
-        Route::get('/organizers/{organizer:slug}', [AdminOrganizerController::class, 'show'])
-    ->name('organizers.show');
+        Route::get('/organizers/{organizer:slug}', [AdminOrganizerController::class, 'show'])->name('organizers.show');
         Route::patch('/organizers/{id}/toggle', [AdminOrganizerController::class, 'toggleStatus'])->name('organizers.toggle');
 
     Route::get('/support', [SupportTicketAdminController::class, 'index'])->name('support.index');
@@ -165,7 +164,7 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     // Create New SEO Page
     Route::get('/seo/create', [SeoPageController::class, 'create'])->name('seo.create');
     Route::post('/seo', [SeoPageController::class, 'store'])->name('seo.store');
-    Route::get('/seo/{seoPage}/edit', [SeoPageController::class, 'edit'])->name('seo.edit');
+    Route::get('/seo/{seoPage:slug}/edit', [SeoPageController::class, 'edit'])->name('seo.edit');
     Route::put('/seo/{seoPage}', [SeoPageController::class, 'update'])->name('seo.update');
 });
 
