@@ -1,5 +1,4 @@
 <!-- resources/views/admin/events/edit.blade.php -->
-
 <x-admin.admin-layout>
 
 <div class="py-8 px-4 max-w-4xl mx-auto">
@@ -137,11 +136,13 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Status *</label>
                     <select name="status" required class="w-full px-5 py-4 border border-gray-300 rounded-xl">
-                        <option value="draft" {{ old('status', $event->status) == 'draft' ? 'selected' : '' }}>Draft</option>
+                        <option value="draft"     {{ old('status', $event->status) == 'draft'     ? 'selected' : '' }}>Draft</option>
                         <option value="published" {{ old('status', $event->status) == 'published' ? 'selected' : '' }}>Published</option>
-                        <option value="cancelled" {{ old('status', $event->status) == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                        <option value="ongoing"   {{ old('status', $event->status) == 'ongoing'   ? 'selected' : '' }}>Ongoing</option>
                         <option value="completed" {{ old('status', $event->status) == 'completed' ? 'selected' : '' }}>Completed</option>
+                        <option value="cancelled" {{ old('status', $event->status) == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                     </select>
+                    @error('status') <p class="text-red-600 text-sm mt-2">{{ $message }}</p> @enderror
                 </div>
 
                 <div class="flex items-center mt-8">

@@ -57,14 +57,14 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Location *</label>
                     <input type="text" name="location" value="{{ old('location') }}" required
                            class="w-full px-5 py-4 border border-gray-300 rounded-xl"
-                           placeholder="e.g. Dhaka, Bangladesh">
-                    @error('location') <p class="text-red-600 text-sm mt-600 text-sm mt-2">{{ $message }}</p> @enderror
+                           placeholder="e.g. Kathmandu, Nepal">
+                    @error('location') <p class="text-red-600 text-sm mt-2">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Venue</label>
                     <input type="text" name="venue" value="{{ old('venue') }}"
                            class="w-full px-5 py-4 border border-gray-300 rounded-xl"
-                           placeholder="e.g. ICCB Hall 4">
+                           placeholder="e.g. Dashrath Stadium">
                 </div>
             </div>
 
@@ -88,7 +88,7 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Short Description</label>
                     <textarea name="short_description" rows="4"
-                              class="w-full px-5 py-4 border border border-gray-300 rounded-xl">{{ old('short_description') }}</textarea>
+                              class="w-full px-5 py-4 border border-gray-300 rounded-xl">{{ old('short_description') }}</textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Full Content</label>
@@ -118,12 +118,15 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Status *</label>
                     <select name="status" required class="w-full px-5 py-4 border border-gray-300 rounded-xl">
-                        <option value="draft" {{ old('status', 'draft') == 'draft' ? 'selected' : '' }}>Draft</option>
-                        <option value="published">Published</option>
-                        <option value="cancelled">Cancelled</option>
-                        <option value="completed">Completed</option>
+                        <option value="draft"     {{ old('status', 'draft')     == 'draft'     ? 'selected' : '' }}>Draft</option>
+                        <option value="published" {{ old('status', 'published') == 'published' ? 'selected' : '' }}>Published</option>
+                        <option value="ongoing"   {{ old('status', 'ongoing')   == 'ongoing'   ? 'selected' : '' }}>Ongoing</option>
+                        <option value="completed" {{ old('status', 'completed') == 'completed' ? 'selected' : '' }}>Completed</option>
+                        <option value="cancelled" {{ old('status', 'cancelled') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                     </select>
+                    @error('status') <p class="text-red-600 text-sm mt-2">{{ $message }}</p> @enderror
                 </div>
+
                 <div class="flex items-center mt-8">
                     <input type="checkbox" name="is_featured" value="1" {{ old('is_featured') ? 'checked' : '' }}
                            class="w-6 h-6 text-primary rounded focus:ring-primary">
