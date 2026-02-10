@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class Event extends Model
@@ -125,4 +126,45 @@ class Event extends Model
     {
         return 'slug';           // ← change this line
     }
+
+public function getEffectiveStatusAttribute(): string
+{
+    if ($this->status !== 'published') {
+        return $this->status;
+    }
+
+    $now = now();
+
+    if ($now < $this->start_date) {
+        return 'upcoming';
+    }
+
+    if ($this->end_date && $now->gt($this->end_date)) {
+        return 'completed';
+    }
+
+    return 'ongoing';
+}
+//     protected static function booted()
+// {
+//     static::retrieved(function (Event $event) {
+//         $now = now();
+
+//         if ($event->status === 'published') {
+//             if ($now->lt($event->start_date)) {
+//                 $event->effective_status = 'upcoming';   // ok to keep if it's just accessor
+//             } elseif ($event->end_date && $now->gt($event->end_date)) {
+//                 $event->effective_status = 'completed';
+//             } else {
+//                 $event->effective_status = 'ongoing';
+//             }
+
+//             // REMOVE THESE LINES ↓↓↓
+//             // if ($event->status !== $event->effective_status) {
+//             //     $event->status = $event->effective_status;
+//             //     $event->saveQuietly();
+//             // }
+//         }
+//     });
+// }
 }
