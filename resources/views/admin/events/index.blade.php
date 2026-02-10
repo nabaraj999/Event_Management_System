@@ -51,8 +51,7 @@
                                 </td>
 
                                 <td class="px-6 py-5">
-                                    <span
-                                        class="px-4 py-1.5 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                                    <span class="px-4 py-1.5 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
                                         {{ $event->category?->name ?? '—' }}
                                     </span>
                                 </td>
@@ -60,48 +59,62 @@
                                 <td class="px-6 py-5 text-gray-700">
                                     {{ $event->start_date->format('d M Y') }}
                                     @if ($event->end_date)
-                                        <br><small class="text-gray-500">→
-                                            {{ $event->end_date->format('d M Y') }}</small>
+                                        <br><small class="text-gray-500">→ {{ $event->end_date->format('d M Y') }}</small>
                                     @endif
                                 </td>
 
+                                <!-- STATUS COLUMN - DYNAMIC CALCULATION -->
                                 <td class="px-6 py-5 text-center">
-                                    @switch($event->status)
-                                        @case('published')
-                                            <span
-                                                class="px-4 py-1.5 bg-green-100 text-green-800 rounded-full text-xs font-medium">Published</span>
-                                        @break
+                                    @php
+                                        $now = now();
+                                        $displayStatus = $event->status;
 
-                                        @case('draft')
-                                            <span
-                                                class="px-4 py-1.5 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">Draft</span>
-                                        @break
+                                        if ($event->status === 'published') {
+                                            if ($now < $event->start_date) {
+                                                $displayStatus = 'upcoming';
+                                            } elseif ($event->end_date && $now->gt($event->end_date)) {
+                                                $displayStatus = 'completed';
+                                            } else {
+                                                $displayStatus = 'ongoing';
+                                            }
+                                        }
+                                    @endphp
 
-                                        @case('cancelled')
-                                            <span
-                                                class="px-4 py-1.5 bg-red-100 text-red-800 rounded-full text-xs font-medium">Cancelled</span>
-                                        @break
+                                    @switch($displayStatus)
+                                        @case('upcoming')
+                                            <span class="px-4 py-1.5 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium">Upcoming</span>
+                                            @break
+
+                                        @case('ongoing')
+                                            <span class="px-4 py-1.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium font-semibold">Ongoing</span>
+                                            @break
 
                                         @case('completed')
-                                            <span
-                                                class="px-4 py-1.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">Completed</span>
-                                        @break
+                                            <span class="px-4 py-1.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">Completed</span>
+                                            @break
+
+                                        @case('draft')
+                                            <span class="px-4 py-1.5 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">Draft</span>
+                                            @break
+
+                                        @case('cancelled')
+                                            <span class="px-4 py-1.5 bg-red-100 text-red-800 rounded-full text-xs font-medium">Cancelled</span>
+                                            @break
 
                                         @default
-                                            <span
-                                                class="px-4 py-1.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">Unknown</span>
+                                            <span class="px-4 py-1.5 bg-gray-200 text-gray-600 rounded-full text-xs font-medium">—</span>
                                     @endswitch
                                 </td>
 
-                                <!-- ACTIONS - 100% CLICKABLE -->
+                                <!-- ACTIONS -->
                                 <td class="px-6 py-5">
                                     <div class="flex items-center gap-3">
 
                                         <!-- Edit Button -->
                                         <a href="{{ route('admin.events.edit', $event) }}"
                                             class="px-4 py-2.5 rounded-lg bg-[#063970] text-white font-medium
-                  shadow-sm hover:bg-blue-700 hover:shadow-md
-                  transition-all duration-200 text-center min-w-[70px]">
+                                            shadow-sm hover:bg-blue-700 hover:shadow-md
+                                            transition-all duration-200 text-center min-w-[70px]">
                                             Edit
                                         </a>
 
@@ -111,8 +124,8 @@
                                             <button type="submit"
                                                 onclick="return confirm('Delete {{ addslashes($event->title) }}?')"
                                                 class="px-4 py-2.5 rounded-lg bg-red-600 text-white font-medium
-                           shadow-sm hover:bg-red-700 hover:shadow-md
-                           transition-all duration-200 text-center min-w-[70px]">
+                                                shadow-sm hover:bg-red-700 hover:shadow-md
+                                                transition-all duration-200 text-center min-w-[70px]">
                                                 Delete
                                             </button>
                                         </form>
@@ -121,25 +134,24 @@
                                 </td>
 
                             </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="text-center py-20 text-gray-500">
-                                        <p class="text-2xl font-medium">No events found</p>
-                                        <a href="{{ route('admin.events.create') }}"
-                                            class="text-primary hover:underline mt-4 inline-block">
-                                            Create your first event →
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center py-20 text-gray-500">
+                                    <p class="text-2xl font-medium">No events found</p>
+                                    <a href="{{ route('admin.events.create') }}"
+                                        class="text-primary hover:underline mt-4 inline-block">
+                                        Create your first event →
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
 
-                <!-- Pagination -->
-                <div class="px-6 py-5 bg-gray-50 border-t text-center">
-                    {{ $events->appends(request()->query())->links('pagination::tailwind') }}
-                </div>
+            <!-- Pagination -->
+            <div class="px-6 py-5 bg-gray-50 border-t text-center">
+                {{ $events->appends(request()->query())->links('pagination::tailwind') }}
             </div>
         </div>
 
@@ -178,4 +190,3 @@
         @endpush
 
     </x-admin.admin-layout>
-

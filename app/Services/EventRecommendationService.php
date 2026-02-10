@@ -3,38 +3,46 @@
 namespace App\Services;
 
 use App\Models\Event;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Support\Collection;
 
 class EventRecommendationService
 {
     /**
-     * Get 6 recommended events based on exact user state
+     * Get recommended events for home page
+     * Respects the global user_algorithm toggle from settings table
      */
     public function getHomeRecommendations(User $user): Collection
     {
+        // Check global toggle first
+        if (! Setting::isUserAlgorithmEnabled()) {
+            return $this->getSimpleLatestEvents(3);
+        }
+
+        // Algorithm is enabled → proceed with original logic
         $hasInterests = $user->interests()->exists();
         $hasBookings = $user->bookings()
             ->where('payment_status', 'paid')
             ->where('status', 'confirmed')
             ->exists();
 
-        // Case 4: Has bookings → Full personalized (interests + history)
+        // Case: Has confirmed bookings → Full personalized
         if ($hasBookings) {
             return $this->getPersonalizedRecommendations($user);
         }
 
-        // Case 2: Has interests but no bookings → Only interest-based
+        // Case: Has interests but no bookings
         if ($hasInterests) {
             return $this->getInterestBasedRecommendations($user);
         }
 
-        // Case 3: No interests, no bookings → Latest NEW events (recently created)
+        // Case: No interests, no bookings → Latest new events
         return $this->getLatestNewEvents();
     }
 
     /**
-     * For Event Show page: Same logic as home, but exclude current event
+     * For event show page: same logic, but exclude current event
      */
     public function getRelatedRecommendations(User $user, Event $currentEvent): Collection
     {
@@ -42,17 +50,31 @@ class EventRecommendationService
 
         return $recommendations
             ->where('id', '!=', $currentEvent->id)
-            ->take(6)
+            ->take(6)           // keep 6 max even when algorithm off (but usually will be ≤3)
             ->values();
     }
 
-    // ——————————————————————— Private Methods ———————————————————————
+    // ──────────────────────────────────────────────
+    //   When algorithm is OFF → always 3 latest
+    // ──────────────────────────────────────────────
+    private function getSimpleLatestEvents(int $limit = 3): Collection
+    {
+        return Event::published()
+            ->upcoming()
+            ->orderByDesc('created_at')     // most recently created first
+            ->limit($limit)
+            ->get();
+    }
+
+    // ──────────────────────────────────────────────
+    //   Your original methods (unchanged)
+    // ──────────────────────────────────────────────
 
     private function getPersonalizedRecommendations(User $user): Collection
     {
         $categoryCounts = [];
 
-        // Explicit: Interests (weight 2)
+        // Explicit interests (weight 2)
         foreach ($user->interests as $interest) {
             if ($interest->category_id) {
                 $catId = $interest->category_id;
@@ -60,7 +82,7 @@ class EventRecommendationService
             }
         }
 
-        // Implicit: Past bookings (weight 1)
+        // Past bookings (weight 1)
         $pastEvents = $user->bookings()
             ->where('payment_status', 'paid')
             ->where('status', 'confirmed')
@@ -107,7 +129,7 @@ class EventRecommendationService
         return Event::published()
             ->upcoming()
             ->whereIn('category_id', $categoryIds)
-            ->inRandomOrder() // diversity
+            ->inRandomOrder()
             ->limit(6)
             ->get();
     }
@@ -115,7 +137,7 @@ class EventRecommendationService
     private function getLatestNewEvents(): Collection
     {
         return Event::published()
-            ->orderByDesc('created_at') // newest first (recently added)
+            ->orderByDesc('created_at')
             ->limit(6)
             ->get();
     }

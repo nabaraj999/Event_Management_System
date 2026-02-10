@@ -16,7 +16,8 @@
                             </label>
                             <select name="event_id" id="event_id"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary @error('event_id') border-red-500 @enderror"
-                                    required>
+                                    required
+                                    data-events="{{ json_encode($eventsWithDates ?? []) }}">
                                 <option value="">-- Select Event --</option>
                                 @foreach($events as $id => $title)
                                     <option value="{{ $id }}" {{ old('event_id') == $id ? 'selected' : '' }}>
@@ -99,7 +100,14 @@
                                    name="sale_start"
                                    id="sale_start"
                                    value="{{ old('sale_start') }}"
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                                   max="{{ now()->addYears(2)->format('Y-m-d\TH:i') }}">
+                            <small id="sale-start-hint" class="text-gray-500 text-xs block mt-1">
+                                Recommended: Start selling soon or 7–14 days before event
+                            </small>
+                            @error('sale_start')
+                                <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <div class="mb-6">
@@ -110,7 +118,11 @@
                                    name="sale_end"
                                    id="sale_end"
                                    value="{{ old('sale_end') }}"
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                                   max="{{ now()->addYears(2)->format('Y-m-d\TH:i') }}">
+                            <small id="sale-end-hint" class="text-gray-500 text-xs block mt-1">
+                                Recommended: End before or on event start date
+                            </small>
                             @error('sale_end')
                                 <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
                             @enderror
@@ -155,5 +167,72 @@
             </form>
         </div>
     </div>
+
+    <!-- JavaScript for dynamic sale date suggestions -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const eventSelect = document.getElementById('event_id');
+            const saleStartInput = document.getElementById('sale_start');
+            const saleEndInput = document.getElementById('sale_end');
+            const startHint = document.getElementById('sale-start-hint');
+            const endHint = document.getElementById('sale-end-hint');
+
+            // Parse events data (you'll need to pass this from controller)
+            let eventsData = {};
+            try {
+                eventsData = JSON.parse(eventSelect.dataset.events || '{}');
+            } catch (e) {
+                console.warn('Invalid events data');
+            }
+
+            eventSelect.addEventListener('change', function () {
+                const eventId = this.value;
+                if (!eventId || !eventsData[eventId]) {
+                    startHint.textContent = 'Recommended: Start selling soon or 7–14 days before event';
+                    endHint.textContent = 'Recommended: End before or on event start date';
+                    saleStartInput.removeAttribute('max');
+                    saleEndInput.removeAttribute('max');
+                    return;
+                }
+
+                const event = eventsData[eventId];
+                const eventStart = event.start_date ? new Date(event.start_date) : null;
+                const eventEnd = event.end_date ? new Date(event.end_date) : null;
+
+                // Set max dates
+                if (eventStart) {
+                    saleStartInput.max = event.start_date;
+                    saleEndInput.max = event.start_date;
+                }
+
+                // Auto-suggest dates if empty
+                if (!saleStartInput.value && eventStart) {
+                    const suggestedStart = new Date(eventStart);
+                    suggestedStart.setDate(suggestedStart.getDate() - 14); // 14 days before
+                    saleStartInput.value = suggestedStart.toISOString().slice(0, 16);
+                }
+
+                if (!saleEndInput.value && eventStart) {
+                    const suggestedEnd = new Date(eventStart);
+                    suggestedEnd.setDate(suggestedEnd.getDate() - 1); // 1 day before
+                    suggestedEnd.setHours(23, 59);
+                    saleEndInput.value = suggestedEnd.toISOString().slice(0, 16);
+                }
+
+                // Update hints
+                startHint.textContent = eventStart
+                    ? `Recommended: Before event start (${event.start_date?.replace('T', ' ')})`
+                    : 'Recommended: Start selling soon';
+                endHint.textContent = eventStart
+                    ? `Recommended: Before or on event start (${event.start_date?.replace('T', ' ')})`
+                    : 'Recommended: End before event starts';
+            });
+
+            // Trigger once on load if pre-selected
+            if (eventSelect.value) {
+                eventSelect.dispatchEvent(new Event('change'));
+            }
+        });
+    </script>
 
 </x-admin.admin-layout>

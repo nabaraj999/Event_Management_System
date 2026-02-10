@@ -15,7 +15,7 @@ class EventTicketController extends Controller
 
         $tickets = EventTicket::with('event')
             ->when($search, function ($query, $search) {
-                return $query->where('name', 'like', "%{$search}%") // Fixed: was searching 'title'
+                return $query->where('name', 'like', "%{$search}%")
                     ->orWhere('id', $search)
                     ->orWhereHas('event', function ($q) use ($search) {
                         $q->where('title', 'like', "%{$search}%");
@@ -23,33 +23,67 @@ class EventTicketController extends Controller
             })
             ->latest()
             ->paginate(10)
-            ->withQueryString(); // Better than appends()
+            ->withQueryString();
 
         return view('admin.event_tickets.index', compact('tickets', 'search'));
     }
 
     public function create()
     {
-        $events = Event::where('status', 'published')->pluck('title', 'id');
+        $events = Event::query()
+            ->where('status', 'published')
+            ->where('start_date', '>', now())
+            ->orderBy('start_date', 'asc')
+            ->pluck('title', 'id');
+
         return view('admin.event_tickets.create', compact('events'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'event_id' => 'required|exists:events,id',
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'total_seats' => 'required|integer|min:1',
-            'sale_start' => 'nullable|date',
-            'sale_end' => 'nullable|date|after_or_equal:sale_start',
-            'is_active' => 'sometimes|boolean',
-            'sort_order' => 'nullable|integer',
+            'event_id'     => 'required|exists:events,id',
+            'name'         => 'required|string|max:255',
+            'description'  => 'nullable|string',
+            'price'        => 'required|numeric|min:0',
+            'total_seats'  => 'required|integer|min:1',
+            'sale_start'   => 'nullable|date',
+            'sale_end'     => 'nullable|date|after_or_equal:sale_start',
+            'is_active'    => 'sometimes|boolean',
+            'sort_order'   => 'nullable|integer',
         ]);
 
-        // Handle checkbox (not sent if unchecked)
         $validated['is_active'] = $request->has('is_active');
+
+        // Load event to validate against its dates
+        $event = Event::findOrFail($validated['event_id']);
+
+        // Prevent sale starting after event begins
+        if (!empty($validated['sale_start']) && $validated['sale_start'] > $event->start_date) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'sale_start' => "Sale start cannot be after the event begins ({$event->start_date->format('d M Y')})."
+                ]);
+        }
+
+        // Prevent sale ending after event ends
+        if (!empty($validated['sale_end']) && $validated['sale_end'] > $event->end_date) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'sale_end' => "Sale end cannot be after the event finishes ({$event->end_date->format('d M Y')})."
+                ]);
+        }
+
+        // Set smart defaults if dates are empty
+        if (empty($validated['sale_start'])) {
+            $validated['sale_start'] = now(); // or ->subDays(14) for more conservative
+        }
+
+        if (empty($validated['sale_end'])) {
+            $validated['sale_end'] = $event->start_date->subDay()->endOfDay();
+        }
 
         EventTicket::create($validated);
 
@@ -59,30 +93,71 @@ class EventTicketController extends Controller
 
     public function edit(EventTicket $eventTicket)
     {
-        $events = Event::where('status', 'published')->pluck('title', 'id');
+        $events = Event::query()
+            ->where(function ($query) use ($eventTicket) {
+                $query->where('id', $eventTicket->event_id)
+                      ->orWhere(function ($q) {
+                          $q->where('status', 'published')
+                            ->where('start_date', '>', now());
+                      });
+            })
+            ->orderByRaw("CASE WHEN id = ? THEN 0 ELSE 1 END", [$eventTicket->event_id])
+            ->orderBy('start_date', 'asc')
+            ->pluck('title', 'id');
+
         return view('admin.event_tickets.edit', compact('eventTicket', 'events'));
     }
 
     public function update(Request $request, EventTicket $eventTicket)
     {
         $validated = $request->validate([
-            'event_id' => 'required|exists:events,id',
-            'name' => 'required|string|max:255', // ← FIXED: was 'requiredandr'
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'total_seats' => 'required|integer|min:1',
-            'sale_start' => 'nullable|date',
-            'sale_end' => 'nullable|date|after_or_equal:sale_start',
-            'is_active' => 'sometimes|boolean',
-            'sort_order' => 'nullable|integer',
+            'event_id'     => 'required|exists:events,id',
+            'name'         => 'required|string|max:255',
+            'description'  => 'nullable|string',
+            'price'        => 'required|numeric|min:0',
+            'total_seats'  => 'required|integer|min:1',
+            'sale_start'   => 'nullable|date',
+            'sale_end'     => 'nullable|date|after_or_equal:sale_start',
+            'is_active'    => 'sometimes|boolean',
+            'sort_order'   => 'nullable|integer',
         ]);
 
-        // Handle checkbox properly
         $validated['is_active'] = $request->has('is_active');
 
-        // Optional: Prevent reducing total_seats below sold_seats
-        if ($request->total_seats < $eventTicket->sold_seats) {
-            return back()->withErrors(['total_seats' => 'Total seats cannot be less than already sold seats (' . $eventTicket->sold_seats . ').']);
+        // Prevent reducing total seats below sold amount
+        if ($validated['total_seats'] < $eventTicket->sold_seats) {
+            return back()->withErrors([
+                'total_seats' => "Total seats cannot be less than already sold seats ({$eventTicket->sold_seats})."
+            ]);
+        }
+
+        // Load the (possibly new) event
+        $event = Event::findOrFail($validated['event_id']);
+
+        // Same date validation as in store()
+        if (!empty($validated['sale_start']) && $validated['sale_start'] > $event->start_date) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'sale_start' => "Sale start cannot be after the event begins ({$event->start_date->format('d M Y')})."
+                ]);
+        }
+
+        if (!empty($validated['sale_end']) && $validated['sale_end'] > $event->end_date) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'sale_end' => "Sale end cannot be after the event finishes ({$event->end_date->format('d M Y')})."
+                ]);
+        }
+
+        // Update defaults if cleared
+        if (empty($validated['sale_start'])) {
+            $validated['sale_start'] = now();
+        }
+
+        if (empty($validated['sale_end'])) {
+            $validated['sale_end'] = $event->start_date->subDay()->endOfDay();
         }
 
         $eventTicket->update($validated);
@@ -93,7 +168,6 @@ class EventTicketController extends Controller
 
     public function destroy(EventTicket $eventTicket)
     {
-        // Optional: Prevent delete if tickets already sold
         if ($eventTicket->sold_seats > 0) {
             return back()->with('error', 'Cannot delete ticket with sold seats.');
         }

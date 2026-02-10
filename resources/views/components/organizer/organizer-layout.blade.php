@@ -170,14 +170,16 @@
                     <span>Settlements</span>
                 </a>
 
-                 
 
 
-                <a href="{{ route('org.insights') }}"
-                    class="sidebar-link flex items-center px-5 py-3 rounded-xl {{ request()->routeIs('org.insights') ? 'sidebar-active' : '' }}">
-                    <i class="fa-solid fa-chart-line w-6 text-center mr-4"></i>
-                    <span>Insights</span>
-                </a>
+
+               @if(\App\Models\Setting::isOrganizerAlgorithmEnabled())
+    <a href="{{ route('org.insights') }}"
+       class="sidebar-link flex items-center px-5 py-3 rounded-xl {{ request()->routeIs('org.insights') ? 'sidebar-active' : '' }}">
+        <i class="fa-solid fa-chart-line w-6 text-center mr-4"></i>
+        <span>Insights</span>
+    </a>
+@endif
 
 
                  <a href="{{ route('org.event-tickets.index') }}"

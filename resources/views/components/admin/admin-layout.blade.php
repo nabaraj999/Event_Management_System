@@ -267,6 +267,12 @@
                     <i class="fa-solid fa-user w-6 h-6 mr-3 text-lg"></i>
                     <span>Profile</span>
                 </a>
+                <a href="{{ route('admin.settings.index') }}"
+                    class="sidebar-link flex items-center px-4 py-3 rounded-lg transition
+       {{ request()->routeIs('admin.settings.*') ? 'sidebar-active' : '' }}">
+                    <i class="fa-solid fa-gear w-6 h-6 mr-3 text-lg"></i>
+                    <span>Settings</span>
+                </a>
             </nav>
 
 
