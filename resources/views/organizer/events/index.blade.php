@@ -1,4 +1,3 @@
-{{-- resources/views/organizer/events/index.blade.php --}}
 <x-organizer.organizer-layout>
 
     <div class="py-8 px-4 max-w-7xl mx-auto">
@@ -51,8 +50,7 @@
                                 </td>
 
                                 <td class="px-6 py-5">
-                                    <span
-                                        class="px-4 py-1.5 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                                    <span class="px-4 py-1.5 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
                                         {{ $event->category?->name ?? '—' }}
                                     </span>
                                 </td>
@@ -60,59 +58,49 @@
                                 <td class="px-6 py-5 text-gray-700">
                                     {{ $event->start_date->format('d M Y') }}
                                     @if ($event->end_date)
-                                        <br><small class="text-gray-500">→
-                                            {{ $event->end_date->format('d M Y') }}</small>
+                                        <br><small class="text-gray-500">→ {{ $event->end_date->format('d M Y') }}</small>
                                     @endif
                                 </td>
 
+                                <!-- Dynamic Status using accessor -->
                                 <td class="px-6 py-5 text-center">
-                                    @switch($event->status)
-                                        @case('published')
-                                            <span
-                                                class="px-4 py-1.5 bg-green-100 text-green-800 rounded-full text-xs font-medium">Published</span>
-                                        @break
+                                    @php
+                                        $status = $event->effective_status;
+                                        $badgeClass = match($status) {
+                                            'upcoming'  => 'bg-emerald-100 text-emerald-800',
+                                            'ongoing'   => 'bg-blue-100 text-blue-800 font-semibold',
+                                            'completed' => 'bg-gray-100 text-gray-700',
+                                            'draft'     => 'bg-yellow-100 text-yellow-800',
+                                            'cancelled' => 'bg-red-100 text-red-800',
+                                            default     => 'bg-gray-200 text-gray-600',
+                                        };
+                                    @endphp
 
-                                        @case('draft')
-                                            <span
-                                                class="px-4 py-1.5 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">Draft</span>
-                                        @break
-
-                                        @case('cancelled')
-                                            <span
-                                                class="px-4 py-1.5 bg-red-100 text-red-800 rounded-full text-xs font-medium">Cancelled</span>
-                                        @break
-
-                                        @case('completed')
-                                            <span
-                                                class="px-4 py-1.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">Completed</span>
-                                        @break
-
-                                        @default
-                                            <span
-                                                class="px-4 py-1.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">Unknown</span>
-                                    @endswitch
+                                    <span class="px-4 py-1.5 rounded-full text-xs font-medium {{ $badgeClass }}">
+                                        {{ ucfirst($status) }}
+                                    </span>
                                 </td>
 
-                                <!-- ACTIONS - 100% CLICKABLE -->
+                                <!-- Actions -->
                                 <td class="px-6 py-5">
                                     <div class="flex items-center gap-3">
 
-                                        <!-- Edit Button -->
+                                        <!-- Edit -->
                                         <a href="{{ route('org.events.edit', $event) }}"
-                                            class="px-4 py-2.5 rounded-lg bg-[#063970] text-white font-medium
-                  shadow-sm hover:bg-blue-700 hover:shadow-md
-                  transition-all duration-200 text-center min-w-[70px]">
+                                           class="px-4 py-2.5 rounded-lg bg-[#063970] text-white font-medium
+                                                  shadow-sm hover:bg-blue-700 hover:shadow-md
+                                                  transition-all duration-200 text-center min-w-[70px]">
                                             Edit
                                         </a>
 
-                                        <!-- Delete Button -->
+                                        <!-- Delete -->
                                         <form action="{{ route('org.events.destroy', $event) }}" method="POST">
                                             @csrf @method('DELETE')
                                             <button type="submit"
-                                                onclick="return confirm('Delete {{ addslashes($event->title) }}?')"
-                                                class="px-4 py-2.5 rounded-lg bg-red-600 text-white font-medium
-                           shadow-sm hover:bg-red-700 hover:shadow-md
-                           transition-all duration-200 text-center min-w-[70px]">
+                                                    onclick="return confirm('Delete {{ addslashes($event->title) }}?')"
+                                                    class="px-4 py-2.5 rounded-lg bg-red-600 text-white font-medium
+                                                           shadow-sm hover:bg-red-700 hover:shadow-md
+                                                           transition-all duration-200 text-center min-w-[70px]">
                                                 Delete
                                             </button>
                                         </form>
@@ -121,25 +109,24 @@
                                 </td>
 
                             </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="text-center py-20 text-gray-500">
-                                        <p class="text-2xl font-medium">No events found</p>
-                                        <a href="{{ route('org.events.create') }}"
-                                            class="text-primary hover:underline mt-4 inline-block">
-                                            Create your first event →
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center py-20 text-gray-500">
+                                    <p class="text-2xl font-medium">No events found</p>
+                                    <a href="{{ route('org.events.create') }}"
+                                       class="text-primary hover:underline mt-4 inline-block">
+                                        Create your first event →
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
 
-                <!-- Pagination -->
-                <div class="px-6 py-5 bg-gray-50 border-t text-center">
-                    {{ $events->appends(request()->query())->links('pagination::tailwind') }}
-                </div>
+            <!-- Pagination -->
+            <div class="px-6 py-5 bg-gray-50 border-t text-center">
+                {{ $events->appends(request()->query())->links('pagination::tailwind') }}
             </div>
         </div>
 
@@ -147,23 +134,6 @@
         @push('scripts')
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <script>
-                function deleteEvent(id, title) {
-                    Swal.fire({
-                        title: 'Delete Event?',
-                        text: `"${title}" will be permanently deleted!`,
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#dc2626',
-                        cancelButtonColor: '#6b7280',
-                        confirmButtonText: 'Yes, delete it!',
-                        cancelButtonText: 'Cancel'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            document.getElementById('delete-form-' + id).submit();
-                        }
-                    });
-                }
-
                 @if (session('swal_success'))
                     Swal.fire({
                         icon: 'success',

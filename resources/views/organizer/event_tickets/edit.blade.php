@@ -17,8 +17,9 @@
                             </label>
                             <select name="event_id" id="event_id"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary @error('event_id') border-red-500 @enderror"
-                                    required>
-                                <option value="">-- Select Event --</option>
+                                    required
+                                    data-events="{{ json_encode($eventsWithDates ?? []) }}">
+                                <option value="">-- Select Upcoming/Ongoing Event --</option>
                                 @foreach($events as $id => $title)
                                     <option value="{{ $id }}" {{ old('event_id', $eventTicket->event_id) == $id ? 'selected' : '' }}>
                                         {{ $title }}
@@ -34,13 +35,9 @@
                             <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Ticket Name <span class="text-red-500">*</span>
                             </label>
-                            <input type="text"
-                                   name="name"
-                                   id="name"
-                                   value="{{ old('name', $eventTicket->name) }}"
+                            <input type="text" name="name" id="name" value="{{ old('name', $eventTicket->name) }}"
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary @error('name') border-red-500 @enderror"
-                                   placeholder="e.g., VIP, Early Bird, General"
-                                   required>
+                                   placeholder="e.g., VIP, Early Bird, General" required>
                             @error('name')
                                 <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
                             @enderror
@@ -50,11 +47,7 @@
                             <label for="price" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Price (Rs.) <span class="text-red-500">*</span>
                             </label>
-                            <input type="number"
-                                   step="0.01"
-                                   name="price"
-                                   id="price"
-                                   value="{{ old('price', $eventTicket->price) }}"
+                            <input type="number" step="0.01" name="price" id="price" value="{{ old('price', $eventTicket->price) }}"
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary @error('price') border-red-500 @enderror"
                                    required>
                             @error('price')
@@ -66,13 +59,9 @@
                             <label for="total_seats" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Total Seats <span class="text-red-500">*</span>
                             </label>
-                            <input type="number"
-                                   name="total_seats"
-                                   id="total_seats"
-                                   value="{{ old('total_seats', $eventTicket->total_seats) }}"
+                            <input type="number" name="total_seats" id="total_seats" value="{{ old('total_seats', $eventTicket->total_seats) }}"
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary @error('total_seats') border-red-500 @enderror"
-                                   min="1"
-                                   required>
+                                   min="{{ $eventTicket->sold_seats }}" required>
                             @error('total_seats')
                                 <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
                             @enderror
@@ -85,9 +74,7 @@
                             <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Description (Optional)
                             </label>
-                            <textarea name="description"
-                                      id="description"
-                                      rows="4"
+                            <textarea name="description" id="description" rows="4"
                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
                                       placeholder="e.g., Includes VIP access, food, and merchandise">{{ old('description', $eventTicket->description) }}</textarea>
                         </div>
@@ -96,32 +83,32 @@
                             <label for="sale_start" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Sale Start Date & Time
                             </label>
-                            <input type="datetime-local"
-                                   name="sale_start"
-                                   id="sale_start"
-                                   value="{{ old('sale_start', $eventTicket->sale_start?->format('Y-m-d\TH:i')) }}"
+                            <input type="datetime-local" name="sale_start" id="sale_start" value="{{ old('sale_start', $eventTicket->sale_start?->format('Y-m-d\TH:i')) }}"
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                            <small id="sale-start-hint" class="text-gray-500 text-xs block mt-1">
+                                Recommended: Start 7–14 days before event
+                            </small>
+                            @error('sale_start')
+                                <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <div class="mb-6">
                             <label for="sale_end" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Sale End Date & Time
                             </label>
-                            <input type="datetime-local"
-                                   name="sale_end"
-                                   id="sale_end"
-                                   value="{{ old('sale_end', $eventTicket->sale_end?->format('Y-m-d\TH:i')) }}"
+                            <input type="datetime-local" name="sale_end" id="sale_end" value="{{ old('sale_end', $eventTicket->sale_end?->format('Y-m-d\TH:i')) }}"
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                            <small id="sale-end-hint" class="text-gray-500 text-xs block mt-1">
+                                Recommended: End 1 day before event starts
+                            </small>
                             @error('sale_end')
                                 <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
                             @enderror
                         </div>
 
                         <div class="mb-6 flex items-center">
-                            <input type="checkbox"
-                                   name="is_active"
-                                   value="1"
-                                   id="is_active"
+                            <input type="checkbox" name="is_active" value="1" id="is_active"
                                    class="h-5 w-5 text-primary rounded focus:ring-primary"
                                    {{ old('is_active', $eventTicket->is_active) ? 'checked' : '' }}>
                             <label for="is_active" class="ml-3 text-sm font-semibold text-gray-700">
@@ -133,10 +120,7 @@
                             <label for="sort_order" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Sort Order <small class="font-normal text-gray-500">(Lower = appears first)</small>
                             </label>
-                            <input type="number"
-                                   name="sort_order"
-                                   id="sort_order"
-                                   value="{{ old('sort_order', $eventTicket->sort_order) }}"
+                            <input type="number" name="sort_order" id="sort_order" value="{{ old('sort_order', $eventTicket->sort_order) }}"
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
                         </div>
                     </div>
@@ -156,5 +140,66 @@
             </form>
         </div>
     </div>
+
+    <!-- Same JavaScript as create -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const eventSelect = document.getElementById('event_id');
+            const saleStartInput = document.getElementById('sale_start');
+            const saleEndInput = document.getElementById('sale_end');
+            const startHint = document.getElementById('sale-start-hint');
+            const endHint = document.getElementById('sale-end-hint');
+
+            let eventsData = {};
+            try {
+                eventsData = JSON.parse(eventSelect.dataset.events || '{}');
+            } catch (e) {
+                console.warn('Invalid events data');
+            }
+
+            eventSelect.addEventListener('change', function () {
+                const eventId = this.value;
+                if (!eventId || !eventsData[eventId]) {
+                    startHint.textContent = 'Recommended: Start selling soon or 7–14 days before event';
+                    endHint.textContent = 'Recommended: End 1 day before event starts';
+                    saleStartInput.removeAttribute('max');
+                    saleEndInput.removeAttribute('max');
+                    return;
+                }
+
+                const event = eventsData[eventId];
+                const eventStart = event.start_date ? new Date(event.start_date) : null;
+
+                if (eventStart) {
+                    saleStartInput.max = event.start_date;
+                    saleEndInput.max = event.start_date;
+                }
+
+                if (!saleStartInput.value && eventStart) {
+                    const suggested = new Date(eventStart);
+                    suggested.setDate(suggested.getDate() - 14);
+                    saleStartInput.value = suggested.toISOString().slice(0, 16);
+                }
+
+                if (!saleEndInput.value && eventStart) {
+                    const suggested = new Date(eventStart);
+                    suggested.setDate(suggested.getDate() - 1);
+                    suggested.setHours(23, 59);
+                    saleEndInput.value = suggested.toISOString().slice(0, 16);
+                }
+
+                startHint.textContent = eventStart
+                    ? `Recommended: Before event start (${event.start_date?.replace('T', ' ')})`
+                    : 'Recommended: Start selling soon';
+                endHint.textContent = eventStart
+                    ? `Recommended: Before or on event start (${event.start_date?.replace('T', ' ')})`
+                    : 'Recommended: End before event starts';
+            });
+
+            if (eventSelect.value) {
+                eventSelect.dispatchEvent(new Event('change'));
+            }
+        });
+    </script>
 
 </x-organizer.organizer-layout>

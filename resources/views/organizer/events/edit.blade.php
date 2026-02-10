@@ -1,5 +1,3 @@
-<!-- resources/views/admin/events/edit.blade.php -->
-
 <x-organizer.organizer-layout>
 
 <div class="py-8 px-4 max-w-4xl mx-auto">
@@ -8,7 +6,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-3xl font-bold">Edit Event</h1>
-                <p class="text-blue-200 mt-1">Update event information</p>
+                <p class="text-blue-200 mt-1">Update your event information</p>
             </div>
             <a href="{{ route('org.events.index') }}"
                class="px-6 py-3 bg-white/20 hover:bg-white/30 rounded-xl transition font-medium">
@@ -139,9 +137,11 @@
                     <select name="status" required class="w-full px-5 py-4 border border-gray-300 rounded-xl">
                         <option value="draft" {{ old('status', $event->status) == 'draft' ? 'selected' : '' }}>Draft</option>
                         <option value="published" {{ old('status', $event->status) == 'published' ? 'selected' : '' }}>Published</option>
-                        <option value="cancelled" {{ old('status', $event->status) == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                        <option value="ongoing" {{ old('status', $event->status) == 'ongoing' ? 'selected' : '' }}>Ongoing</option>
                         <option value="completed" {{ old('status', $event->status) == 'completed' ? 'selected' : '' }}>Completed</option>
+                        <option value="cancelled" {{ old('status', $event->status) == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                     </select>
+                    <small class="text-gray-500 block mt-1">You can manually set to Completed after event ends</small>
                 </div>
 
                 <div class="flex items-center mt-8">

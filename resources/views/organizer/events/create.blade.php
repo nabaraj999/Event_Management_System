@@ -6,7 +6,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-3xl font-bold">Create New Event</h1>
-                <p class="text-blue-200 mt-1">Add a new event to the system</p>
+                <p class="text-blue-200 mt-1">Add a new event to your organizer account</p>
             </div>
             <a href="{{ route('org.events.index') }}"
                class="px-6 py-3 bg-white/20 hover:bg-white/30 rounded-xl transition">
@@ -34,7 +34,7 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Slug (URL)</label>
                     <input type="text" name="slug" id="slug" value="{{ old('slug') }}"
                            class="w-full px-5 py-4 border border-gray-300 rounded-xl bg-gray-50">
-                    <small class="text-gray-500">Auto-generated from title</small>
+                    <small class="text-gray-500">Auto-generated from title (leave blank to auto-fill)</small>
                 </div>
 
                 <div>
@@ -57,14 +57,14 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Location *</label>
                     <input type="text" name="location" value="{{ old('location') }}" required
                            class="w-full px-5 py-4 border border-gray-300 rounded-xl"
-                           placeholder="e.g. Dhaka, Bangladesh">
-                    @error('location') <p class="text-red-600 text-sm mt-600 text-sm mt-2">{{ $message }}</p> @enderror
+                           placeholder="e.g. Kathmandu, Nepal">
+                    @error('location') <p class="text-red-600 text-sm mt-2">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Venue</label>
                     <input type="text" name="venue" value="{{ old('venue') }}"
                            class="w-full px-5 py-4 border border-gray-300 rounded-xl"
-                           placeholder="e.g. ICCB Hall 4">
+                           placeholder="e.g. Dashrath Stadium">
                 </div>
             </div>
 
@@ -88,7 +88,7 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Short Description</label>
                     <textarea name="short_description" rows="4"
-                              class="w-full px-5 py-4 border border border-gray-300 rounded-xl">{{ old('short_description') }}</textarea>
+                              class="w-full px-5 py-4 border border-gray-300 rounded-xl">{{ old('short_description') }}</textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Full Content</label>
@@ -119,10 +119,10 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Status *</label>
                     <select name="status" required class="w-full px-5 py-4 border border-gray-300 rounded-xl">
                         <option value="draft" {{ old('status', 'draft') == 'draft' ? 'selected' : '' }}>Draft</option>
-                        <option value="published">Published</option>
-                        <option value="cancelled">Cancelled</option>
-                        <option value="completed">Completed</option>
+                        <option value="published" {{ old('status', 'published') == 'published' ? 'selected' : '' }}>Published</option>
+                        <option value="cancelled" {{ old('status', 'cancelled') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                     </select>
+                    <small class="text-gray-500 block mt-1">You can change to Completed later</small>
                 </div>
                 <div class="flex items-center mt-8">
                     <input type="checkbox" name="is_featured" value="1" {{ old('is_featured') ? 'checked' : '' }}
@@ -193,5 +193,5 @@ function updateSlug() {
     });
 @endif
 </script>
-`
+
 </x-organizer.organizer-layout>
