@@ -1,4 +1,3 @@
-<!-- resources/views/admin/events/edit.blade.php -->
 <x-admin.admin-layout>
 
 <div class="py-8 px-4 max-w-4xl mx-auto">
@@ -18,7 +17,7 @@
 
     <!-- Edit Form -->
     <div class="bg-white rounded-2xl shadow-xl p-8">
-        <form action="{{ route('admin.events.update', $event) }}" method="POST" enctype="multipart/form-data">
+        <form id="eventForm" action="{{ route('admin.events.update', $event) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -27,21 +26,24 @@
                 <div class="md:col-span-2">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Event Title *</label>
                     <input type="text" name="title" id="title" value="{{ old('title', $event->title) }}" required
-                           class="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary text-lg"
+                           class="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary text-lg transition"
                            onkeyup="updateSlug()">
+                    <p class="error-message text-red-600 text-sm mt-1.5 hidden"></p>
                     @error('title') <p class="text-red-600 text-sm mt-2">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Slug (URL)</label>
                     <input type="text" name="slug" id="slug" value="{{ old('slug', $event->slug) }}"
-                           class="w-full px-5 py-4 border border-gray-300 rounded-xl bg-gray-50">
-                    <small class="text-gray-500">Leave empty to auto-update from title</small>
+                           class="w-full px-5 py-4 border border-gray-300 rounded-xl bg-gray-50 transition">
+                    <small class="text-gray-500 block mt-1">Leave empty to auto-update from title</small>
+                    <p class="error-message text-red-600 text-sm mt-1.5 hidden"></p>
+                    @error('slug') <p class="text-red-600 text-sm mt-2">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Category *</label>
-                    <select name="category_id" required class="w-full px-5 py-4 border border-gray-300 rounded-xl">
+                    <select name="category_id" required class="w-full px-5 py-4 border border-gray-300 rounded-xl transition">
                         <option value="">Select Category</option>
                         @foreach($categories as $cat)
                             <option value="{{ $cat->id }}"
@@ -50,6 +52,7 @@
                             </option>
                         @endforeach
                     </select>
+                    <p class="error-message text-red-600 text-sm mt-1.5 hidden"></p>
                     @error('category_id') <p class="text-red-600 text-sm mt-2">{{ $message }}</p> @enderror
                 </div>
             </div>
@@ -59,13 +62,16 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Location *</label>
                     <input type="text" name="location" value="{{ old('location', $event->location) }}" required
-                           class="w-full px-5 py-4 border border-gray-300 rounded-xl">
+                           class="w-full px-5 py-4 border border-gray-300 rounded-xl transition">
+                    <p class="error-message text-red-600 text-sm mt-1.5 hidden"></p>
                     @error('location') <p class="text-red-600 text-sm mt-2">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Venue</label>
-                    <input type="text" name="venue" value="{{ old('venue', $event->venue) }}"
-                           class="w-full px-5 py-4 border border-gray-300 rounded-xl">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Venue *</label>
+                    <input type="text" name="venue" value="{{ old('venue', $event->venue) }}" required
+                           class="w-full px-5 py-4 border border-gray-300 rounded-xl transition">
+                    <p class="error-message text-red-600 text-sm mt-1.5 hidden"></p>
+                    @error('venue') <p class="text-red-600 text-sm mt-2">{{ $message }}</p> @enderror
                 </div>
             </div>
 
@@ -75,58 +81,67 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Start Date & Time *</label>
                     <input type="datetime-local" name="start_date"
                            value="{{ old('start_date', $event->start_date?->format('Y-m-d\TH:i')) }}" required
-                           class="w-full px-5 py-4 border border-gray-300 rounded-xl">
+                           class="w-full px-5 py-4 border border-gray-300 rounded-xl transition">
+                    <p class="error-message text-red-600 text-sm mt-1.5 hidden"></p>
                     @error('start_date') <p class="text-red-600 text-sm mt-2">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">End Date & Time</label>
                     <input type="datetime-local" name="end_date"
                            value="{{ old('end_date', $event->end_date?->format('Y-m-d\TH:i')) }}"
-                           class="w-full px-5 py-4 border border-gray-300 rounded-xl">
+                           class="w-full px-5 py-4 border border-gray-300 rounded-xl transition">
+                    <p class="error-message text-red-600 text-sm mt-1.5 hidden"></p>
+                    @error('end_date') <p class="text-red-600 text-sm mt-2">{{ $message }}</p> @enderror
                 </div>
             </div>
 
             <!-- Descriptions -->
             <div class="grid grid-cols-1 gap-8 mb-8">
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Short Description</label>
-                    <textarea name="short_description" rows="4"
-                              class="w-full px-5 py-4 border border-gray-300 rounded-xl">{{ old('short_description', $event->short_description) }}</textarea>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Short Description *</label>
+                    <textarea name="short_description" rows="5" required
+                              class="w-full px-5 py-4 border border-gray-300 rounded-xl transition">{{ old('short_description', $event->short_description) }}</textarea>
+                    <p class="error-message text-red-600 text-sm mt-1.5 hidden"></p>
+                    @error('short_description') <p class="text-red-600 text-sm mt-2">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Full Content</label>
-                    <textarea name="content" rows="10"
-                              class="w-full px-5 py-4 border border-gray-300 rounded-xl">{{ old('content', $event->content) }}</textarea>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Full Content *</label>
+                    <textarea name="content" id="editor" rows="14"
+                              class="w-full border border-gray-300 rounded-xl transition">{{ old('content', $event->content) }}</textarea>
+                    <p class="error-message text-red-600 text-sm mt-1.5 hidden"></p>
+                    @error('content') <p class="text-red-600 text-sm mt-2">{{ $message }}</p> @enderror
                 </div>
             </div>
 
-            <!-- Current Images + Replace Option -->
+            <!-- Current Images + Replace -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-3">Current Banner Image</label>
                     @if($event->banner_image)
-                        <img src="{{ asset('storage/'.$event->banner_image) }}"
-                             class="w-full h-64 object-cover rounded-xl shadow-lg mb-4">
-                        <p class="text-sm text-gray-500">Leave blank to keep current</p>
+                        <img src="{{ Storage::url($event->banner_image) }}"
+                             class="w-full h-48 object-cover rounded-xl shadow mb-3">
+                        <p class="text-sm text-gray-600 mb-2">Leave blank to keep current</p>
                     @else
-                        <p class="text-gray-400">No banner image</p>
+                        <p class="text-gray-400 mb-2">No banner image set</p>
                     @endif
                     <input type="file" name="banner_image" accept="image/*"
-                           class="w-full mt-2 px-5 py-4 border border-dashed border-gray-400 rounded-xl">
+                           class="w-full px-5 py-6 border-2 border-dashed border-gray-300 rounded-xl text-center hover:border-primary transition">
+                    <p class="error-message text-red-600 text-sm mt-1.5 hidden"></p>
                     @error('banner_image') <p class="text-red-600 text-sm mt-2">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-3">Current Thumbnail</label>
                     @if($event->thumbnail)
-                        <img src="{{ asset('storage/'.$event->thumbnail) }}"
-                             class="w-full h-64 object-cover rounded-xl shadow-lg mb-4">
-                        <p class="text-sm text-gray-500">Leave blank to keep current</p>
+                        <img src="{{ Storage::url($event->thumbnail) }}"
+                             class="w-full h-48 object-cover rounded-xl shadow mb-3">
+                        <p class="text-sm text-gray-600 mb-2">Leave blank to keep current</p>
                     @else
-                        <p class="text-gray-400">No thumbnail</p>
+                        <p class="text-gray-400 mb-2">No thumbnail set</p>
                     @endif
                     <input type="file" name="thumbnail" accept="image/*"
-                           class="w-full mt-2 px-5 py-4 border border-dashed border-gray-400 rounded-xl">
+                           class="w-full px-5 py-6 border-2 border-dashed border-gray-300 rounded-xl text-center hover:border-primary transition">
+                    <p class="error-message text-red-600 text-sm mt-1.5 hidden"></p>
                     @error('thumbnail') <p class="text-red-600 text-sm mt-2">{{ $message }}</p> @enderror
                 </div>
             </div>
@@ -135,21 +150,24 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Status *</label>
-                    <select name="status" required class="w-full px-5 py-4 border border-gray-300 rounded-xl">
+                    <select name="status" required class="w-full px-5 py-4 border border-gray-300 rounded-xl transition">
                         <option value="draft"     {{ old('status', $event->status) == 'draft'     ? 'selected' : '' }}>Draft</option>
                         <option value="published" {{ old('status', $event->status) == 'published' ? 'selected' : '' }}>Published</option>
                         <option value="ongoing"   {{ old('status', $event->status) == 'ongoing'   ? 'selected' : '' }}>Ongoing</option>
                         <option value="completed" {{ old('status', $event->status) == 'completed' ? 'selected' : '' }}>Completed</option>
                         <option value="cancelled" {{ old('status', $event->status) == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                     </select>
+                    <p class="error-message text-red-600 text-sm mt-1.5 hidden"></p>
                     @error('status') <p class="text-red-600 text-sm mt-2">{{ $message }}</p> @enderror
                 </div>
 
                 <div class="flex items-center mt-8">
-                    <input type="checkbox" name="is_featured" value="1"
-                           {{ old('is_featured', $event->is_featured) ? 'checked' : '' }}
-                           class="w-6 h-6 text-primary rounded focus:ring-primary">
-                    <label class="ml-3 text-lg font-medium text-gray-700">Mark as Featured Event</label>
+                    <input type="checkbox" name="is_featured" id="is_featured" value="1"
+                           class="w-6 h-6 text-primary rounded focus:ring-primary"
+                           {{ old('is_featured', $event->is_featured ? 1 : 0) ? 'checked' : '' }}>
+                    <label for="is_featured" class="ml-3 text-lg font-medium text-gray-700">
+                        Mark as Featured Event
+                    </label>
                 </div>
             </div>
 
@@ -158,12 +176,12 @@
                 <h3 class="text-xl font-bold text-gray-800 mb-6">SEO Settings (Optional)</h3>
                 <div class="grid grid-cols-1 gap-6">
                     <input type="text" name="meta_title" value="{{ old('meta_title', $event->meta_title) }}"
-                           placeholder="Meta Title (60-70 chars)" class="w-full px-5 py-4 border rounded-xl">
+                           placeholder="Meta Title (60-70 chars)" class="w-full px-5 py-4 border rounded-xl transition">
                     <textarea name="meta_description" rows="3"
                            placeholder="Meta Description (150-160 chars)"
-                           class="w-full px-5 py-4 border rounded-xl">{{ old('meta_description', $event->meta_description) }}</textarea>
+                           class="w-full px-5 py-4 border rounded-xl transition">{{ old('meta_description', $event->meta_description) }}</textarea>
                     <input type="text" name="meta_keywords" value="{{ old('meta_keywords', $event->meta_keywords) }}"
-                           placeholder="Keywords (comma separated)" class="w-full px-5 py-4 border rounded-xl">
+                           placeholder="Keywords (comma separated)" class="w-full px-5 py-4 border rounded-xl transition">
                 </div>
             </div>
 
@@ -173,7 +191,7 @@
                    class="px-10 py-4 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-100 font-medium transition">
                     Cancel
                 </a>
-                <button type="submit"
+                <button type="submit" id="submitBtn"
                         class="px-12 py-4 bg-primary text-white font-bold rounded-xl hover:bg-orange-600 shadow-xl transition transform hover:scale-105">
                     Update Event
                 </button>
@@ -182,30 +200,121 @@
     </div>
 </div>
 
-<!-- Live Slug + SweetAlert -->
+<!-- CKEditor 5 CDN -->
+<script src="https://cdn.ckeditor.com/ckeditor5/43.0.0/classic/ckeditor.js"></script>
+
 <script>
+// Slug generator
 function updateSlug() {
-    const title = document.getElementById('title').value;
-    const slugField = document.getElementById('slug');
-    if (!slugField.value) {
-        slugField.value = title
-            .toLowerCase()
+    const title = document.getElementById('title').value.trim();
+    const slugInput = document.getElementById('slug');
+    if (!slugInput.value.trim()) {
+        slugInput.value = title.toLowerCase()
             .replace(/[^a-z0-9 -]/g, '')
             .replace(/\s+/g, '-')
-            .replace(/-+/g, '-')
-            .trim();
+            .replace(/-+/g, '-');
     }
 }
 
-@if(session('swal_success'))
-    Swal.fire({
-        icon: 'success',
-        title: 'Updated!',
-        text: '{{ session('swal_success') }}',
-        confirmButtonColor: '#FF7A28',
-        timer: 3000
+// Initialize CKEditor
+ClassicEditor
+    .create(document.querySelector('#editor'))
+    .catch(error => console.error('CKEditor error:', error));
+
+// AJAX Form Handling
+document.getElementById('eventForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const form = this;
+    const formData = new FormData(form);
+    const btn = document.getElementById('submitBtn');
+    const originalText = btn.innerHTML;
+
+    btn.disabled = true;
+    btn.innerHTML = 'Updating...';
+
+    // Clear previous errors
+    document.querySelectorAll('.error-message').forEach(el => {
+        el.textContent = '';
+        el.classList.add('hidden');
     });
-@endif
+    document.querySelectorAll('input, select, textarea').forEach(el => {
+        el.classList.remove('border-red-500', 'ring-red-400/40');
+    });
+
+    try {
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            credentials: 'same-origin'
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: data.message || 'Event updated successfully!',
+                timer: 2500,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.href = '{{ route("admin.events.index") }}';
+            });
+        } else if (response.status === 422) {
+            // Show field-specific errors
+            Object.entries(data.errors || {}).forEach(([field, messages]) => {
+                const input = document.querySelector(`[name="${field}"]`);
+                if (!input) return;
+
+                input.classList.add('border-red-500', 'ring-red-400/40');
+
+                const errorEl = input.nextElementSibling;
+                if (errorEl && errorEl.classList.contains('error-message')) {
+                    errorEl.textContent = messages[0];
+                    errorEl.classList.remove('hidden');
+                }
+            });
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Validation Error',
+                text: 'Please check the highlighted fields',
+                confirmButtonColor: '#FF7A28'
+            });
+        } else {
+            throw new Error(data.message || `Server responded with status ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Update error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message || 'Failed to update event. Please try again.',
+            confirmButtonColor: '#FF7A28'
+        });
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+});
 </script>
+
+@if(session('swal_success'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Updated!',
+            text: '{{ session('swal_success') }}',
+            confirmButtonColor: '#FF7A28',
+            timer: 3000
+        });
+    </script>
+@endif
 
 </x-admin.admin-layout>

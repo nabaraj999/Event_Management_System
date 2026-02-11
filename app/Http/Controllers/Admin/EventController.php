@@ -42,19 +42,31 @@ class EventController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title'             => 'required|string|max:255',
-            'slug'              => 'nullable|string|unique:events,slug',
-            'category_id'       => 'required|exists:event_categories,id',
-            'short_description' => 'required|string|max:500',
-            'content'           => 'required|string',
-            'location'          => 'required|string|max:255',
-            'venue'             => 'nullable|string|max:255',
-            'start_date'        => 'required|date',
-            'end_date'          => 'nullable|date|after_or_equal:start_date',
-            'banner_image'      => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'thumbnail'         => 'required|image|mimes:jpg,jpeg,png,webp|max:1024',
-            'status'            => 'required|in:draft,published,cancelled,completed',
-        ]);
+    'title' => 'required|string|max:255|unique:events,title',
+
+    'slug' => 'nullable|string|unique:events,slug',
+
+    'category_id' => 'required|exists:event_categories,id',
+
+    'short_description' => 'required|string|max:500',
+
+    'content' => 'required|string|min:20',
+
+    'location' => 'nullable|string|max:255|required_without:venue',
+
+    'venue' => 'nullable|string|max:255|required_without:location',
+
+    'start_date' => 'required|date|after_or_equal:now',
+
+    'end_date' => 'nullable|date|after:start_date',
+
+    'banner_image' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+
+    'thumbnail' => 'required|image|mimes:jpg,jpeg,png,webp|max:1024',
+
+    'status' => 'required|in:draft,published,ongoing,completed,cancelled',
+]);
+
 
         $banner = $request->file('banner_image')->store('events/banners', 'public');
         $thumb  = $request->file('thumbnail')->store('events/thumbnails', 'public');
@@ -91,19 +103,31 @@ class EventController extends Controller
     public function update(Request $request, Event $event)
     {
         $request->validate([
-            'title'             => 'required|string|max:255',
-            'slug'              => 'nullable|string|unique:events,slug,' . $event->id,
-            'category_id'       => 'required|exists:event_categories,id',
-            'short_description' => 'required|string|max:500',
-            'content'           => 'required|string',
-            'location'          => 'required|string|max:255',
-            'venue'             => 'nullable|string|max:255',
-            'start_date'        => 'required|date',
-            'end_date'          => 'nullable|date|after_or_equal:start_date',
-            'banner_image'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'thumbnail'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:1024',
-            'status'            => 'required|in:draft,published,cancelled,completed',
-        ]);
+    'title' => 'required|string|max:255|unique:events,title,' . $event->id,
+
+    'slug' => 'nullable|string|unique:events,slug,' . $event->id,
+
+    'category_id' => 'required|exists:event_categories,id',
+
+    'short_description' => 'required|string|max:500',
+
+    'content' => 'required|string|min:20',
+
+    'location' => 'nullable|string|max:255|required_without:venue',
+
+    'venue' => 'nullable|string|max:255|required_without:location',
+
+    'start_date' => 'required|date',
+
+    'end_date' => 'nullable|date|after:start_date',
+
+    'banner_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+
+    'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:1024',
+
+    'status' => 'required|in:draft,published,ongoing,completed,cancelled',
+]);
+
 
         if ($request->hasFile('banner_image')) {
             Storage::disk('public')->delete($event->banner_image);
