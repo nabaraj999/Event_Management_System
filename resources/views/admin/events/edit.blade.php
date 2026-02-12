@@ -57,6 +57,37 @@
                 </div>
             </div>
 
+            <!-- ORGANIZER (NEW FIELD) -->
+            <div class="mb-8">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Organizer
+                    <span class="text-gray-500 font-normal text-sm ml-2">(optional – leave empty if admin-owned)</span>
+                </label>
+
+                <select name="organizer_id"
+                        class="w-full px-5 py-4 border border-gray-300 rounded-xl transition bg-white focus:ring-2 focus:ring-primary">
+                    <option value="">— Admin Created Event —</option>
+
+                    @foreach($organizers as $org)
+                        <option value="{{ $org->id }}"
+                            {{ old('organizer_id', $event->organizer_id) == $org->id ? 'selected' : '' }}>
+                            {{ $org->organization_name }}
+                            @if($org->contact_person)
+                                • {{ $org->contact_person }}
+                            @endif
+                            <span class="text-gray-500 text-sm">({{ $org->email }})</span>
+                        </option>
+                    @endforeach
+                </select>
+
+                <p class="text-gray-500 text-xs mt-1.5">
+                    Change this if the event should belong to a different approved organizer
+                </p>
+
+                <p class="error-message text-red-600 text-sm mt-1.5 hidden"></p>
+                @error('organizer_id') <p class="text-red-600 text-sm mt-2">{{ $message }}</p> @enderror
+            </div>
+
             <!-- Location & Venue -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 <div>
@@ -175,12 +206,12 @@
             <div class="border-t pt-8 mb-8">
                 <h3 class="text-xl font-bold text-gray-800 mb-6">SEO Settings (Optional)</h3>
                 <div class="grid grid-cols-1 gap-6">
-                    <input type="text" name="meta_title" value="{{ old('meta_title', $event->meta_title) }}"
+                    <input type="text" name="meta_title" value="{{ old('meta_title', $event->meta_title ?? '') }}"
                            placeholder="Meta Title (60-70 chars)" class="w-full px-5 py-4 border rounded-xl transition">
                     <textarea name="meta_description" rows="3"
                            placeholder="Meta Description (150-160 chars)"
-                           class="w-full px-5 py-4 border rounded-xl transition">{{ old('meta_description', $event->meta_description) }}</textarea>
-                    <input type="text" name="meta_keywords" value="{{ old('meta_keywords', $event->meta_keywords) }}"
+                           class="w-full px-5 py-4 border rounded-xl transition">{{ old('meta_description', $event->meta_description ?? '') }}</textarea>
+                    <input type="text" name="meta_keywords" value="{{ old('meta_keywords', $event->meta_keywords ?? '') }}"
                            placeholder="Keywords (comma separated)" class="w-full px-5 py-4 border rounded-xl transition">
                 </div>
             </div>
@@ -221,7 +252,7 @@ ClassicEditor
     .create(document.querySelector('#editor'))
     .catch(error => console.error('CKEditor error:', error));
 
-// AJAX Form Handling
+// AJAX Form Handling (unchanged)
 document.getElementById('eventForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
@@ -233,7 +264,6 @@ document.getElementById('eventForm').addEventListener('submit', async function(e
     btn.disabled = true;
     btn.innerHTML = 'Updating...';
 
-    // Clear previous errors
     document.querySelectorAll('.error-message').forEach(el => {
         el.textContent = '';
         el.classList.add('hidden');
@@ -267,7 +297,6 @@ document.getElementById('eventForm').addEventListener('submit', async function(e
                 window.location.href = '{{ route("admin.events.index") }}';
             });
         } else if (response.status === 422) {
-            // Show field-specific errors
             Object.entries(data.errors || {}).forEach(([field, messages]) => {
                 const input = document.querySelector(`[name="${field}"]`);
                 if (!input) return;

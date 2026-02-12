@@ -1,26 +1,36 @@
-<x-admin.admin-layout>
+<x-admin.admin-layout title="Event Settlements">
 
-    <div class="py-8 px-4 max-w-5xl mx-auto">
+    <div class="py-6 px-4 max-w-7xl mx-auto">
 
-        <div class="bg-darkBlue text-white rounded-2xl shadow-2xl p-10 mb-10">
-            <h1 class="text-4xl font-bold mb-4">Event Settlements</h1>
-            <p class="text-xl text-blue-200">Select any event to view payment details and mark as settled</p>
-            <div class="mt-6">
-                <span class="bg-orange-500/20 px-6 py-3 rounded-xl font-semibold text-lg">
+        <!-- Header -->
+        <div class="bg-[#063970] text-white rounded-xl shadow-md p-6 mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-bold">Event Settlements</h1>
+                    <p class="text-blue-100 text-sm mt-1 opacity-90">Select an event to view payment details and mark as settled</p>
+                </div>
+            </div>
+
+            <!-- Commission Info -->
+            <div class="mt-4">
+                <span class="inline-block px-4 py-2 bg-white/20 rounded-lg text-sm font-medium">
                     16% EventHub Commission (All Inclusive)
                 </span>
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
-            <div class="p-10">
+        <!-- Main Card -->
+        <div class="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+
+            <div class="p-6 lg:p-8">
+
                 <form action="{{ route('admin.settlements.show') }}" method="GET">
-                    <div class="mb-12">
-                        <label for="event_id" class="block text-xl font-semibold text-gray-800 mb-4">
-                            Select Event <span class="text-red-500">*</span>
+                    <div class="mb-8">
+                        <label for="event_id" class="block text-base font-semibold text-gray-800 mb-2">
+                            Select Event <span class="text-red-600">*</span>
                         </label>
                         <select name="event_id" id="event_id" required
-                                class="w-full px-6 py-5 text-lg border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-primary/30 focus:border-primary transition">
+                                class="w-full px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#FF7A28] focus:ring-2 focus:ring-[#FF7A28]/30 text-base transition">
                             <option value="">-- Choose an Event --</option>
                             @foreach($events as $event)
                                 <option value="{{ $event->id }}" {{ request('event_id') == $event->id ? 'selected' : '' }}>
@@ -29,25 +39,52 @@
                                         ({{ $event->organizerApplication->contact_person ?? 'Unknown' }})
                                     @endif
                                     @if($event->settlement?->settled_at)
-                                        <span class="text-green-600 font-bold"> [Settled]</span>
+                                        <span class="text-green-600 font-medium"> [Settled]</span>
                                     @endif
                                 </option>
                             @endforeach
                         </select>
-                        <p class="mt-3 text-sm text-gray-500">
+
+                        <p class="mt-2 text-sm text-gray-500">
                             {{ $events->count() }} total event{{ $events->count() == 1 ? '' : 's' }} available
                         </p>
                     </div>
 
                     <div class="flex justify-end">
                         <button type="submit"
-                                class="px-16 py-6 bg-primary hover:bg-orange-600 text-white font-bold text-2xl rounded-2xl shadow-2xl hover:shadow-orange-500/50 transition duration-300">
+                                class="px-8 py-3 bg-[#FF7A28] hover:bg-[#FF7A28]/90 text-white font-medium rounded-lg transition shadow-sm text-base">
                             View Settlement Details
                         </button>
                     </div>
                 </form>
+
             </div>
         </div>
     </div>
+
+    @push('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            @if(session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: '{{ session('success') }}',
+                    confirmButtonColor: '#FF7A28',
+                    timer: 3200,
+                    timerProgressBar: true
+                });
+            @endif
+
+            @if(session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: '{{ session('error') }}',
+                    confirmButtonColor: '#FF7A28'
+                });
+            @endif
+        </script>
+    @endpush
 
 </x-admin.admin-layout>

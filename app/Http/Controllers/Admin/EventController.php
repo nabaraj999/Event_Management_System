@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\EventCategory;
+use App\Models\OrganizerApplication; // ← added
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -13,22 +14,34 @@ use Illuminate\Support\Facades\Storage;
 class EventController extends Controller
 {
     public function index(Request $request)
-    {
-        $query = Event::with('category')->latest();
+{
+    $query = Event::with(['category', 'organizer']) // ← important: load organizer relation
+        ->latest();
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('location', 'like', "%{$search}%")
-                  ->orWhere('venue', 'like', "%{$search}%");
-            });
-        }
-
-        $events = $query->paginate(10)->withQueryString();
-
-        return view('admin.events.index', compact('events'));
+    // Search
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function ($q) use ($search) {
+            $q->where('title', 'like', "%{$search}%")
+              ->orWhere('location', 'like', "%{$search}%")
+              ->orWhere('venue', 'like', "%{$search}%");
+        });
     }
+
+    // New: Filter by organizer
+    if ($request->filled('organizer_id')) {
+        $query->where('organizer_id', $request->organizer_id);
+    }
+
+    $events = $query->paginate(10)->withQueryString();
+
+    // Pass approved organizers for the dropdown
+    $approved_organizers = \App\Models\OrganizerApplication::where('status', 'approved')
+        ->orderBy('organization_name')
+        ->get(['id', 'organization_name', 'contact_person', 'email']);
+
+    return view('admin.events.index', compact('events', 'approved_organizers'));
+}
 
     public function create()
     {
@@ -36,37 +49,30 @@ class EventController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        return view('admin.events.create', compact('categories'));
+        $organizers = OrganizerApplication::where('status', 'approved')
+            ->orderBy('organization_name')
+            ->get(['id', 'organization_name', 'contact_person', 'email']);
+
+        return view('admin.events.create', compact('categories', 'organizers'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-    'title' => 'required|string|max:255|unique:events,title',
-
-    'slug' => 'nullable|string|unique:events,slug',
-
-    'category_id' => 'required|exists:event_categories,id',
-
-    'short_description' => 'required|string|max:500',
-
-    'content' => 'required|string|min:20',
-
-    'location' => 'nullable|string|max:255|required_without:venue',
-
-    'venue' => 'nullable|string|max:255|required_without:location',
-
-    'start_date' => 'required|date|after_or_equal:now',
-
-    'end_date' => 'nullable|date|after:start_date',
-
-    'banner_image' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
-
-    'thumbnail' => 'required|image|mimes:jpg,jpeg,png,webp|max:1024',
-
-    'status' => 'required|in:draft,published,ongoing,completed,cancelled',
-]);
-
+        $validated = $request->validate([
+            'title'             => 'required|string|max:255|unique:events,title',
+            'slug'              => 'nullable|string|unique:events,slug',
+            'category_id'       => 'required|exists:event_categories,id',
+            'organizer_id'      => 'nullable|exists:organizer_applications,id',           // ← added
+            'short_description' => 'required|string|max:500',
+            'content'           => 'required|string|min:20',
+            'location'          => 'nullable|string|max:255|required_without:venue',
+            'venue'             => 'nullable|string|max:255|required_without:location',
+            'start_date'        => 'required|date|after_or_equal:now',
+            'end_date'          => 'nullable|date|after:start_date',
+            'banner_image'      => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'thumbnail'         => 'required|image|mimes:jpg,jpeg,png,webp|max:1024',
+            'status'            => 'required|in:draft,published,ongoing,completed,cancelled',
+        ]);
 
         $banner = $request->file('banner_image')->store('events/banners', 'public');
         $thumb  = $request->file('thumbnail')->store('events/thumbnails', 'public');
@@ -75,6 +81,7 @@ class EventController extends Controller
             'title'             => $request->title,
             'slug'              => $request->filled('slug') ? Str::slug($request->slug) : Str::slug($request->title),
             'category_id'       => $request->category_id,
+            'organizer_id'      => $request->organizer_id ?: null,                             // ← added
             'short_description' => $request->short_description,
             'content'           => $request->content,
             'location'          => $request->location,
@@ -84,7 +91,7 @@ class EventController extends Controller
             'banner_image'      => $banner,
             'thumbnail'         => $thumb,
             'status'            => $request->status,
-            'is_featured'       => $request->has('is_featured'),
+            'is_featured'       => $request->boolean('is_featured'),
             'created_by'        => Auth::guard('admin')->id(),
             'updated_by'        => Auth::guard('admin')->id(),
         ]);
@@ -97,37 +104,31 @@ class EventController extends Controller
     public function edit(Event $event)
     {
         $categories = EventCategory::where('is_active', true)->get();
-        return view('admin.events.edit', compact('event', 'categories'));
+
+        $organizers = OrganizerApplication::where('status', 'approved')
+            ->orderBy('organization_name')
+            ->get(['id', 'organization_name', 'contact_person', 'email']);
+
+        return view('admin.events.edit', compact('event', 'categories', 'organizers'));
     }
 
     public function update(Request $request, Event $event)
     {
-        $request->validate([
-    'title' => 'required|string|max:255|unique:events,title,' . $event->id,
-
-    'slug' => 'nullable|string|unique:events,slug,' . $event->id,
-
-    'category_id' => 'required|exists:event_categories,id',
-
-    'short_description' => 'required|string|max:500',
-
-    'content' => 'required|string|min:20',
-
-    'location' => 'nullable|string|max:255|required_without:venue',
-
-    'venue' => 'nullable|string|max:255|required_without:location',
-
-    'start_date' => 'required|date',
-
-    'end_date' => 'nullable|date|after:start_date',
-
-    'banner_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-
-    'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:1024',
-
-    'status' => 'required|in:draft,published,ongoing,completed,cancelled',
-]);
-
+        $validated = $request->validate([
+            'title'             => 'required|string|max:255|unique:events,title,' . $event->id,
+            'slug'              => 'nullable|string|unique:events,slug,' . $event->id,
+            'category_id'       => 'required|exists:event_categories,id',
+            'organizer_id'      => 'nullable|exists:organizer_applications,id',           // ← added
+            'short_description' => 'required|string|max:500',
+            'content'           => 'required|string|min:20',
+            'location'          => 'nullable|string|max:255|required_without:venue',
+            'venue'             => 'nullable|string|max:255|required_without:location',
+            'start_date'        => 'required|date',
+            'end_date'          => 'nullable|date|after:start_date',
+            'banner_image'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'thumbnail'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:1024',
+            'status'            => 'required|in:draft,published,ongoing,completed,cancelled',
+        ]);
 
         if ($request->hasFile('banner_image')) {
             Storage::disk('public')->delete($event->banner_image);
@@ -140,8 +141,18 @@ class EventController extends Controller
         }
 
         $event->update($request->only([
-            'title', 'slug', 'category_id', 'short_description', 'content',
-            'location', 'venue', 'start_date', 'end_date', 'status', 'is_featured'
+            'title',
+            'slug',
+            'category_id',
+            'organizer_id',           // ← added
+            'short_description',
+            'content',
+            'location',
+            'venue',
+            'start_date',
+            'end_date',
+            'status',
+            'is_featured',
         ]));
 
         $event->updated_by = Auth::guard('admin')->id();

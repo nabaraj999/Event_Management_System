@@ -71,6 +71,39 @@
                     <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
                 @enderror
             </div>
+            <div class="mb-8">
+                <label class="block font-semibold mb-2">
+                    Organizer
+                    <span class="text-gray-500 text-sm font-normal">(optional – leave empty if created by admin)</span>
+                </label>
+
+                <select name="organizer_id"
+                        class="w-full px-5 py-4 border rounded-xl transition
+                              bg-white focus:ring-2 focus:ring-primary
+                              @error('organizer_id') border-red-500 @enderror">
+
+                    <option value="">— Admin Created Event —</option>
+
+                    @foreach($organizers as $org)
+                        <option value="{{ $org->id }}"
+                            {{ old('organizer_id') == $org->id ? 'selected' : '' }}>
+                            {{ $org->organization_name }}
+                            @if($org->contact_person)
+                                • {{ $org->contact_person }}
+                            @endif
+                            <span class="text-gray-500 text-sm">({{ $org->email }})</span>
+                        </option>
+                    @endforeach
+                </select>
+
+                @error('organizer_id')
+                    <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
+                @enderror
+
+                <p class="text-gray-500 text-xs mt-1.5">
+                    Select an approved organizer if this event belongs to them (e.g., when approving their request)
+                </p>
+            </div>
 
             {{-- ================= LOCATION & VENUE ================= --}}
             <div class="grid md:grid-cols-2 gap-8 mb-8">
