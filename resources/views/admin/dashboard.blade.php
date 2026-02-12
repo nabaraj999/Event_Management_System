@@ -151,11 +151,11 @@
             <div class="relative z-10">
                 <h2 class="text-2xl font-bold mb-8">Quick Actions</h2>
                 <div class="space-y-6">
-                    <a href="{{ route('admin.events.pending') }}" class="block bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-xl p-6 transition-all transform hover:scale-105">
+                    <a href="" class="block bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-xl p-6 transition-all transform hover:scale-105">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="font-bold text-xl">Review Pending Events</p>
-                                <p class="text-white/80 text-sm mt-2">{{ $pendingEvents }} events waiting</p>
+                                <p class="text-white/80 text-sm mt-2">events waiting</p>
                             </div>
                             <svg class="w-8 h-8 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
