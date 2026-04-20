@@ -96,6 +96,13 @@ class EventController extends Controller
             'updated_by'        => Auth::guard('admin')->id(),
         ]);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Event created successfully!'
+            ]);
+        }
+
         return redirect()
             ->route('admin.events.index')
             ->with('swal_success', 'Event created successfully!');
@@ -157,6 +164,13 @@ class EventController extends Controller
 
         $event->updated_by = Auth::guard('admin')->id();
         $event->save();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Event updated successfully!'
+            ]);
+        }
 
         return redirect()
             ->route('admin.events.index')
