@@ -28,22 +28,8 @@ class BookingController extends Controller
             return redirect()->route('login')->with('error', 'Please login to book tickets.');
         }
 
-      $bookedQuantity = BookingTicket::where('event_ticket_id', $eventTicket->id)
-    ->join('bookings', 'booking_ticket.booking_id', '=', 'bookings.id') // use actual table name
-    ->whereIn('bookings.payment_status', ['pending', 'paid'])
-    ->sum('booking_ticket.quantity'); // use actual table name
-
-        $remaining = $eventTicket->total_seats - ($eventTicket->sold_seats + $bookedQuantity);
-
-        $now = now();
-        $isOnSale = true;
-
-        if ($eventTicket->sale_start && $now->lt($eventTicket->sale_start)) {
-            $isOnSale = false;
-        }
-        if ($eventTicket->sale_end && $now->gt($eventTicket->sale_end)) {
-            $isOnSale = false;
-        }
+        $remaining = $eventTicket->remaining_seats;
+        $isOnSale = $eventTicket->isOnSale();
 
         if ($remaining <= 0 || !$isOnSale) {
             $message = $remaining <= 0
@@ -64,7 +50,7 @@ class BookingController extends Controller
 {
     $request->validate([
         'event_ticket_id' => 'required|exists:event_tickets,id',
-        'quantity'        => 'required|integer|min:1|max:20', // ← UNCOMMENT & KEEP THIS
+        'quantity'        => 'required|integer|min:1|max:20',
         'full_name'       => 'required|string|max:255',
         'email'           => 'required|email|max:255',
         'phone'           => 'required|string|max:20',
@@ -72,15 +58,17 @@ class BookingController extends Controller
     ]);
 
     $eventTicket = EventTicket::findOrFail($request->event_ticket_id);
-    $quantity    = (int) $request->quantity; // ← This is needed!
+    $quantity    = (int) $request->quantity;
 
-    // Check available seats
-    $bookedQuantity = BookingTicket::where('event_ticket_id', $eventTicket->id)
-        ->join('bookings', 'booking_ticket.booking_id', '=', 'bookings.id')
-        ->whereIn('bookings.payment_status', ['pending', 'paid'])
-        ->sum('booking_ticket.quantity');
+    if (! $eventTicket->is_active) {
+        return back()->withInput()->with('error', 'This ticket is currently inactive.');
+    }
 
-    $remaining = $eventTicket->total_seats - ($eventTicket->sold_seats + $bookedQuantity);
+    if (! $eventTicket->isOnSale()) {
+        return back()->withInput()->with('error', 'This ticket is not currently available for sale.');
+    }
+
+    $remaining = $eventTicket->remaining_seats;
 
     if ($quantity > $remaining) {
         return back()->withInput()->with('error', "Only {$remaining} ticket(s) available.");
@@ -89,7 +77,6 @@ class BookingController extends Controller
     $totalAmount = $quantity * $eventTicket->price;
 
     return DB::transaction(function () use ($request, $eventTicket, $quantity, $totalAmount, $khalti) {
-        // 1. Create main booking (NO quantity here — correct!)
         $booking = Booking::create([
             'user_id'         => Auth::id(),
             'event_id'        => $eventTicket->event_id,
@@ -102,16 +89,14 @@ class BookingController extends Controller
             'status'          => 'pending',
         ]);
 
-        // 2. Save quantity in the pivot table — THIS IS CRITICAL
         BookingTicket::create([
             'booking_id'       => $booking->id,
             'event_ticket_id'  => $eventTicket->id,
-            'quantity'         => $quantity,                    // ← UNCOMMENT THIS
+            'quantity'         => $quantity,
             'price_at_booking' => $eventTicket->price,
             'sub_total'        => $totalAmount,
         ]);
 
-        // 3. Initiate Khalti payment
         $payload = [
             'return_url'         => route('booking.success'),
             'website_url'        => config('services.khalti.website_url'),
@@ -177,7 +162,6 @@ class BookingController extends Controller
 
                 $booking->load(['bookingTickets.eventTicket.event', 'event']);
 
-                // Update sold seats
                 $bookingTicket = BookingTicket::where('booking_id', $booking->id)->first();
                 if ($bookingTicket) {
                     EventTicket::where('id', $bookingTicket->event_ticket_id)
@@ -186,17 +170,16 @@ class BookingController extends Controller
 
                 // Generate QR & PDF
                 $verificationUrl = route('verify.ticket', $booking->ticket_token);
-                $qrCodePng = (string) QrCode::format('png')->size(300)->errorCorrection('H')->generate($verificationUrl);
+                $qrCodeSvg = (string) QrCode::format('svg')->size(300)->errorCorrection('H')->generate($verificationUrl);
 
                 $pdf = Pdf::loadView('emails.ticket-pdf', [
-                    'booking'   => $booking,
-                    'qrCodePng' => $qrCodePng,
+                    'booking'      => $booking,
+                    'qrCodeBase64' => base64_encode($qrCodeSvg),
                 ]);
 
-                // Send email with PDF + QR PNG attached
                 Mail::to($booking->email)->send(new TicketConfirmation(
                     $booking,
-                    $qrCodePng,
+                    $qrCodeSvg,
                     $pdf->output()
                 ));
             });
@@ -280,8 +263,8 @@ class BookingController extends Controller
                     'email'          => $booking->email,
                     'phone'          => $booking->phone ?? 'Not provided',
                     'ticket_token'   => $booking->ticket_token,
-                    'quantity'       => $booking->quantity,
-                    'event_title'    => $booking->event->title,
+                    'quantity'       => $booking->bookingTickets->sum('quantity'),
+                    'event_title'    => $booking->event->title ?? 'N/A',
                     'booking_date'   => $booking->created_at->format('M d, Y'),
                     'payment_status' => ucfirst($booking->payment_status),
                     'is_checked_in'  => (bool) $booking->is_checked_in,

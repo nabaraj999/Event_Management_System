@@ -135,6 +135,12 @@ class OrganizerApplication extends Authenticatable
     public function scopeActive($query)
     {
         return $query->where('status', 'approved')
+            ->where('is_frozen', true);
+    }
+
+    public function scopeInactive($query)
+    {
+        return $query->where('status', 'approved')
             ->where('is_frozen', false);
     }
 

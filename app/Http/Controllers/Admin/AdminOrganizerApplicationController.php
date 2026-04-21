@@ -9,7 +9,7 @@ use App\Models\OrganizerApplication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Pest\Support\Str;
+use Illuminate\Support\Str;
 
 class AdminOrganizerApplicationController extends Controller
 {
@@ -32,8 +32,8 @@ class AdminOrganizerApplicationController extends Controller
     $application->update([
         'status'   => 'approved',
         'password' => Hash::make($temporaryPassword), // Manual hash – safe
-        // Optional: reset freeze if any
-        'is_frozen' => false,
+        // Approved organizers become live and their editable profile is locked.
+        'is_frozen' => true,
     ]);
 
     Mail::to($application->email)->send(

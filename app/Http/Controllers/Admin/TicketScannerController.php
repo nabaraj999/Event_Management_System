@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class TicketScannerController extends Controller
 {
@@ -65,6 +64,43 @@ class TicketScannerController extends Controller
             'event' => $booking->event->title ?? 'N/A',
             'quantity' => $booking->bookingTickets->sum('quantity'),
         ]
+    ]);
+}
+
+public function search(Request $request)
+{
+    $validated = $request->validate([
+        'query' => 'required|string|max:255',
+    ]);
+
+    $query = trim($validated['query']);
+
+    $booking = Booking::with(['event', 'bookingTickets'])
+        ->where('ticket_token', $query)
+        ->orWhere('full_name', 'like', "%{$query}%")
+        ->orWhere('email', 'like', "%{$query}%")
+        ->orWhere('phone', 'like', "%{$query}%")
+        ->first();
+
+    if (!$booking) {
+        return response()->json(['success' => false]);
+    }
+
+    return response()->json([
+        'success' => true,
+        'booking' => [
+            'id'             => $booking->id,
+            'full_name'      => $booking->full_name,
+            'email'          => $booking->email,
+            'phone'          => $booking->phone ?? 'Not provided',
+            'ticket_token'   => $booking->ticket_token,
+            'quantity'       => $booking->bookingTickets->sum('quantity'),
+            'event_title'    => $booking->event->title ?? 'N/A',
+            'booking_date'   => $booking->created_at->format('M d, Y'),
+            'payment_status' => ucfirst($booking->payment_status),
+            'is_checked_in'  => (bool) $booking->is_checked_in,
+            'checked_in_at'  => $booking->checked_in_at?->format('M d, Y h:i A'),
+        ],
     ]);
 }
 

@@ -7,21 +7,21 @@ use App\Models\BookingTicket;
 use App\Models\Event;
 use App\Models\Setting;
 use App\Models\UserInterest;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class EventInsightsService
 {
-    protected $organizer;
-
-    public function __construct()
-    {
-        $this->organizer = Auth::guard('organizer')->user();
-    }
-
     public function getInsights()
     {
-        $organizerId = $this->organizer->id;
+        $organizer = Auth::guard('organizer')->user();
+
+        if (! $organizer) {
+            throw new AuthenticationException('Organizer authentication is required to view insights.');
+        }
+
+        $organizerId = $organizer->id;
 
         // ── Global toggle check ────────────────────────────────────────
         if (! Setting::isOrganizerAlgorithmEnabled()) {
@@ -83,7 +83,7 @@ class EventInsightsService
             'avg_ticket_price'    => $avgTicketPrice,
             'top_categories'      => $topCategories,
             'top_interests'       => $topInterests,
-            'organizer_name'      => $this->organizer->contact_person ?? 'Organizer',
+            'organizer_name'      => $organizer->contact_person ?? 'Organizer',
             'algorithm_enabled'   => true,
         ];
     }
@@ -93,6 +93,8 @@ class EventInsightsService
      */
     private function getBasicInsights($organizerId)
     {
+        $organizer = Auth::guard('organizer')->user();
+
         $totalEvents = Event::where('organizer_id', $organizerId)->count();
 
         $totalRevenue = Booking::join('events', 'bookings.event_id', '=', 'events.id')
@@ -116,7 +118,7 @@ class EventInsightsService
             'avg_ticket_price'    => $totalTicketsSold > 0 ? round($totalRevenue / $totalTicketsSold, 2) : 0,
             'top_categories'      => collect(),                 // empty
             'top_interests'       => collect(),                 // empty
-            'organizer_name'      => $this->organizer->contact_person ?? 'Organizer',
+            'organizer_name'      => $organizer?->contact_person ?? 'Organizer',
             'algorithm_enabled'   => false,
         ];
     }

@@ -94,8 +94,7 @@ class OrgEventTicketController extends Controller
                 ]);
         }
 
-        // Prevent sale ending after event ends
-        if (!empty($validated['sale_end']) && $validated['sale_end'] > $event->end_date) {
+        if ($event->end_date && !empty($validated['sale_end']) && $validated['sale_end'] > $event->end_date) {
             return back()
                 ->withInput()
                 ->withErrors([
@@ -109,7 +108,7 @@ class OrgEventTicketController extends Controller
         }
 
         if (empty($validated['sale_end'])) {
-            $validated['sale_end'] = $event->start_date->subDay()->endOfDay();
+            $validated['sale_end'] = $event->start_date->copy()->subDay()->endOfDay();
         }
 
         EventTicket::create($validated);
@@ -165,7 +164,7 @@ class OrgEventTicketController extends Controller
             'name'         => 'required|string|max:255',
             'description'  => 'nullable|string',
             'price'        => 'required|numeric|min:0',
-            'total_seats'  => 'required|integer|min:' . $eventTicket->sold_seats,
+            'total_seats'  => 'required|integer|min:1',
             'sale_start'   => 'nullable|date',
             'sale_end'     => 'nullable|date|after_or_equal:sale_start',
             'is_active'    => 'boolean',
@@ -187,7 +186,15 @@ class OrgEventTicketController extends Controller
                 ]);
         }
 
-        if (!empty($validated['sale_end']) && $validated['sale_end'] > $event->end_date) {
+        if ($validated['total_seats'] < $eventTicket->getCommittedSeatsCount()) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'total_seats' => "Total seats cannot be less than committed seats ({$eventTicket->getCommittedSeatsCount()})."
+                ]);
+        }
+
+        if ($event->end_date && !empty($validated['sale_end']) && $validated['sale_end'] > $event->end_date) {
             return back()
                 ->withInput()
                 ->withErrors([
@@ -201,7 +208,7 @@ class OrgEventTicketController extends Controller
         }
 
         if (empty($validated['sale_end'])) {
-            $validated['sale_end'] = $event->start_date->subDay()->endOfDay();
+            $validated['sale_end'] = $event->start_date->copy()->subDay()->endOfDay();
         }
 
         $eventTicket->update($validated);
@@ -219,8 +226,8 @@ class OrgEventTicketController extends Controller
         }
 
         // Optional: prevent delete if tickets sold
-        if ($eventTicket->sold_seats > 0) {
-            return back()->with('error', 'Cannot delete ticket with sold seats.');
+        if ($eventTicket->getCommittedSeatsCount() > 0) {
+            return back()->with('error', 'Cannot delete ticket with committed seats.');
         }
 
         $eventTicket->delete();

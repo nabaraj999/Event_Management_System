@@ -1,100 +1,79 @@
 <section>
-    <form method="post" action="{{ route('user.profile.update') }}" class="space-y-8">
+    <form method="post" action="{{ route('user.profile.update') }}" class="space-y-5">
         @csrf
         @method('patch')
 
-        <!-- Name and Email Fields -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Name Field -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <!-- Name -->
             <div>
-                <label for="name" class="block text-lg font-semibold text-darkBlue mb-2">
-                    {{ __('Name') }}
+                <label for="name" class="block text-xs font-black text-gray-600 uppercase tracking-wider mb-2">
+                    {{ __('Full Name') }}
                 </label>
-                <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    value="{{ old('name', $user->name) }}"
-                    required
-                    autofocus
-                    autocomplete="name"
-                    class="w-full px-5 py-4 text-gray-800 bg-white border-2 border-gray-300 rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/20 focus:outline-none transition"
-                />
+                <div class="relative">
+                    <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></i>
+                    <input id="name" name="name" type="text"
+                        value="{{ old('name', $user->name) }}"
+                        required autofocus autocomplete="name"
+                        class="w-full pl-11 pr-4 py-3.5 border {{ $errors->has('name') ? 'border-red-400' : 'border-gray-200' }} rounded-xl focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium" />
+                </div>
                 @if ($errors->has('name'))
-                    <p class="mt-2 text-sm text-red-600 font-medium">
-                        {{ $errors->first('name') }}
+                    <p class="text-red-500 text-xs mt-1.5 flex items-center gap-1">
+                        <i class="fas fa-exclamation-circle"></i> {{ $errors->first('name') }}
                     </p>
                 @endif
             </div>
 
-            <!-- Email Field -->
+            <!-- Email -->
             <div>
-                <label for="email" class="block text-lg font-semibold text-darkBlue mb-2">
+                <label for="email" class="block text-xs font-black text-gray-600 uppercase tracking-wider mb-2">
                     {{ __('Email Address') }}
                 </label>
-                <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value="{{ old('email', $user->email) }}"
-                    required
-                    autocomplete="username"
-                    class="w-full px-5 py-4 text-gray-800 bg-white border-2 border-gray-300 rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/20 focus:outline-none transition"
-                />
+                <div class="relative">
+                    <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></i>
+                    <input id="email" name="email" type="email"
+                        value="{{ old('email', $user->email) }}"
+                        required autocomplete="username"
+                        class="w-full pl-11 pr-4 py-3.5 border {{ $errors->has('email') ? 'border-red-400' : 'border-gray-200' }} rounded-xl focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium" />
+                </div>
                 @if ($errors->has('email'))
-                    <p class="mt-2 text-sm text-red-600 font-medium">
-                        {{ $errors->first('email') }}
+                    <p class="text-red-500 text-xs mt-1.5 flex items-center gap-1">
+                        <i class="fas fa-exclamation-circle"></i> {{ $errors->first('email') }}
                     </p>
                 @endif
 
-                <!-- Email Verification Status -->
                 @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
-                    <div class="mt-4 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                        <p class="text-sm text-orange-800 font-medium">
-                            {{ __('Your email address is unverified.') }}
-                        </p>
-                        <button
-                            form="send-verification"
-                            type="submit"
-                            class="mt-2 text-sm font-semibold text-primary hover:text-orange-700 underline"
-                        >
-                            {{ __('Click here to re-send the verification email') }}
-                        </button>
-
-                        @if (session('status') === 'verification-link-sent')
-                            <p class="mt-3 text-sm font-bold text-green-600">
-                                {{ __('A new verification link has been sent to your email.') }}
-                            </p>
-                        @endif
+                    <div class="mt-3 p-3.5 bg-orange-50 border border-orange-200 rounded-xl flex items-start gap-2.5">
+                        <i class="fas fa-exclamation-circle text-orange-500 text-sm mt-0.5 flex-shrink-0"></i>
+                        <div>
+                            <p class="text-xs text-orange-700 font-semibold">Email not verified</p>
+                            <button form="send-verification" type="submit"
+                                class="text-xs font-bold text-primary hover:underline mt-0.5">
+                                Re-send verification email →
+                            </button>
+                            @if (session('status') === 'verification-link-sent')
+                                <p class="mt-1.5 text-xs font-bold text-green-600">Verification link sent!</p>
+                            @endif
+                        </div>
                     </div>
                 @endif
             </div>
         </div>
 
-        <!-- Submit Button & Success Message -->
-        <div class="flex items-center gap-6 pt-6">
-            <button
-                type="submit"
-                class="px-10 py-4 bg-primary hover:bg-orange-600 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition duration-200"
-            >
-                {{ __('Save Changes') }}
+        <div class="flex items-center gap-4 pt-2">
+            <button type="submit"
+                class="btn-primary inline-flex items-center gap-2 px-7 py-3 text-white font-bold rounded-xl shadow-md text-sm">
+                <i class="fas fa-save"></i> {{ __('Save Changes') }}
             </button>
-
             @if (session('status') === 'profile-updated')
-                <div
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-transition.opacity
-                    x-init="setTimeout(() => show = false, 4000)"
-                    class="text-xl font-bold text-green-600 bg-green-50 px-6 py-3 rounded-lg"
-                >
-                    {{ __('Saved successfully!') }}
+                <div x-data="{ show: true }" x-show="show" x-transition.opacity
+                     x-init="setTimeout(() => show = false, 3000)"
+                     class="flex items-center gap-1.5 text-sm font-bold text-green-600 bg-green-50 px-4 py-2 rounded-xl border border-green-200">
+                    <i class="fas fa-check-circle text-xs"></i> {{ __('Saved!') }}
                 </div>
             @endif
         </div>
     </form>
 
-    <!-- Hidden form for resending verification -->
     <form id="send-verification" method="post" action="{{ route('verification.send') }}" class="hidden">
         @csrf
     </form>

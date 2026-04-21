@@ -14,13 +14,13 @@ class TicketConfirmation extends Mailable
     use Queueable, SerializesModels;
 
     public $booking;
-    protected $qrCodePng;
+    protected $qrCodeSvg;
     protected $pdfContent;
 
-    public function __construct($booking, string $qrCodePng, string $pdfContent)
+    public function __construct($booking, string $qrCodeSvg, string $pdfContent)
     {
         $this->booking = $booking;
-        $this->qrCodePng = $qrCodePng;
+        $this->qrCodeSvg = $qrCodeSvg;
         $this->pdfContent = $pdfContent;
     }
 
@@ -37,8 +37,7 @@ class TicketConfirmation extends Mailable
             view: 'emails.ticket-confirmation',
             with: [
                 'booking' => $this->booking,
-                // Keep small for email clients
-                'qrCodeBase64' => base64_encode($this->qrCodePng),
+                'qrCodeBase64' => base64_encode($this->qrCodeSvg),
             ]
         );
     }
@@ -52,9 +51,9 @@ class TicketConfirmation extends Mailable
             )->withMime('application/pdf'),
 
             Attachment::fromData(
-                fn () => $this->qrCodePng,
-                'EventHUB-QR-' . $this->booking->ticket_token . '.png'
-            )->withMime('image/png'),
+                fn () => $this->qrCodeSvg,
+                'EventHUB-QR-' . $this->booking->ticket_token . '.svg'
+            )->withMime('image/svg+xml'),
         ];
     }
 }

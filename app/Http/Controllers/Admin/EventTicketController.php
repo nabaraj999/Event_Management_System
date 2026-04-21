@@ -68,7 +68,7 @@ class EventTicketController extends Controller
         }
 
         // Prevent sale ending after event ends
-        if (!empty($validated['sale_end']) && $validated['sale_end'] > $event->end_date) {
+        if ($event->end_date && !empty($validated['sale_end']) && $validated['sale_end'] > $event->end_date) {
             return back()
                 ->withInput()
                 ->withErrors([
@@ -82,7 +82,7 @@ class EventTicketController extends Controller
         }
 
         if (empty($validated['sale_end'])) {
-            $validated['sale_end'] = $event->start_date->subDay()->endOfDay();
+            $validated['sale_end'] = $event->start_date->copy()->subDay()->endOfDay();
         }
 
         EventTicket::create($validated);
@@ -125,9 +125,9 @@ class EventTicketController extends Controller
         $validated['is_active'] = $request->has('is_active');
 
         // Prevent reducing total seats below sold amount
-        if ($validated['total_seats'] < $eventTicket->sold_seats) {
+        if ($validated['total_seats'] < $eventTicket->getCommittedSeatsCount()) {
             return back()->withErrors([
-                'total_seats' => "Total seats cannot be less than already sold seats ({$eventTicket->sold_seats})."
+                'total_seats' => "Total seats cannot be less than committed seats ({$eventTicket->getCommittedSeatsCount()})."
             ]);
         }
 
@@ -143,7 +143,7 @@ class EventTicketController extends Controller
                 ]);
         }
 
-        if (!empty($validated['sale_end']) && $validated['sale_end'] > $event->end_date) {
+        if ($event->end_date && !empty($validated['sale_end']) && $validated['sale_end'] > $event->end_date) {
             return back()
                 ->withInput()
                 ->withErrors([
@@ -157,7 +157,7 @@ class EventTicketController extends Controller
         }
 
         if (empty($validated['sale_end'])) {
-            $validated['sale_end'] = $event->start_date->subDay()->endOfDay();
+            $validated['sale_end'] = $event->start_date->copy()->subDay()->endOfDay();
         }
 
         $eventTicket->update($validated);
@@ -168,8 +168,8 @@ class EventTicketController extends Controller
 
     public function destroy(EventTicket $eventTicket)
     {
-        if ($eventTicket->sold_seats > 0) {
-            return back()->with('error', 'Cannot delete ticket with sold seats.');
+        if ($eventTicket->getCommittedSeatsCount() > 0) {
+            return back()->with('error', 'Cannot delete ticket with committed seats.');
         }
 
         $eventTicket->delete();

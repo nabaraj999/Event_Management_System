@@ -14,7 +14,7 @@ class OrganizerController extends Controller
      */
     public function index()
     {
-        $organizers = OrganizerApplication::where('is_frozen', true)
+        $organizers = OrganizerApplication::active()
             ->whereNotNull('profile_image')
             ->latest('profile_completed_at')
             ->paginate(12);
@@ -29,7 +29,7 @@ class OrganizerController extends Controller
 {
     // $organizer is now automatically the model found by slug
 
-    $events = Event::published()
+    $events = Event::visibleToUsers()
         ->upcoming()
         ->where('organizer_id', $organizer->id)
         ->orderBy('start_date', 'asc')

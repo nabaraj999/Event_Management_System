@@ -1,200 +1,271 @@
 <x-frontend.frontend-layout />
 
-<div class="min-h-screen bg-gray-50 py-8 px-4 sm:py-12 sm:px-6">
-    <div class="max-w-7xl mx-auto">
-        <h1 class="text-3xl sm:text-4xl font-extrabold text-darkBlue mb-8 text-center sm:text-left">
-            My Booking History
-        </h1>
+<!-- Page Header -->
+<div class="bg-gradient-to-br from-darkBlue via-[#0a4f9e] to-darkBlue pt-28 pb-16 relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 text-white">
+        <p class="text-primary font-bold text-xs mb-2 uppercase tracking-widest">Account</p>
+        <h1 class="font-raleway text-4xl sm:text-5xl font-black mb-2">My Bookings</h1>
+        <p class="text-white/60 text-base">All your event bookings and digital tickets in one place</p>
+    </div>
+</div>
+
+<div class="py-12 bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
 
         @if($bookings->count() === 0)
-            <div class="text-center py-16">
-                <i class="fas fa-ticket-alt text-6xl text-gray-300 mb-4"></i>
-                <p class="text-xl text-gray-600">You haven't booked any events yet.</p>
+            <!-- Empty State -->
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 py-24 text-center">
+                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-ticket-alt text-gray-400 text-3xl"></i>
+                </div>
+                <h3 class="font-raleway font-black text-xl text-gray-600 mb-2">No Bookings Yet</h3>
+                <p class="text-gray-400 text-sm mb-8">You haven't booked any events yet. Start exploring!</p>
                 <a href="{{ route('events.index') }}"
-                   class="mt-6 inline-block bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-orange-600 transition">
-                    Browse Events
+                   class="btn-primary inline-flex items-center gap-2 px-8 py-3.5 text-white font-bold rounded-xl shadow-lg">
+                    <i class="fas fa-search"></i> Browse Events
                 </a>
             </div>
+
         @else
-            <div class="grid gap-8">
+            <div class="space-y-6">
                 @foreach($bookings as $booking)
-                    <div class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col lg:flex-row">
-                        <!-- Event Image -->
-                        <div class="lg:w-80 h-56 lg:h-auto">
-                            <img src="{{ $booking->event->banner_image ? asset('storage/' . $booking->event->banner_image) : asset('images/default-event.jpg') }}"
-                                 alt="{{ $booking->event->title }}"
-                                 class="w-full h-full object-cover">
-                        </div>
+                    @php
+                        $statusColors = [
+                            'paid'    => 'bg-green-100 text-green-700 border-green-200',
+                            'failed'  => 'bg-red-100 text-red-700 border-red-200',
+                            'pending' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
+                            'refunded'=> 'bg-purple-100 text-purple-700 border-purple-200',
+                        ];
+                        $statusIcons = [
+                            'paid'    => 'fa-check-circle',
+                            'failed'  => 'fa-times-circle',
+                            'pending' => 'fa-clock',
+                            'refunded'=> 'fa-undo',
+                        ];
+                        $colorClass = $statusColors[$booking->payment_status] ?? 'bg-gray-100 text-gray-600 border-gray-200';
+                        $iconClass  = $statusIcons[$booking->payment_status]  ?? 'fa-circle';
+                    @endphp
 
-                        <!-- Booking Details -->
-                        <div class="flex-1 p-6 sm:p-8">
-                            <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
-                                <div>
-                                    <h3 class="text-xl sm:text-2xl font-bold text-darkBlue">
-                                        {{ $booking->event->title }}
-                                    </h3>
-                                    <p class="text-gray-600 mt-1 flex items-center text-sm sm:text-base">
-                                        <i class="fas fa-calendar-alt mr-2"></i>
-                                        {{ $booking->event->start_date->format('M d, Y') }}
-                                        @if($booking->event->end_date)
-                                            - {{ $booking->event->end_date->format('M d, Y') }}
-                                        @endif
-                                    </p>
-                                    <p class="text-gray-500 text-sm mt-2 flex items-center">
-                                        <i class="fas fa-map-marker-alt mr-2"></i>
-                                        {{ Str::limit($booking->event->location, 40) }}
-                                    </p>
-                                </div>
+                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="flex flex-col lg:flex-row">
 
-                                <div class="text-center sm:text-right">
-                                    <span class="inline-block px-4 py-2 rounded-full text-sm font-semibold
-                                        {{ $booking->payment_status === 'paid' ? 'bg-green-100 text-green-800' :
-                                           ($booking->payment_status === 'failed' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800') }}">
-                                        {{ ucfirst($booking->payment_status) }}
-                                    </span>
-                                    <p class="mt-2 text-sm text-gray-600">
-                                        Booking: {{ ucfirst($booking->status) }}
-                                    </p>
-                                </div>
+                            <!-- Event Image -->
+                            <div class="lg:w-72 xl:w-80 h-52 lg:h-auto flex-shrink-0 relative overflow-hidden">
+                                <img src="{{ $booking->event->banner_image ? asset('storage/' . $booking->event->banner_image) : 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600' }}"
+                                     alt="{{ $booking->event->title }}"
+                                     class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-gradient-to-r from-transparent to-black/10 lg:bg-gradient-to-l"></div>
                             </div>
 
-                            <!-- Info Grid -->
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
-                                <div class="space-y-2 text-sm sm:text-base">
-                                    <p><strong>Booked on:</strong> {{ $booking->created_at->format('M d, Y h:i A') }}</p>
-                                    <p><strong>Name:</strong> {{ $booking->full_name }}</p>
-                                    <p><strong>Email:</strong> {{ $booking->email }}</p>
-                                    <p><strong>Phone:</strong> {{ $booking->phone }}</p>
-                                    <p><strong>Transaction:</strong> {{ $booking->transaction_id ?? 'N/A' }}</p>
-                                </div>
-
-                                <div>
-                                    <p class="text-2xl sm:text-3xl font-extrabold text-darkBlue">
-                                        Rs. {{ number_format($booking->total_amount, 2) }}
-                                    </p>
-
-                                    <div class="mt-4">
-                                        <p class="font-semibold text-gray-800">Tickets:</p>
-                                        <ul class="mt-2 space-y-1 text-sm">
-                                            @foreach($booking->bookingTickets as $bt)
-                                                <li class="text-gray-700">
-                                                    {{ $bt->quantity }} × {{ $bt->eventTicket->name }}
-                                                    <span class="text-gray-500">
-                                                        @ Rs. {{ number_format($bt->price_at_booking, 2) }}
-                                                    </span>
-                                                </li>
-                                            @endforeach
-                                        </ul>
-                                        <p class="mt-3 text-sm text-gray-600">
-                                            Total: {{ $booking->bookingTickets->sum('quantity') }} ticket(s)
-                                        </p>
+                            <!-- Details -->
+                            <div class="flex-1 p-6 sm:p-8">
+                                <!-- Top Row -->
+                                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-5">
+                                    <div>
+                                        <h3 class="font-raleway font-black text-xl sm:text-2xl text-darkBlue leading-tight">
+                                            {{ $booking->event->title }}
+                                        </h3>
+                                        <div class="flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-500 font-medium">
+                                            <span class="flex items-center gap-1.5">
+                                                <i class="fas fa-calendar-alt text-primary text-xs"></i>
+                                                {{ $booking->event->start_date->format('M d, Y') }}
+                                                @if($booking->event->end_date)
+                                                    &ndash; {{ $booking->event->end_date->format('M d, Y') }}
+                                                @endif
+                                            </span>
+                                            <span class="flex items-center gap-1.5">
+                                                <i class="fas fa-map-marker-alt text-primary text-xs"></i>
+                                                {{ Str::limit($booking->event->location, 35) }}
+                                            </span>
+                                        </div>
                                     </div>
 
+                                    <!-- Status Badge -->
+                                    <div class="flex-shrink-0">
+                                        <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-black border {{ $colorClass }}">
+                                            <i class="fas {{ $iconClass }} text-xs"></i>
+                                            {{ ucfirst($booking->payment_status) }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Info Grid -->
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4 border-t border-b border-gray-100 mb-5">
+                                    <div>
+                                        <p class="text-xs font-black text-gray-400 uppercase tracking-wider mb-1">Booked On</p>
+                                        <p class="text-sm font-bold text-darkBlue">{{ $booking->created_at->format('M d, Y') }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-black text-gray-400 uppercase tracking-wider mb-1">Attendee</p>
+                                        <p class="text-sm font-bold text-darkBlue truncate">{{ $booking->full_name }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-black text-gray-400 uppercase tracking-wider mb-1">Tickets</p>
+                                        <p class="text-sm font-bold text-darkBlue">{{ $booking->bookingTickets->sum('quantity') }} ticket(s)</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-black text-gray-400 uppercase tracking-wider mb-1">Total Paid</p>
+                                        <p class="text-base font-black text-primary">Rs. {{ number_format($booking->total_amount, 0) }}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Ticket List -->
+                                <div class="flex flex-wrap gap-2 mb-5">
+                                    @foreach($booking->bookingTickets as $bt)
+                                        <span class="inline-flex items-center gap-1.5 bg-gray-100 text-gray-700 text-xs font-bold px-3 py-1.5 rounded-full">
+                                            <i class="fas fa-ticket-alt text-primary text-xs"></i>
+                                            {{ $bt->quantity }} × {{ $bt->eventTicket->name }}
+                                            <span class="text-gray-500 font-normal">@ Rs. {{ number_format($bt->price_at_booking, 0) }}</span>
+                                        </span>
+                                    @endforeach
                                     @if($booking->is_checked_in)
-                                        <p class="mt-4 text-green-600 font-bold flex items-center justify-end">
-                                            <i class="fas fa-check-circle mr-2"></i> Checked In
-                                        </p>
+                                        <span class="inline-flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-black px-3 py-1.5 rounded-full">
+                                            <i class="fas fa-check-circle text-xs"></i> Checked In
+                                        </span>
                                     @endif
                                 </div>
-                            </div>
 
-                            <!-- Actions -->
-                            <div class="mt-8 flex flex-wrap gap-3">
-                                <button onclick="openTicketModal({{ $booking->id }})"
-                                        class="bg-darkBlue text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary transition flex items-center">
-                                    <i class="fas fa-ticket-alt mr-2"></i> View Ticket
-                                </button>
+                                <!-- Actions -->
+                                <div class="flex flex-wrap gap-3">
+                                    <button onclick="openTicketModal({{ $booking->id }})"
+                                            class="inline-flex items-center gap-2 px-5 py-2.5 bg-darkBlue text-white font-bold rounded-xl hover:bg-primary transition-colors text-sm shadow-md">
+                                        <i class="fas fa-qrcode"></i> View Ticket
+                                    </button>
 
-                                @if($booking->payment_status === 'paid')
-                                    <a href="{{ route('user.profile.invoice', $booking->ticket_token) }}"
-                                       class="border border-darkBlue text-darkBlue px-6 py-3 rounded-lg font-semibold hover:bg-darkBlue hover:text-white transition flex items-center">
-                                        <i class="fas fa-download mr-2"></i> Download Invoice
+                                    @if($booking->payment_status === 'paid')
+                                        <a href="{{ route('user.profile.invoice', $booking->ticket_token) }}"
+                                           class="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-darkBlue text-darkBlue font-bold rounded-xl hover:bg-darkBlue hover:text-white transition-all text-sm">
+                                            <i class="fas fa-download"></i> Download Invoice
+                                        </a>
+                                    @endif
+
+                                    <a href="{{ route('events.show', $booking->event) }}"
+                                       class="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-gray-200 text-gray-600 font-bold rounded-xl hover:border-primary hover:text-primary transition-all text-sm">
+                                        <i class="fas fa-external-link-alt"></i> View Event
                                     </a>
-                                @endif
+                                </div>
                             </div>
                         </div>
                     </div>
                 @endforeach
             </div>
 
-            <div class="mt-12 flex justify-center">
-                {{ $bookings->links() }}
-            </div>
+            <!-- Pagination -->
+            @if($bookings->hasPages())
+                <div class="mt-10 flex justify-center">
+                    {{ $bookings->links('pagination::tailwind') }}
+                </div>
+            @endif
         @endif
+
     </div>
 </div>
 
-<!-- Ticket Modals with QR Code -->
+<!-- Ticket Modals -->
 @foreach($bookings as $booking)
 <div id="ticket-modal-{{ $booking->id }}"
-     class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50 p-4 overflow-y-auto">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full my-8">
-        <div class="bg-gradient-to-r from-darkBlue to-primary text-white p-6 sm:p-8 text-center relative">
-            <h2 class="text-2xl sm:text-4xl font-extrabold">Event Ticket</h2>
-            <p class="text-lg sm:text-xl mt-2 opacity-90">EventHUB</p>
+     class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center z-50 p-4 overflow-y-auto"
+     style="display:none;">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full my-8 overflow-hidden">
+
+        <!-- Modal Header -->
+        <div class="relative bg-gradient-to-r from-darkBlue to-primary px-8 py-7 text-center">
             <button onclick="closeTicketModal({{ $booking->id }})"
-                    class="absolute top-4 right-6 text-3xl hover:opacity-70">&times;</button>
+                    class="absolute top-4 right-4 w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors">
+                <i class="fas fa-xmark text-white text-sm"></i>
+            </button>
+            <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-ticket-alt text-white text-xl"></i>
+            </div>
+            <h2 class="font-raleway font-black text-2xl text-white">Event Ticket</h2>
+            <p class="text-white/70 text-sm mt-1">EventHUB — Digital Entry Pass</p>
         </div>
 
-        <div class="p-6 sm:p-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="md:col-span-2 space-y-6">
-                    <h3 class="text-2xl sm:text-3xl font-bold text-darkBlue">{{ $booking->event->title }}</h3>
+        <!-- Dashed divider -->
+        <div class="relative flex items-center px-8 py-2 bg-gray-50">
+            <div class="w-7 h-7 bg-gray-100 rounded-full absolute -left-3.5 border-2 border-gray-200"></div>
+            <div class="flex-1 border-t-2 border-dashed border-gray-200 mx-4"></div>
+            <div class="w-7 h-7 bg-gray-100 rounded-full absolute -right-3.5 border-2 border-gray-200"></div>
+        </div>
 
-                    <div class="space-y-4 text-base sm:text-lg">
-                        <p class="flex items-center"><i class="fas fa-calendar-alt text-primary mr-4 w-8"></i>
-                            <span>{{ $booking->event->start_date->format('l, F d, Y') }}
+        <!-- Modal Body -->
+        <div class="px-8 py-6">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
+
+                <!-- Event Info -->
+                <div class="md:col-span-3 space-y-4">
+                    <h3 class="font-raleway font-black text-xl text-darkBlue">{{ $booking->event->title }}</h3>
+
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 text-sm text-gray-600">
+                            <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-calendar-alt text-primary text-xs"></i>
+                            </div>
+                            <span class="font-medium">{{ $booking->event->start_date->format('l, F d, Y') }}
                                 @if($booking->event->start_time) at {{ $booking->event->start_time }} @endif
                             </span>
-                        </p>
-                        <p class="flex items-center"><i class="fas fa-map-marker-alt text-primary mr-4 w-8"></i>
-                            {{ $booking->event->location }}
-                        </p>
-                        <p class="flex items-center"><i class="fas fa-user text-primary mr-4 w-8"></i> {{ $booking->full_name }}</p>
-                        <p class="flex items-center"><i class="fas fa-envelope text-primary mr-4 w-8"></i> {{ $booking->email }}</p>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-600">
+                            <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-map-marker-alt text-primary text-xs"></i>
+                            </div>
+                            <span class="font-medium">{{ $booking->event->location }}</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-600">
+                            <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-user text-primary text-xs"></i>
+                            </div>
+                            <span class="font-medium">{{ $booking->full_name }}</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-600">
+                            <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-envelope text-primary text-xs"></i>
+                            </div>
+                            <span class="font-medium">{{ $booking->email }}</span>
+                        </div>
                     </div>
 
-                    <div class="mt-8 bg-gray-50 rounded-xl p-5">
-                        <p class="font-bold text-gray-800 text-lg mb-3">Ticket Summary</p>
+                    <!-- Ticket Summary -->
+                    <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                        <p class="text-xs font-black text-gray-500 uppercase tracking-wider mb-3">Ticket Summary</p>
                         <div class="space-y-2">
                             @foreach($booking->bookingTickets as $bt)
-                                <div class="flex justify-between text-gray-700">
+                                <div class="flex justify-between text-sm text-gray-700 font-medium">
                                     <span>{{ $bt->quantity }} × {{ $bt->eventTicket->name }}</span>
-                                    <span>Rs. {{ number_format($bt->sub_total, 2) }}</span>
+                                    <span class="font-bold">Rs. {{ number_format($bt->sub_total, 0) }}</span>
                                 </div>
                             @endforeach
                         </div>
-                        <hr class="my-4 border-dashed border-gray-300">
-                        <div class="flex justify-between text-xl font-bold text-darkBlue">
-                            <span>Total</span>
-                            <span>Rs. {{ number_format($booking->total_amount, 2) }}</span>
+                        <div class="flex justify-between items-center mt-3 pt-3 border-t border-dashed border-gray-200">
+                            <span class="text-sm font-black text-darkBlue">Total</span>
+                            <span class="text-lg font-black text-primary">Rs. {{ number_format($booking->total_amount, 0) }}</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- QR Code Section -->
-                <div class="flex flex-col items-center justify-center space-y-6">
-                    <div class="bg-white p-4 rounded-2xl shadow-xl border-4 border-gray-100">
-                        {!! QrCode::size(200)->generate(route('verify.ticket', $booking->ticket_token)) !!}
+                <!-- QR Code -->
+                <div class="md:col-span-2 flex flex-col items-center justify-start gap-4">
+                    <div class="bg-white p-4 rounded-2xl shadow-md border-2 border-gray-100">
+                        {!! QrCode::size(160)->generate(route('verify.ticket', $booking->ticket_token)) !!}
                     </div>
                     <div class="text-center">
-                        <p class="text-xs text-gray-600">Scan at venue entrance</p>
-                        <p class="mt-2 text-xs font-mono bg-gray-100 px-3 py-1 rounded">
+                        <p class="text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Scan at Venue</p>
+                        <p class="text-xs font-mono bg-gray-100 px-3 py-1.5 rounded-lg text-gray-600 break-all">
                             {{ $booking->ticket_token }}
                         </p>
                         @if($booking->is_checked_in)
-                            <p class="mt-4 px-6 py-2 bg-green-100 text-green-800 rounded-full font-bold text-sm">
-                                CHECKED IN
-                            </p>
+                            <div class="mt-3 inline-flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-black px-4 py-2 rounded-full">
+                                <i class="fas fa-check-circle text-xs"></i> CHECKED IN
+                            </div>
                         @endif
                     </div>
                 </div>
             </div>
 
-            <div class="mt-10 text-center text-sm text-gray-500">
-                <p>Thank you for booking with EventHUB!</p>
-                <p class="mt-2">Present this digital ticket at the venue.</p>
-            </div>
+            <p class="text-center text-xs text-gray-400 mt-6 pb-2">
+                Thank you for booking with EventHUB — Present this ticket at the venue entrance
+            </p>
         </div>
     </div>
 </div>
@@ -202,18 +273,29 @@
 
 <script>
 function openTicketModal(id) {
-    document.getElementById('ticket-modal-' + id).classList.remove('hidden');
+    const modal = document.getElementById('ticket-modal-' + id);
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
 }
 function closeTicketModal(id) {
-    document.getElementById('ticket-modal-' + id).classList.add('hidden');
+    const modal = document.getElementById('ticket-modal-' + id);
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
 }
 document.querySelectorAll('[id^="ticket-modal-"]').forEach(modal => {
     modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeTicketModal(modal.id.split('-')[2]);
+        if (e.target === modal) {
+            const id = modal.id.replace('ticket-modal-', '');
+            closeTicketModal(id);
+        }
     });
 });
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('[id^="ticket-modal-"]').forEach(modal => {
+            modal.style.display = 'none';
+        });
+        document.body.style.overflow = '';
+    }
+});
 </script>
-
-<style>
-.bg-gradient-to-r { background: linear-gradient(to right, #063970, #FF7A28); }
-</style>

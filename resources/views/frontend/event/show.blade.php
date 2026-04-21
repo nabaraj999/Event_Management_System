@@ -1,256 +1,236 @@
 <x-frontend.frontend-layout />
 
+<div class="bg-gray-50 min-h-screen pt-16">
 
-<div class="py-12 bg-white min-h-screen font-raleway">
-    <div class="max-w-7xl mx-auto px-6">
-        <!-- Event Banner -->
-        <div class="relative rounded-2xl overflow-hidden shadow-xl mb-10">
-            <img src="{{ $event->banner_image ? asset('storage/' . $event->banner_image) : 'https://via.placeholder.com/1600x800' }}"
-                alt="{{ $event->title }}" class="w-full h-96 md:h-[500px] object-cover">
-            <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-            <div class="absolute bottom-0 left-0 p-8 text-white">
-                <h1 class="text-4xl md:text-5xl font-extrabold mb-3">
+    <!-- Event Banner -->
+    <div class="relative h-72 sm:h-96 md:h-[480px] overflow-hidden">
+        <img src="{{ $event->banner_image ? asset('storage/' . $event->banner_image) : 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1600' }}"
+             alt="{{ $event->title }}" class="w-full h-full object-cover" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-darkBlue/30 to-transparent"></div>
+
+        <!-- Category badge -->
+        @if($event->category)
+            <div class="absolute top-6 left-6">
+                <span class="bg-primary/90 backdrop-blur-sm text-white text-xs font-black px-4 py-1.5 rounded-full shadow-md">
+                    {{ $event->category->name }}
+                </span>
+            </div>
+        @endif
+
+        <!-- Title overlay -->
+        <div class="absolute bottom-0 left-0 right-0 p-6 sm:p-10 text-white">
+            <div class="max-w-7xl mx-auto">
+                <h1 class="font-raleway text-3xl sm:text-4xl md:text-5xl font-black mb-4 leading-tight drop-shadow-lg">
                     {{ $event->title }}
                 </h1>
-                <div class="flex flex-wrap gap-6 text-lg">
-                    <span class="flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                                clip-rule="evenodd" />
-                        </svg>
+                <div class="flex flex-wrap gap-4 sm:gap-6 text-sm sm:text-base font-semibold">
+                    <span class="flex items-center gap-2 bg-white/15 backdrop-blur-sm px-4 py-2 rounded-full">
+                        <i class="fas fa-calendar-alt text-primary"></i>
                         {{ $event->start_date->format('F d, Y') }}
                         @if ($event->end_date && $event->end_date->ne($event->start_date))
-                            - {{ $event->end_date->format('F d, Y') }}
+                            &ndash; {{ $event->end_date->format('F d, Y') }}
                         @endif
                     </span>
-                    <span class="flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                                clip-rule="evenodd" />
-                        </svg>
+                    <span class="flex items-center gap-2 bg-white/15 backdrop-blur-sm px-4 py-2 rounded-full">
+                        <i class="fas fa-map-marker-alt text-primary"></i>
                         {{ $event->location }}
                     </span>
                 </div>
             </div>
         </div>
+    </div>
 
+    <!-- Content Area -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
         <div class="grid lg:grid-cols-3 gap-10">
+
             <!-- Main Content -->
-            <div class="lg:col-span-2 space-y-10">
-                <!-- Description -->
-                <section class="bg-softGray p-8 rounded-2xl shadow-md">
-                    <h2 class="text-2xl font-bold text-darkBlue mb-4">About This Event</h2>
-                    <div class="text-gray-700 leading-relaxed whitespace-pre-line">
+            <div class="lg:col-span-2 space-y-8">
+
+                <!-- About This Event -->
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="px-8 py-5 border-b border-gray-100 bg-gray-50/50 flex items-center gap-3">
+                        <div class="w-9 h-9 bg-orange-100 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-info-circle text-primary text-sm"></i>
+                        </div>
+                        <h2 class="font-raleway text-xl font-black text-darkBlue">About This Event</h2>
+                    </div>
+                    <div class="p-8 text-gray-600 leading-relaxed whitespace-pre-line text-[15px]">
                         {!! nl2br(e($event->long_description ?? $event->short_description)) !!}
                     </div>
-                </section>
+                </div>
 
-                <!-- Category -->
+                <!-- Category Tag -->
                 @if ($event->category)
-                    <div class="bg-softGray p-6 rounded-xl">
-                        <span class="text-sm font-medium text-gray-600">Category:</span>
-                        <span class="ml-2 px-4 py-2 bg-primary/20 text-primary rounded-lg font-semibold">
-                            {{ $event->category->name }}
-                        </span>
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-6 py-5 flex items-center gap-4">
+                        <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-tag text-primary text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Category</p>
+                            <span class="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/10 text-primary rounded-full font-black text-sm">
+                                {{ $event->category->name }}
+                            </span>
+                        </div>
                     </div>
                 @endif
-            </div>
 
-            <!-- Tickets Sidebar -->
-            @if ($event->tickets->isNotEmpty())
-                <aside class="lg:col-span-1">
-                    <div class="bg-softGray p-8 rounded-2xl shadow-lg sticky top-24">
-                        <h3 class="text-2xl font-bold text-darkBlue mb-6">Tickets</h3>
+                <!-- Related Events -->
+                @if ($relatedEvents->isNotEmpty())
+                    <div class="pt-4">
+                        <div class="flex justify-between items-center mb-8">
+                            <h2 class="font-raleway text-2xl font-black text-darkBlue">
+                                @auth Recommended For You @else Related Events @endauth
+                            </h2>
+                            <a href="{{ route('events.index') }}" class="text-primary font-bold text-sm hover:underline flex items-center gap-1">
+                                View All <i class="fas fa-arrow-right text-xs"></i>
+                            </a>
+                        </div>
 
-                        <div class="space-y-6">
-                            @foreach ($event->tickets as $ticket)
-                                @php
-                                    $remaining = $ticket->total_seats - $ticket->sold_seats;
-                                    $now = now();
-
-                                    $isOnSale = true;
-                                    if ($ticket->sale_start && $now->lt($ticket->sale_start)) {
-                                        $isOnSale = false;
-                                    }
-                                    if ($ticket->sale_end && $now->gt($ticket->sale_end)) {
-                                        $isOnSale = false;
-                                    }
-
-                                    $canBook = $remaining > 0 && $isOnSale;
-                                @endphp
-
-                                <div
-                                    class="border-2 {{ $canBook ? 'border-primary/30' : 'border-gray-300' }} rounded-xl p-6 {{ !$canBook ? 'opacity-75' : '' }}">
-                                    <div class="flex justify-between items-start mb-3">
-                                        <div>
-                                            <h4 class="text-xl font-bold text-darkBlue">{{ $ticket->name }}</h4>
-                                            @if ($ticket->description)
-                                                <p class="text-sm text-gray-600 mt-1">{{ $ticket->description }}</p>
+                        <div class="grid sm:grid-cols-2 gap-6">
+                            @foreach ($relatedEvents->take(4) as $relatedEvent)
+                                <a href="{{ route('events.show', $relatedEvent) }}" class="card-hover group block">
+                                    <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+                                        <div class="relative overflow-hidden h-44">
+                                            <img src="{{ $relatedEvent->banner_image ? asset('storage/' . $relatedEvent->banner_image) : 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800' }}"
+                                                 alt="{{ $relatedEvent->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                                            @if ($relatedEvent->is_featured)
+                                                <div class="absolute top-3 right-3">
+                                                    <span class="bg-yellow-400 text-yellow-900 text-xs font-black px-3 py-1 rounded-full flex items-center gap-1 shadow-md">
+                                                        <i class="fas fa-star text-xs"></i> Featured
+                                                    </span>
+                                                </div>
+                                            @endif
+                                            @if ($relatedEvent->category)
+                                                <div class="absolute bottom-3 left-3">
+                                                    <span class="bg-primary/90 text-white text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm">
+                                                        {{ $relatedEvent->category->name }}
+                                                    </span>
+                                                </div>
                                             @endif
                                         </div>
-                                        <div class="text-right">
-                                            @if ($ticket->price == 0)
-                                                <span class="text-2xl font-extrabold text-green-600">Free</span>
-                                            @else
-                                                <span class="text-2xl font-extrabold text-primary">
-                                                    Rs. {{ number_format($ticket->price, 2) }}
-                                                </span>
-                                            @endif
+                                        <div class="p-5">
+                                            <h3 class="font-raleway font-black text-darkBlue text-base mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                                                {{ $relatedEvent->title }}
+                                            </h3>
+                                            <div class="flex items-center gap-3 text-xs text-gray-500">
+                                                <span class="flex items-center gap-1.5 font-medium"><i class="fas fa-map-marker-alt text-primary text-xs"></i> {{ Str::limit($relatedEvent->location, 18) }}</span>
+                                                <span class="flex items-center gap-1.5 font-medium"><i class="fas fa-calendar text-primary text-xs"></i> {{ $relatedEvent->start_date->format('M d, Y') }}</span>
+                                            </div>
                                         </div>
                                     </div>
-
-                                    <div class="text-sm font-medium mb-4 text-gray-700">
-                                        <span class="text-lg font-bold">{{ $remaining }}</span>
-                                        ticket{{ $remaining != 1 ? 's' : '' }} available
-
-                                        @if (!$isOnSale)
-                                            <span class="block mt-2 text-red-600 font-semibold">
-                                                @if ($ticket->sale_start && $now->lt($ticket->sale_start))
-                                                    Sale starts on
-                                                    {{ $ticket->sale_start->format('M d, Y \a\t h:i A') }}
-                                                @else
-                                                    Sale has ended
-                                                @endif
-                                            </span>
-                                        @elseif ($remaining == 0)
-                                            <span class="block mt-2 text-red-600 font-semibold">Sold Out</span>
-                                        @elseif ($remaining <= 10)
-                                            <span class="ml-2 text-orange-600 font-semibold">Hurry! Limited seats</span>
-                                        @endif
-                                    </div>
-
-                                    @if ($canBook)
-                                        <a href="{{ route('user.booking.create', $ticket) }}"
-                                            class="block w-full py-3 bg-primary text-white font-bold rounded-lg text-center hover:bg-darkBlue transition">
-                                            Book Now
-                                        </a>
-                                    @else
-                                        <button disabled
-                                            class="w-full py-3 bg-gray-500 text-white font-bold rounded-lg cursor-not-allowed">
-                                            @if ($remaining == 0)
-                                                Sold Out
-                                            @else
-                                                Not Available
-                                            @endif
-                                        </button>
-                                    @endif
-                                </div>
+                                </a>
                             @endforeach
                         </div>
                     </div>
-                </aside>
-            @else
-                <aside class="lg:col-span-1">
-                    <div class="bg-softGray p-8 rounded-2xl shadow-lg text-center">
-                        <p class="text-xl text-gray-600">No tickets available for this event.</p>
-                    </div>
-                </aside>
-            @endif
-        </div>
+                @endif
 
-        <!-- Related / Recommended Events Section (Inline Cards - No Component) -->
-        @if ($relatedEvents->isNotEmpty())
-            <section class="mt-20">
-                <div class="flex justify-between items-center mb-10">
-                    <h2 class="text-3xl font-extrabold text-darkBlue">
-                        @auth
-                            Recommended For You
-                        @else
-                            Related Events
-                        @endauth
-                    </h2>
-                    <a href="{{ route('events.index') }}" class="text-primary font-semibold hover:underline">
-                        View All Events →
+                <!-- Back Link -->
+                <div class="pt-2">
+                    <a href="{{ route('events.index') }}"
+                       class="inline-flex items-center gap-2 text-gray-500 hover:text-primary font-semibold text-sm transition-colors group">
+                        <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform duration-200"></i>
+                        Back to All Events
                     </a>
                 </div>
+            </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                    @foreach ($relatedEvents as $relatedEvent)
-                        <a href="{{ route('events.show', $relatedEvent) }}" class="block group">
-                            <div
-                                class="bg-white rounded-xl overflow-hidden shadow-lg transform transition hover:-translate-y-2 hover:shadow-2xl duration-300">
-                                <!-- Image -->
-                                <div class="relative">
-                                    <img src="{{ $relatedEvent->banner_image ? asset('storage/' . $relatedEvent->banner_image) : 'https://via.placeholder.com/1200x520' }}"
-                                        alt="{{ $relatedEvent->title }}" class="w-full h-52 object-cover">
-
-                                    <!-- Featured Badge -->
-                                    @if ($relatedEvent->is_featured)
-                                        <div class="absolute top-4 left-4">
-                                            <span
-                                                class="bg-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow">
-                                                Featured
-                                            </span>
-                                        </div>
-                                    @endif
-
-                                    <!-- Category Badge -->
-                                    @if ($relatedEvent->category)
-                                        <div class="absolute bottom-4 left-4">
-                                            <span
-                                                class="bg-primary/90 text-white text-xs font-medium px-3 py-1 rounded-lg">
-                                                {{ $relatedEvent->category->name }}
-                                            </span>
-                                        </div>
-                                    @endif
+            <!-- Tickets Sidebar -->
+            <aside class="lg:col-span-1">
+                <div class="sticky top-20">
+                    @if ($event->tickets->isNotEmpty())
+                        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                            <div class="px-6 py-5 border-b border-gray-100 bg-gray-50/50 flex items-center gap-3">
+                                <div class="w-9 h-9 bg-orange-100 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-ticket text-primary text-sm"></i>
                                 </div>
+                                <h3 class="font-raleway text-lg font-black text-darkBlue">Tickets</h3>
+                            </div>
 
-                                <!-- Content -->
-                                <div class="p-6">
-                                    <h3
-                                        class="font-bold text-xl text-darkBlue mb-2 line-clamp-2 group-hover:text-primary transition">
-                                        {{ $relatedEvent->title }}
-                                    </h3>
+                            <div class="p-5 space-y-4">
+                                @foreach ($event->tickets as $ticket)
+                                    @php
+                                        $remaining = $ticket->remaining_seats;
+                                        $now = now();
+                                        $isOnSale = $ticket->isOnSale($now);
+                                        $canBook = $ticket->isAvailable($now);
+                                    @endphp
 
-                                    <p class="text-gray-600 text-sm mb-1">
-                                        {{ $relatedEvent->location }} •
-                                        {{ $relatedEvent->start_date->format('M d, Y') }}
-                                    </p>
+                                    <div class="rounded-2xl border-2 {{ $canBook ? 'border-primary/25 bg-orange-50/30' : 'border-gray-200 bg-gray-50/50 opacity-70' }} p-5">
+                                        <div class="flex justify-between items-start mb-3">
+                                            <div class="flex-1 pr-3">
+                                                <h4 class="font-raleway font-black text-darkBlue text-base">{{ $ticket->name }}</h4>
+                                                @if ($ticket->description)
+                                                    <p class="text-xs text-gray-500 mt-1 leading-relaxed">{{ $ticket->description }}</p>
+                                                @endif
+                                            </div>
+                                            <div class="text-right flex-shrink-0">
+                                                @if ($ticket->price == 0)
+                                                    <span class="text-xl font-black text-green-600">Free</span>
+                                                @else
+                                                    <span class="text-xl font-black text-primary">Rs.&nbsp;{{ number_format($ticket->price, 0) }}</span>
+                                                @endif
+                                            </div>
+                                        </div>
 
-                                    @if ($relatedEvent->end_date && $relatedEvent->end_date->gt($relatedEvent->start_date))
-                                        <p class="text-gray-600 text-sm mb-3">
-                                            Ends: {{ $relatedEvent->end_date->format('M d, Y') }}
-                                        </p>
-                                    @endif
+                                        <!-- Availability -->
+                                        <div class="mb-4">
+                                            @if (!$ticket->is_active)
+                                                <div class="flex items-center gap-2 text-xs font-bold text-red-600 bg-red-50 px-3 py-2 rounded-lg">
+                                                    <i class="fas fa-ban"></i> Ticket is currently unavailable
+                                                </div>
+                                            @elseif (!$isOnSale)
+                                                <div class="flex items-center gap-2 text-xs font-bold text-red-600 bg-red-50 px-3 py-2 rounded-lg">
+                                                    <i class="fas fa-clock"></i>
+                                                    @if ($ticket->sale_start && $now->lt($ticket->sale_start))
+                                                        Sale starts {{ $ticket->sale_start->format('M d, Y \a\t h:i A') }}
+                                                    @else
+                                                        Sale has ended
+                                                    @endif
+                                                </div>
+                                            @elseif ($remaining == 0)
+                                                <div class="flex items-center gap-2 text-xs font-bold text-red-600 bg-red-50 px-3 py-2 rounded-lg">
+                                                    <i class="fas fa-ban"></i> Sold Out
+                                                </div>
+                                            @elseif ($remaining <= 10)
+                                                <div class="flex items-center gap-2 text-xs font-bold text-orange-600 bg-orange-50 px-3 py-2 rounded-lg">
+                                                    <i class="fas fa-fire"></i> Only {{ $remaining }} left — Hurry!
+                                                </div>
+                                            @else
+                                                <div class="flex items-center gap-2 text-xs font-semibold text-green-700 bg-green-50 px-3 py-2 rounded-lg">
+                                                    <i class="fas fa-check-circle"></i> {{ $remaining }} tickets available
+                                                </div>
+                                            @endif
+                                        </div>
 
-                                    <p class="text-gray-700 text-sm mb-4 line-clamp-3">
-                                        {{ $relatedEvent->short_description ?? 'No description available.' }}
-                                    </p>
-
-                                    <div class="mt-4 flex gap-3">
-                                        <span
-                                            class="px-4 py-2 border border-primary rounded-lg text-primary font-semibold hover:bg-primary hover:text-white transition">
-                                            Details
-                                        </span>
-                                    </div>
-
-                                    <div class="mt-5 text-right">
-                                        @if (isset($relatedEvent->min_price) && $relatedEvent->min_price > 0)
-                                            <span class="text-2xl font-extrabold text-primary">
-                                                Rs. {{ number_format($relatedEvent->min_price) }}+
-                                            </span>
+                                        @if ($canBook)
+                                            <a href="{{ route('user.booking.create', $ticket) }}"
+                                               class="btn-primary block w-full py-3 text-white font-black rounded-xl text-center text-sm shadow-md">
+                                                <i class="fas fa-ticket-alt mr-2"></i>Book Now
+                                            </a>
                                         @else
+                                            <button disabled
+                                                    class="w-full py-3 bg-gray-300 text-gray-500 font-black rounded-xl cursor-not-allowed text-sm">
+                                                {{ $remaining == 0 ? 'Sold Out' : 'Not Available' }}
+                                            </button>
                                         @endif
                                     </div>
-                                </div>
+                                @endforeach
                             </div>
-                        </a>
-                    @endforeach
+                        </div>
+                    @else
+                        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 text-center">
+                            <div class="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-ticket text-gray-400 text-xl"></i>
+                            </div>
+                            <h3 class="font-raleway font-black text-gray-700 mb-2">No Tickets Yet</h3>
+                            <p class="text-sm text-gray-400">No tickets are available for this event at the moment.</p>
+                        </div>
+                    @endif
                 </div>
-            </section>
-        @endif
+            </aside>
 
-        <!-- Back to Events -->
-        <div class="mt-16 text-center">
-            <a href="{{ route('events.index') }}"
-                class="inline-flex items-center gap-2 text-primary font-semibold hover:underline">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                </svg>
-                Back to Events
-            </a>
         </div>
     </div>
 </div>

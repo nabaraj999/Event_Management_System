@@ -102,12 +102,32 @@ class Event extends Model
         return $query->where('start_date', '>=', now());
     }
 
+    public function scopeNotEnded($query)
+    {
+        return $query->where(function ($query) {
+            $query->where('start_date', '>=', now())
+                ->orWhere(function ($subQuery) {
+                    $subQuery->where('start_date', '<=', now())
+                        ->where(function ($endQuery) {
+                            $endQuery->whereNull('end_date')
+                                ->orWhere('end_date', '>=', now());
+                        });
+                });
+        });
+    }
+
+    public function scopeVisibleToUsers(Builder $query): Builder
+    {
+        return $query->published()
+            ->whereHas('organizer', fn (Builder $organizerQuery) => $organizerQuery->active());
+    }
+
     /**
      * Optional: Combine both for convenience
      */
     public function scopeActive(Builder $query): Builder
     {
-        return $query->published()->upcoming();
+        return $query->visibleToUsers()->upcoming();
     }
 
     public function organizerApplication()

@@ -211,7 +211,7 @@
                             <!-- QR Code Section -->
                             <div class="qr-section">
                                 <p class="qr-title">Your Entry QR Code</p>
-                               <img src="data:image/png;base64,{{ $qrCodeBase64 }}"
+                               <img src="data:image/svg+xml;base64,{{ $qrCodeBase64 }}"
      alt="Ticket QR Code"
      class="qr-image">
 

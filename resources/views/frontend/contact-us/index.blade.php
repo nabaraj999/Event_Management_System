@@ -1,145 +1,235 @@
 <x-frontend.frontend-layout />
 
-    <!-- Success Message -->
-    @if(session('success'))
-        <div class="container mx-auto px-4 mb-8">
-            <div class="max-w-4xl mx-auto p-6 bg-green-100 border border-green-400 text-green-800 rounded-2xl text-center text-lg">
-                {{ session('success') }}
+<!-- Flash Message -->
+@if(session('success'))
+    <div class="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4">
+        <div class="bg-green-500 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 font-semibold text-sm">
+            <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-check text-white text-xs"></i>
             </div>
+            {{ session('success') }}
         </div>
-    @endif
+    </div>
+@endif
 
-    <!-- Hero Section -->
-    <section class="py-20 md:py-32 bg-cover bg-center relative" style="background-image: url('{{ asset('storage/' . $company->bg_image) ?? 'https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg' }}');">
-        <div class="absolute inset-0 bg-darkBlue/80"></div>
-        <div class="container mx-auto px-4 relative z-10 text-center text-white">
-            <h1 class="text-4xl md:text-6xl font-bold font-raleway mb-6">Contact Us</h1>
-            <p class="text-xl md:text-2xl max-w-3xl mx-auto">We'd love to hear from you. Let's plan your next unforgettable event together.</p>
+<!-- ========== HERO ========== -->
+<section class="relative pt-40 pb-24 overflow-hidden">
+    <div class="absolute inset-0">
+        @if($company->bg_image)
+            <img src="{{ asset('storage/' . $company->bg_image) }}" class="w-full h-full object-cover" alt="Contact" />
+        @else
+            <div class="w-full h-full bg-gradient-to-br from-darkBlue via-[#0a4f9e] to-darkBlue"></div>
+        @endif
+        <div class="absolute inset-0 bg-darkBlue/85"></div>
+        <div class="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+    </div>
+
+    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 text-center text-white">
+        <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white/80 text-xs font-bold px-5 py-2 rounded-full mb-8 uppercase tracking-wider">
+            <i class="fas fa-headset text-primary text-xs"></i> Get In Touch
         </div>
-    </section>
+        <h1 class="font-raleway text-5xl sm:text-6xl font-black mb-5 leading-tight">
+            Contact <span class="text-primary">Us</span>
+        </h1>
+        <p class="text-lg text-white/65 max-w-2xl mx-auto">
+            We'd love to hear from you. Let's plan your next unforgettable event together.
+        </p>
+    </div>
 
-    <!-- Contact Form + Info -->
-    <section class="py-16 bg-gray-50">
-        <div class="container mx-auto px-4">
-            <div class="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+    <!-- Wave -->
+    <div class="absolute bottom-0 left-0 w-full overflow-hidden">
+        <svg viewBox="0 0 1440 60" class="w-full h-16 text-gray-50 fill-current" preserveAspectRatio="none">
+            <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z"></path>
+        </svg>
+    </div>
+</section>
 
-                <!-- Form -->
-                <div class="bg-white rounded-3xl shadow-xl p-8 md:p-12">
-                    <h2 class="text-3xl font-bold text-darkBlue font-raleway mb-8">Send Us a Message</h2>
 
-                    <form action="{{ route('contact.store') }}" method="POST" class="space-y-6">
+<!-- ========== FORM + INFO ========== -->
+<section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="grid md:grid-cols-2 gap-10 max-w-6xl mx-auto">
+
+            <!-- Contact Form -->
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="px-8 py-6 border-b border-gray-100 bg-gray-50/50 flex items-center gap-3">
+                    <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-paper-plane text-primary"></i>
+                    </div>
+                    <h2 class="font-raleway text-xl font-black text-darkBlue">Send Us a Message</h2>
+                </div>
+
+                <div class="p-8">
+                    <form action="{{ route('contact.store') }}" method="POST" class="space-y-5">
                         @csrf
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="grid sm:grid-cols-2 gap-5">
                             <div>
-                                <label class="block text-darkBlue font-medium mb-2">Name *</label>
-                                <input type="text" name="name" value="{{ old('name') }}" required
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary @error('name') border-red-500 @enderror">
+                                <label class="block text-xs font-black text-gray-600 uppercase tracking-wider mb-2">Full Name *</label>
+                                <div class="relative">
+                                    <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></i>
+                                    <input type="text" name="name" value="{{ old('name') }}" required placeholder="Your full name"
+                                           class="w-full pl-11 pr-4 py-3.5 border {{ $errors->has('name') ? 'border-red-400' : 'border-gray-200' }} rounded-xl focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium">
+                                </div>
                                 @error('name')
-                                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                    <p class="text-red-500 text-xs mt-1.5 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> {{ $message }}</p>
                                 @enderror
                             </div>
 
                             <div>
-                                <label class="block text-darkBlue font-medium mb-2">Email *</label>
-                                <input type="email" name="email" value="{{ old('email') }}" required
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary @error('email') border-red-500 @enderror">
+                                <label class="block text-xs font-black text-gray-600 uppercase tracking-wider mb-2">Email Address *</label>
+                                <div class="relative">
+                                    <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></i>
+                                    <input type="email" name="email" value="{{ old('email') }}" required placeholder="your@email.com"
+                                           class="w-full pl-11 pr-4 py-3.5 border {{ $errors->has('email') ? 'border-red-400' : 'border-gray-200' }} rounded-xl focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium">
+                                </div>
                                 @error('email')
-                                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                    <p class="text-red-500 text-xs mt-1.5 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> {{ $message }}</p>
                                 @enderror
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-darkBlue font-medium mb-2">Phone (Optional)</label>
-                            <input type="text" name="phone" value="{{ old('phone') }}"
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                            <label class="block text-xs font-black text-gray-600 uppercase tracking-wider mb-2">Phone Number <span class="text-gray-400 font-normal normal-case">(Optional)</span></label>
+                            <div class="relative">
+                                <i class="fas fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></i>
+                                <input type="text" name="phone" value="{{ old('phone') }}" placeholder="+977-98XXXXXXXX"
+                                       class="w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-xl focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium">
+                            </div>
                         </div>
 
                         <div>
-                            <label class="block text-darkBlue font-medium mb-2">Message *</label>
-                            <textarea name="message" rows="6" required
-                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary @error('message') border-red-500 @enderror">{{ old('message') }}</textarea>
+                            <label class="block text-xs font-black text-gray-600 uppercase tracking-wider mb-2">Your Message *</label>
+                            <textarea name="message" rows="5" required placeholder="Tell us how we can help you..."
+                                      class="w-full px-4 py-3.5 border {{ $errors->has('message') ? 'border-red-400' : 'border-gray-200' }} rounded-xl focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-medium resize-none">{{ old('message') }}</textarea>
                             @error('message')
-                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                <p class="text-red-500 text-xs mt-1.5 flex items-center gap-1"><i class="fas fa-exclamation-circle"></i> {{ $message }}</p>
                             @enderror
                         </div>
 
                         <button type="submit"
-                                class="w-full bg-primary text-white font-bold py-4 rounded-full hover:bg-primary/90 transform hover:scale-105 transition-all duration-300 shadow-lg">
+                                class="btn-primary w-full py-4 text-white font-black rounded-xl shadow-lg flex items-center justify-center gap-3 text-sm">
+                            <i class="fas fa-paper-plane"></i>
                             Send Message
                         </button>
                     </form>
                 </div>
+            </div>
 
-                <!-- Company Details -->
-                <div class="space-y-8">
-                    <h2 class="text-3xl font-bold text-darkBlue font-raleway mb-8">Get in Touch</h2>
+            <!-- Contact Info -->
+            <div class="space-y-6">
+                <div>
+                    <p class="text-primary font-bold text-xs mb-3 uppercase tracking-widest">Reach Us</p>
+                    <h2 class="font-raleway text-3xl font-black text-darkBlue mb-4">We're Here to Help</h2>
+                    <p class="text-gray-500 text-sm leading-relaxed">Our team is available to assist you with any questions about events, tickets, or partnerships.</p>
+                </div>
 
-                    @if($company->address_full || $company->location)
-                        <div class="bg-white rounded-2xl p-6 shadow-md">
-                            <h4 class="text-xl font-semibold text-darkBlue mb-3 flex items-center">
-                                <svg class="w-6 h-6 text-primary mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                </svg>
-                                Our Address
-                            </h4>
-                            <p class="text-gray-700">{{ $company->address_full ?? $company->location }}</p>
+                <!-- Address -->
+                @if($company->address_full || $company->location)
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-start gap-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-primary rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
+                            <i class="fas fa-map-marker-alt text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-black text-darkBlue text-sm mb-1">Our Location</h4>
+                            <p class="text-gray-600 text-sm">{{ $company->address_full ?? $company->location }}</p>
                             @if($company->map_link)
-                                <a href="{{ $company->map_link }}" target="_blank" class="text-primary font-medium hover:underline mt-3 inline-block">View on Map →</a>
+                                <a href="{{ $company->map_link }}" target="_blank" class="inline-flex items-center gap-1 text-primary font-bold text-xs mt-2 hover:underline">
+                                    View on Map <i class="fas fa-external-link-alt text-xs"></i>
+                                </a>
                             @endif
                         </div>
+                    </div>
+                @endif
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    @if($company->phone)
+                        <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+                            <div class="w-11 h-11 bg-gradient-to-br from-blue-600 to-darkBlue rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
+                                <i class="fas fa-phone text-white text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-black text-gray-500 uppercase tracking-wider mb-0.5">Phone</p>
+                                <p class="font-bold text-darkBlue text-sm">{{ $company->phone }}</p>
+                            </div>
+                        </div>
                     @endif
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        @if($company->phone)
-                            <div class="bg-white rounded-2xl p-6 shadow-md text-center">
-                                <svg class="w-12 h-12 text-primary mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-                                </svg>
-                                <p class="font-semibold text-darkBlue">Phone</p>
-                                <p class="text-gray-700">{{ $company->phone }}</p>
-                            </div>
-                        @endif
-
-                        <div class="bg-white rounded-2xl p-6 shadow-md text-center">
-                            <svg class="w-12 h-12 text-primary mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                            </svg>
-                            <p class="font-semibold text-darkBlue">Email</p>
-                            <p class="text-gray-700 break-all">{{ $company->email }}</p>
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+                        <div class="w-11 h-11 bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
+                            <i class="fas fa-envelope text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-black text-gray-500 uppercase tracking-wider mb-0.5">Email</p>
+                            <p class="font-bold text-darkBlue text-sm break-all">{{ $company->email }}</p>
                         </div>
                     </div>
-
-                    <!-- Social Links -->
-                    @if($company->facebook || $company->instagram || $company->twitter || $company->linkedin || $company->youtube)
-                        <div class="bg-white rounded-2xl p-6 shadow-md">
-                            <h4 class="text-xl font-semibold text-darkBlue mb-4">Follow Us</h4>
-                            <div class="flex space-x-6 justify-center">
-                                @if($company->facebook)<a href="{{ $company->facebook }}" target="_blank" class="text-3xl text-gray-600 hover:text-primary transition"><i class="fab fa-facebook-f"></i></a>@endif
-                                @if($company->instagram)<a href="{{ $company->instagram }}" target="_blank" class="text-3xl text-gray-600 hover:text-primary transition"><i class="fab fa-instagram"></i></a>@endif
-                                @if($company->twitter)<a href="{{ $company->twitter }}" target="_blank" class="text-3xl text-gray-600 hover:text-primary transition"><i class="fab fa-twitter"></i></a>@endif
-                                @if($company->linkedin)<a href="{{ $company->linkedin }}" target="_blank" class="text-3xl text-gray-600 hover:text-primary transition"><i class="fab fa-linkedin-in"></i></a>@endif
-                                @if($company->youtube)<a href="{{ $company->youtube }}" target="_blank" class="text-3xl text-gray-600 hover:text-primary transition"><i class="fab fa-youtube"></i></a>@endif
-                            </div>
-                        </div>
-                    @endif
                 </div>
+
+                <!-- Social Links -->
+                @if($company->facebook || $company->instagram || $company->twitter || $company->linkedin || $company->youtube)
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                        <h4 class="font-black text-darkBlue text-sm mb-4">Follow Us on Social Media</h4>
+                        <div class="flex flex-wrap gap-3">
+                            @if($company->facebook)
+                                <a href="{{ $company->facebook }}" target="_blank" class="w-10 h-10 bg-blue-100 hover:bg-blue-600 text-blue-600 hover:text-white rounded-xl flex items-center justify-center transition-all duration-200 shadow-sm">
+                                    <i class="fab fa-facebook-f text-sm"></i>
+                                </a>
+                            @endif
+                            @if($company->instagram)
+                                <a href="{{ $company->instagram }}" target="_blank" class="w-10 h-10 bg-pink-100 hover:bg-pink-600 text-pink-600 hover:text-white rounded-xl flex items-center justify-center transition-all duration-200 shadow-sm">
+                                    <i class="fab fa-instagram text-sm"></i>
+                                </a>
+                            @endif
+                            @if($company->twitter)
+                                <a href="{{ $company->twitter }}" target="_blank" class="w-10 h-10 bg-sky-100 hover:bg-sky-500 text-sky-500 hover:text-white rounded-xl flex items-center justify-center transition-all duration-200 shadow-sm">
+                                    <i class="fab fa-twitter text-sm"></i>
+                                </a>
+                            @endif
+                            @if($company->linkedin)
+                                <a href="{{ $company->linkedin }}" target="_blank" class="w-10 h-10 bg-blue-100 hover:bg-blue-700 text-blue-700 hover:text-white rounded-xl flex items-center justify-center transition-all duration-200 shadow-sm">
+                                    <i class="fab fa-linkedin-in text-sm"></i>
+                                </a>
+                            @endif
+                            @if($company->youtube)
+                                <a href="{{ $company->youtube }}" target="_blank" class="w-10 h-10 bg-red-100 hover:bg-red-600 text-red-600 hover:text-white rounded-xl flex items-center justify-center transition-all duration-200 shadow-sm">
+                                    <i class="fab fa-youtube text-sm"></i>
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Quick CTA -->
+                <div class="bg-gradient-to-br from-darkBlue to-[#0a4f9e] rounded-2xl p-6 text-white relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-primary/15 rounded-full blur-2xl pointer-events-none"></div>
+                    <div class="relative">
+                        <h4 class="font-raleway font-black text-lg mb-2">Want to Organize an Event?</h4>
+                        <p class="text-white/65 text-sm mb-4">Join hundreds of organizers on EventHUB and reach thousands of attendees.</p>
+                        <a href="{{ route('organizer.apply.form') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white font-bold rounded-xl hover:bg-orange-400 transition-colors text-sm shadow-md">
+                            <i class="fas fa-rocket"></i> Apply Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- ========== MAP ========== -->
+@if($company->map_link)
+    <section class="pb-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="rounded-3xl overflow-hidden shadow-xl border border-gray-100 h-80 sm:h-96">
+                <iframe src="{{ $company->map_link }}" width="100%" height="100%"
+                        style="border:0;" allowfullscreen="" loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </div>
     </section>
-
-    <!-- Map -->
-    @if($company->map_link)
-        <section class="py-16">
-            <div class="container mx-auto px-4">
-                <div class="rounded-3xl overflow-hidden shadow-2xl h-96">
-                    <iframe src="{{ $company->map_link }}" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                </div>
-            </div>
-        </section>
-    @endif
+@endif
 
 
 <x-frontend.footer-card />

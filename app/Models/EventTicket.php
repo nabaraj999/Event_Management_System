@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class EventTicket extends Model
@@ -24,6 +25,9 @@ class EventTicket extends Model
 
     // THIS IS THE KEY FIX
     protected $casts = [
+        'price'      => 'decimal:2',
+        'total_seats' => 'integer',
+        'sold_seats' => 'integer',
         'sale_start' => 'datetime',
         'sale_end'   => 'datetime',
         'is_active'  => 'boolean',
@@ -38,24 +42,57 @@ class EventTicket extends Model
         return $this->belongsTo(Event::class, 'event_id');
     }
 
-    public function getRemainingSeatsAttribute()
+    public function bookingTickets(): HasMany
     {
-        return $this->total_seats - $this->sold_seats;
+        return $this->hasMany(BookingTicket::class, 'event_ticket_id');
     }
 
-    public function isAvailable()
+    public function getPendingReservedSeatsCount(): int
     {
-        return $this->is_active && $this->remaining_seats > 0;
+        return (int) $this->bookingTickets()
+            ->whereHas('booking', fn ($query) => $query->where('payment_status', 'pending'))
+            ->sum('quantity');
     }
 
-    public function bookingTickets()
-{
-    return $this->hasMany(BookingTicket::class, 'event_ticket_id');
-}
-public function getRouteKeyName()
+    public function getCommittedSeatsCount(): int
+    {
+        return $this->sold_seats + $this->getPendingReservedSeatsCount();
+    }
+
+    public function getRemainingSeatsAttribute(): int
+    {
+        return max(0, $this->total_seats - $this->getCommittedSeatsCount());
+    }
+
+    public function isOnSale(?\Illuminate\Support\Carbon $at = null): bool
+    {
+        $at ??= now();
+
+        if (! $this->is_active) {
+            return false;
+        }
+
+        if ($this->sale_start && $at->lt($this->sale_start)) {
+            return false;
+        }
+
+        if ($this->sale_end && $at->gt($this->sale_end)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function isAvailable(?\Illuminate\Support\Carbon $at = null): bool
+    {
+        return $this->isOnSale($at) && $this->remaining_seats > 0;
+    }
+
+    public function getRouteKeyName()
     {
         return 'slug';
     }
+
     protected static function booted()
     {
         static::creating(function ($ticket) {

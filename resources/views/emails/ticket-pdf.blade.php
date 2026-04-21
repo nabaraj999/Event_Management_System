@@ -149,11 +149,7 @@
 
     <!-- QR CODE -->
     <div class="qr">
-        <img
-            src="{{ public_path('storage/' . $booking->qr_path) }}"
-            width="130"
-            alt="Ticket QR Code"
-        >
+        <img src="data:image/svg+xml;base64,{{ $qrCodeBase64 }}" width="130" alt="Ticket QR Code">
         <div style="font-size:10px;color:#666;margin-top:4px;">
             Present this QR code at entry
         </div>

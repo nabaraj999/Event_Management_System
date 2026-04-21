@@ -25,19 +25,18 @@ class HomeController extends Controller
                            ->orderBy('name', 'asc')
                            ->get();
 
-          // NEW: Fetch verified & active organizers with profile image
-    $organizers = OrganizerApplication::where('is_frozen', true)
-        ->whereNotNull('profile_image')
-        ->inRandomOrder()
-        ->limit(6) // Show 6 featured organizers
-        ->get();
+        $organizers = OrganizerApplication::active()
+            ->whereNotNull('profile_image')
+            ->inRandomOrder()
+            ->limit(6)
+            ->get();
 
         $user = Auth::user();
         $showInterestModal = $user && $user->interests()->count() === 0;
 
         if (!$user) {
             // Guest → Featured events
-            $events = Event::published()
+            $events = Event::visibleToUsers()
                 ->upcoming()
                 ->where('is_featured', true)
                 ->orderBy('start_date')

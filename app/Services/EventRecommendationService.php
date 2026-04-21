@@ -46,10 +46,10 @@ class EventRecommendationService
      */
     public function getRelatedRecommendations(User $user, Event $currentEvent): Collection
     {
-        $recommendations = $this->getHomeRecommendations($user);
+        $recommendations = $this->getHomeRecommendations($user)
+            ->where('id', '!=', $currentEvent->id);
 
         return $recommendations
-            ->where('id', '!=', $currentEvent->id)
             ->take(6)           // keep 6 max even when algorithm off (but usually will be ≤3)
             ->values();
     }
@@ -60,6 +60,7 @@ class EventRecommendationService
     private function getSimpleLatestEvents(int $limit = 3): Collection
     {
         return Event::published()
+            ->visibleToUsers()
             ->upcoming()
             ->orderByDesc('created_at')     // most recently created first
             ->limit($limit)
@@ -101,7 +102,7 @@ class EventRecommendationService
             return $this->getFallbackEvents();
         }
 
-        $events = Event::published()->upcoming()->with('category')->get();
+        $events = Event::visibleToUsers()->upcoming()->with('category')->get();
 
         return $events
             ->map(function ($event) use ($categoryCounts) {
@@ -127,6 +128,7 @@ class EventRecommendationService
         }
 
         return Event::published()
+            ->visibleToUsers()
             ->upcoming()
             ->whereIn('category_id', $categoryIds)
             ->inRandomOrder()
@@ -137,6 +139,8 @@ class EventRecommendationService
     private function getLatestNewEvents(): Collection
     {
         return Event::published()
+            ->visibleToUsers()
+            ->upcoming()
             ->orderByDesc('created_at')
             ->limit(6)
             ->get();
@@ -145,6 +149,7 @@ class EventRecommendationService
     private function getFallbackEvents(): Collection
     {
         return Event::published()
+            ->visibleToUsers()
             ->upcoming()
             ->orderByDesc('is_featured')
             ->orderBy('start_date')

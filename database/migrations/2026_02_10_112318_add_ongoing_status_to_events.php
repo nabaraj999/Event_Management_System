@@ -7,14 +7,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    private function shouldSkipEnumAlter(): bool
+    {
+        return Schema::getConnection()->getDriverName() === 'sqlite';
+    }
+
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::table('events', function (Blueprint $table) {
-            DB::statement("ALTER TABLE events MODIFY COLUMN status ENUM('draft', 'published', 'ongoing', 'completed', 'cancelled') DEFAULT 'draft'");
-        });
+        if ($this->shouldSkipEnumAlter()) {
+            return;
+        }
+
+        DB::statement("ALTER TABLE events MODIFY COLUMN status ENUM('draft', 'published', 'ongoing', 'completed', 'cancelled') DEFAULT 'draft'");
     }
 
     /**
@@ -22,8 +29,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('events', function (Blueprint $table) {
-            DB::statement("ALTER TABLE events MODIFY COLUMN status ENUM('draft', 'published', 'completed', 'cancelled') DEFAULT 'draft'");
-        });
+        if ($this->shouldSkipEnumAlter()) {
+            return;
+        }
+
+        DB::statement("ALTER TABLE events MODIFY COLUMN status ENUM('draft', 'published', 'completed', 'cancelled') DEFAULT 'draft'");
     }
 };

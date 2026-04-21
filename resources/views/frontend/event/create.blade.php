@@ -74,25 +74,40 @@
             <!-- Booking Form -->
             <div class="lg:col-span-2 order-1 lg:order-2">
                 <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-10 border">
+                    @if (session('error'))
+                        <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
+                    @if ($errors->any())
+                        <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
+                            <p class="font-semibold">Please fix the highlighted fields.</p>
+                        </div>
+                    @endif
+
                     <form action="{{ route('user.booking.store') }}" method="POST">
                         @csrf
                         <input type="hidden" name="event_ticket_id" value="{{ $eventTicket->id }}">
 
                         <!-- Quantity -->
                         <div class="mb-8">
-                            <label class="block text-lg font-bold text-darkBlue mb-3">
+                            <label for="quantity" class="block text-lg font-bold text-darkBlue mb-3">
                                 Number of Tickets
                             </label>
                             <select name="quantity" id="quantity"
-                                class="w-full px-5 py-4 border-2 rounded-xl focus:border-primary focus:ring-primary/20"
+                                class="w-full px-5 py-4 border-2 rounded-xl focus:border-primary focus:ring-primary/20 @error('quantity') border-red-400 focus:border-red-400 focus:ring-red-100 @enderror"
                                 required>
                                 <option value="">Select quantity</option>
                                 @for($i = 1; $i <= min(10, $remaining); $i++)
-                                    <option value="{{ $i }}">
+                                    <option value="{{ $i }}" @selected((string) old('quantity') === (string) $i)>
                                         {{ $i }} ticket{{ $i > 1 ? 's' : '' }}
                                     </option>
                                 @endfor
                             </select>
+                            @error('quantity')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <!-- User Info -->
@@ -105,20 +120,30 @@
                                 <input type="text" name="full_name"
                                     value="{{ old('full_name', auth()->user()->name ?? '') }}"
                                     placeholder="Full Name"
-                                    class="w-full px-5 py-4 border-2 rounded-xl"
+                                    class="w-full px-5 py-4 border-2 rounded-xl @error('full_name') border-red-400 focus:border-red-400 focus:ring-red-100 @enderror"
                                     required>
+                                @error('full_name')
+                                    <p class="sm:col-span-2 -mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
 
                                <input type="email" name="email"
        value="{{ old('email', auth()->user()->email ?? '') }}"
        placeholder="Email Address"
-       class="w-full px-5 py-4 border-2 rounded-xl"
+       class="w-full px-5 py-4 border-2 rounded-xl @error('email') border-red-400 focus:border-red-400 focus:ring-red-100 @enderror"
        readonly
        required>
+                                @error('email')
+                                    <p class="sm:col-span-2 -mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
 
                                 <input type="text" name="phone"
+                                    value="{{ old('phone') }}"
                                     placeholder="Phone Number"
-                                    class="sm:col-span-2 w-full px-5 py-4 border-2 rounded-xl"
+                                    class="sm:col-span-2 w-full px-5 py-4 border-2 rounded-xl @error('phone') border-red-400 focus:border-red-400 focus:ring-red-100 @enderror"
                                     required>
+                                @error('phone')
+                                    <p class="sm:col-span-2 -mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
                         </div>
 
@@ -143,6 +168,9 @@
                             </div>
 
                             <input type="hidden" name="payment_method" value="khalti">
+                            @error('payment_method')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <!-- Actions -->
@@ -172,12 +200,15 @@
     const total = document.getElementById('total-amount');
     const price = {{ $eventTicket->price }};
 
-    quantity.addEventListener('change', () => {
+    function updateTotal() {
         const q = parseInt(quantity.value || 0);
         total.textContent = 'Rs. ' + (q * price).toLocaleString('en-US', {
             minimumFractionDigits: 2
         });
-    });
+    }
+
+    quantity.addEventListener('change', updateTotal);
+    updateTotal();
 </script>
 
 <x-frontend.footer-card />

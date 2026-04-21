@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Setting extends Model
 {
     protected $table = 'settings';
+    const CREATED_AT = null;
 
     protected $fillable = [
         'user_algorithm',
@@ -21,7 +22,7 @@ class Setting extends Model
 
     public static function getSettings(): ?self
     {
-        return self::first();
+        return self::query()->first();
     }
 
     public static function isUserAlgorithmEnabled(): bool
@@ -41,11 +42,10 @@ class Setting extends Model
      */
     public static function updateToggles(array $data): bool
     {
-        $settings = self::getSettings();
-
-        if (!$settings) {
-            return false;
-        }
+        $settings = self::query()->firstOrCreate([], [
+            'user_algorithm' => true,
+            'organizer_algorithm' => true,
+        ]);
 
         if (array_key_exists('user_algorithm', $data)) {
             $settings->user_algorithm = (bool) $data['user_algorithm'];

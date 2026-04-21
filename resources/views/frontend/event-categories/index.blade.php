@@ -1,77 +1,73 @@
 <x-frontend.frontend-layout />
 
-<!-- Debug Message (Remove later if you want) -->
-<script src="https://kit.fontawesome.com/YOUR_KIT_CODE.js" crossorigin="anonymous"></script>
+<!-- Page Header -->
+<div class="bg-gradient-to-br from-darkBlue via-[#0a4f9e] to-darkBlue pt-28 pb-16 relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-300/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 text-center text-white">
+        <p class="text-primary font-bold text-xs mb-3 uppercase tracking-widest">Browse by Type</p>
+        <h1 class="font-raleway text-4xl sm:text-5xl font-black mb-4">Event Categories</h1>
+        <p class="text-white/60 text-lg max-w-xl mx-auto">Choose the perfect category and discover events that match your interests</p>
+    </div>
+</div>
 
-<section class="py-12 bg-gray-50">
-    <div class="container px-4 mx-auto">
-        <!-- Section Title -->
-        <div class="mb-12 text-center">
-            <h2 class="text-3xl font-bold md:text-4xl text-darkBlue font-raleway">
-                Explore Event Categories
-            </h2>
-            <p class="max-w-2xl mx-auto mt-4 text-lg text-gray-600">
-                Choose the perfect category for your special occasion.
-            </p>
-        </div>
+<section class="py-16 bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
 
-        <!-- 4 Cards Grid (Fixed 4 columns on all devices) -->
         @if(isset($eventCategories) && $eventCategories->count() > 0)
-        <div class="grid grid-cols-1 gap-8 mx-auto sm:grid-cols-2 lg:grid-cols-3 max-w-7xl">
-            @foreach($eventCategories->take(20) as $category)
-            <!-- Optional: limit if too many -->
-            <a href="#"
-                class="block overflow-hidden transition-all duration-300 transform bg-white shadow-md group rounded-2xl hover:shadow-2xl hover:-translate-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                @foreach($eventCategories as $category)
+                    <a href="{{ route('events.category', $category->slug) }}"
+                       class="card-hover group bg-white rounded-3xl shadow-sm border-2 border-transparent hover:border-primary overflow-hidden text-center p-8 flex flex-col items-center">
 
-                <div class="p-8 text-center">
-                    <!-- Icon: Font Awesome → Custom SVG → Fallback -->
-                    <div class="flex items-center justify-center h-32 mb-6">
-                        @if($category->icon_type === 'fontawesome' && $category->icon_name)
-                        <i class="{{ $category->icon_name }} text-7xl text-primary"></i>
-
-                        @elseif($category->icon_type === 'custom' && $category->custom_svg)
-                        <div class="w-28 h-28">
-                            {!! $category->custom_svg !!}
+                        <!-- Icon Container -->
+                        <div class="w-20 h-20 bg-orange-50 group-hover:bg-primary rounded-2xl flex items-center justify-center mb-5 transition-all duration-300 shadow-sm flex-shrink-0">
+                            @if($category->icon_type === 'fontawesome' && $category->icon_name)
+                                <i class="{{ $category->icon_name }} text-primary group-hover:text-white text-3xl transition-colors duration-300"></i>
+                            @elseif($category->icon_type === 'custom' && $category->custom_svg)
+                                <div class="w-10 h-10 text-primary group-hover:text-white transition-colors duration-300">
+                                    {!! $category->custom_svg !!}
+                                </div>
+                            @else
+                                <div class="w-10 h-10 flex items-center justify-center">
+                                    <span class="text-2xl font-black text-primary group-hover:text-white transition-colors duration-300">
+                                        {{ strtoupper(substr($category->name ?? '??', 0, 2)) }}
+                                    </span>
+                                </div>
+                            @endif
                         </div>
 
-                        @else
-                        <div class="flex items-center justify-center w-24 h-24 rounded-full bg-primary/10">
-                            <span class="text-4xl font-bold text-primary">
-                                {{ strtoupper(substr($category->name ?? '??', 0, 2)) }}
-                            </span>
-                        </div>
+                        <!-- Category Name -->
+                        <h3 class="font-raleway text-lg font-black text-darkBlue group-hover:text-primary transition-colors duration-200 mb-2">
+                            {{ $category->name ?? 'No Name' }}
+                        </h3>
+
+                        @if($category->description)
+                            <p class="text-sm text-gray-500 line-clamp-2 leading-relaxed">
+                                {{ Str::limit($category->description, 80) }}
+                            </p>
                         @endif
-                    </div>
 
-                    <!-- Category Name -->
-                    <h3
-                        class="text-xl font-semibold transition-colors duration-300 md:text-2xl text-darkBlue font-raleway group-hover:text-primary">
-                        {{ $category->name ?? 'No Name' }}
-                    </h3>
-
-                    <!-- Description -->
-                    @if($category->description)
-                    <p class="mt-4 text-sm text-gray-600 line-clamp-3">
-                        {{ \Illuminate\Support\Str::limit($category->description, 100) }}
-                    </p>
-                    @endif
-
-                    <!-- Hover Arrow -->
-                    <div class="mt-6 transition-opacity duration-300 opacity-0 group-hover:opacity-100">
-                        <svg class="mx-auto w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </div>
-                </div>
-            </a>
-            @endforeach
-        </div>
+                        <!-- Arrow -->
+                        <div class="mt-5 w-8 h-8 bg-gray-100 group-hover:bg-primary rounded-full flex items-center justify-center transition-all duration-300">
+                            <i class="fas fa-arrow-right text-xs text-gray-400 group-hover:text-white transition-colors duration-300"></i>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
         @else
-        <div class="py-20 text-center bg-white shadow rounded-2xl">
-            <p class="mb-4 text-2xl text-gray-500">No event categories available</p>
-            <p class="text-gray-400">Please add active categories in the admin panel.</p>
-        </div>
+            <div class="py-24 text-center bg-white rounded-3xl shadow-sm border border-gray-100">
+                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-5">
+                    <i class="fas fa-th-large text-gray-400 text-3xl"></i>
+                </div>
+                <h3 class="font-raleway text-xl font-black text-gray-600 mb-2">No Categories Yet</h3>
+                <p class="text-gray-400 text-sm">Please add active categories from the admin panel.</p>
+                <a href="{{ route('home') }}" class="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-darkBlue transition-colors text-sm">
+                    <i class="fas fa-home"></i> Back to Home
+                </a>
+            </div>
         @endif
+
     </div>
 </section>
 

@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
        View::composer('*', function ($view) {
-            $company = CompanyInfo::first(); // Fetch company data
+            $company = CompanyInfo::first() ?? new CompanyInfo();
 
             $view->with('company', $company);
 

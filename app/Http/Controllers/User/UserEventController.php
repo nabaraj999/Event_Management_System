@@ -27,12 +27,9 @@ class UserEventController extends Controller
     // Base query: only published, upcoming events from ACTIVE organizers
     $query = Event::query()
         ->with(['category', 'organizer'])
-        ->where('status', 'published')
+        ->visibleToUsers()
         ->where('start_date', '>=', now())
-        ->whereHas('organizer', function ($q) {
-            $q->where('status', 'approved')
-              ->where('is_frozen', true);  // Active only (your admin logic)
-        });
+        ->whereHas('organizer');
 
     // Keyword search
     if ($request->filled('query')) {
@@ -66,7 +63,7 @@ class UserEventController extends Controller
 
     // Sorting
     $sort = $request->input('sort', 'newest');
-    $query->orderBy('start_date', $sort === 'oldest' ? 'desc' : 'asc');
+    $query->orderBy('start_date', $sort === 'oldest' ? 'asc' : 'desc');
 
     // Paginate
     $events = $query->paginate(12)->withQueryString();
@@ -78,11 +75,10 @@ class UserEventController extends Controller
         ->get();
 
     // Active organizers only (with upcoming event count)
-    $organizers = OrganizerApplication::where('status', 'approved')
-        ->where('is_frozen', true)  // Active only
+    $organizers = OrganizerApplication::active()
         ->withCount([
             'events as upcoming_events_count' => fn($q) =>
-                $q->where('status', 'published')
+                $q->visibleToUsers()
                   ->where('start_date', '>=', now())
         ])
         ->orderBy('organization_name')
@@ -96,8 +92,13 @@ class UserEventController extends Controller
      */
     public function show(Event $event)
     {
-        // Only allow published and upcoming/present events
-        if ($event->status !== 'published' || $event->start_date < now()) {
+        $isVisible = Event::query()
+            ->visibleToUsers()
+            ->notEnded()
+            ->whereKey($event->id)
+            ->exists();
+
+        if (! $isVisible) {
             abort(404);
         }
 
@@ -119,7 +120,7 @@ class UserEventController extends Controller
 
         // Fallback: Same category
         if ($relatedEvents->isEmpty() && $event->category_id) {
-            $relatedEvents = Event::published()
+            $relatedEvents = Event::visibleToUsers()
                 ->upcoming()
                 ->where('category_id', $event->category_id)
                 ->where('id', '!=', $event->id)
@@ -130,7 +131,7 @@ class UserEventController extends Controller
 
         // Final fallback: Featured or recent upcoming
         if ($relatedEvents->isEmpty()) {
-            $relatedEvents = Event::published()
+            $relatedEvents = Event::visibleToUsers()
                 ->upcoming()
                 ->where('id', '!=', $event->id)
                 ->orderByDesc('is_featured')
